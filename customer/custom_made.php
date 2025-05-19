@@ -188,8 +188,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 $success = true;
                 
-                // Redirect after 3 seconds
-                header("refresh:3;url=index.php");
+                // Don't redirect immediately, show modal instead
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var successModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+                        successModal.show();
+                    });
+                </script>";
             } catch (Exception $e) {
                 // Roll back the transaction if something failed
                 $conn->rollback();
@@ -465,6 +470,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="orderSuccessModalLabel"><i class="fas fa-check-circle me-2"></i> Order Submitted Successfully!</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <div class="mb-4">
+              <i class="fas fa-tshirt fa-3x text-success mb-3"></i>
+              <h4>Thank you for your order!</h4>
+              <p class="mb-0">Your custom made clothing order has been submitted.</p>
+              <p class="mb-3">Order ID: <strong><?php echo $order_id; ?></strong></p>
+              <div class="alert alert-light border">
+                <p class="mb-1"><strong>Next steps:</strong></p>
+                <ul class="text-start mb-0">
+                  <li>Our staff will review your order details</li>
+                  <li>You'll receive a notification when your order is approved</li>
+                  <?php if ($needs_seamstress): ?>
+                    <li>We'll confirm your seamstress appointment date</li>
+                  <?php endif; ?>
+                  <li>Payment will be collected once your order is approved</li>
+                </ul>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+              <a href="index.php" class="btn btn-primary me-2">
+                <i class="fas fa-home me-1"></i> Go to Dashboard
+              </a>
+              <a href="orders.php" class="btn btn-outline-secondary">
+                <i class="fas fa-list-alt me-1"></i> View My Orders
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap & JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -522,6 +566,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Initialize form
         window.addEventListener('DOMContentLoaded', function() {
             toggleMeasurementOptions();
+            
+            // Check if success is true and show modal
+            <?php if ($success): ?>
+            var successModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+            successModal.show();
+            
+            // Handle modal dismissal
+            document.getElementById('orderSuccessModal').addEventListener('hidden.bs.modal', function () {
+                window.location.href = 'index.php';
+            });
+            <?php endif; ?>
         });
     </script>
 </body>

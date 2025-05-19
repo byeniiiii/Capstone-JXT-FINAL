@@ -38,213 +38,199 @@ if (!in_array($_SESSION['role'], $allowed_roles)) {
 // Include database connection
 include '../db.php';
 
-// Get filter parameters
-$date_from = isset($_GET['date_from']) ? $_GET['date_from'] : date('Y-m-d', strtotime('-30 days'));
-$date_to = isset($_GET['date_to']) ? $_GET['date_to'] : date('Y-m-d');
-$order_status = isset($_GET['order_status']) ? $_GET['order_status'] : 'all';
-$order_type = isset($_GET['order_type']) ? $_GET['order_type'] : 'all';
-$search_query = isset($_GET['search']) ? $_GET['search'] : '';
+// Check if user is logged in and has Staff role
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Staff') {
+    header("Location: ../index.php");
+    exit();
+}
 
-// Build the base query
-$query = "SELECT o.*, 
-          c.first_name AS customer_fname, c.last_name AS customer_lname,
-          s.first_name AS staff_fname, s.last_name AS staff_lname
-          FROM orders o
-          LEFT JOIN customers c ON o.customer_id = c.customer_id
-          LEFT JOIN users s ON o.staff_id = s.user_id
-          WHERE 1=1";
+// Set default filter values
+$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+$status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
+$type_filter = isset($_GET['type']) ? $_GET['type'] : 'all';
 
-$params = array();
-$types = "";
+// Build the WHERE clause based on filters
+$where_conditions = [];
+$params = [];
+$types = '';
 
 // Add date range filter
-if ($date_from && $date_to) {
-    $query .= " AND DATE(o.created_at) BETWEEN ? AND ?";
-    $params[] = $date_from;
-    $params[] = $date_to;
-    $types .= "ss";
-}
+$where_conditions[] = "o.created_at BETWEEN ? AND ?";
+$params[] = $start_date . ' 00:00:00';
+$params[] = $end_date . ' 23:59:59';
+$types .= "ss";
 
-// Add status filter
-if ($order_status != 'all') {
-    $query .= " AND o.order_status = ?";
-    $params[] = $order_status;
+// Add status filter if not 'all'
+if ($status_filter != 'all') {
+    $where_conditions[] = "o.order_status = ?";
+    $params[] = $status_filter;
     $types .= "s";
 }
 
-// Add order type filter
-if ($order_type != 'all') {
-    $query .= " AND o.order_type = ?";
-    $params[] = $order_type;
+// Add type filter if not 'all'
+if ($type_filter != 'all') {
+    $where_conditions[] = "o.order_type = ?";
+    $params[] = $type_filter;
     $types .= "s";
 }
 
-// Add search filter
-if ($search_query) {
-    $query .= " AND (o.order_id LIKE ? OR 
-                     CONCAT(c.first_name, ' ', c.last_name) LIKE ? OR
-                     CONCAT(s.first_name, ' ', s.last_name) LIKE ?)";
-    $search_param = "%$search_query%";
-    $params[] = $search_param;
-    $params[] = $search_param;
-    $params[] = $search_param;
-    $types .= "sss";
-}
+// Combine WHERE conditions
+$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
 
-// Add sorting
-$query .= " ORDER BY o.created_at DESC";
+// Prepare the SQL query
+$query = "SELECT o.*, c.first_name, c.last_name, c.phone_number,
+          u.first_name AS staff_fname, u.last_name AS staff_lname,
+          m.first_name AS manager_fname, m.last_name AS manager_lname,
+          p.method AS payment_method
+          FROM orders o
+          LEFT JOIN customers c ON o.customer_id = c.customer_id
+          LEFT JOIN users u ON o.staff_id = u.user_id
+          LEFT JOIN users m ON o.manager_id = m.user_id
+          LEFT JOIN payments p ON o.payment_id = p.payment_id
+          $where_clause
+          ORDER BY o.created_at DESC";
 
-// Prepare and execute the query
+// Use prepared statement
 $stmt = $conn->prepare($query);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
+if ($stmt) {
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $orders = $result->fetch_all(MYSQLI_ASSOC);
+} else {
+    $orders = [];
+    // Handle error
 }
-$stmt->execute();
-$result = $stmt->get_result();
 
-// Get all possible order statuses for filter dropdown
-$all_statuses_query = "SELECT DISTINCT order_status FROM orders";
-$all_statuses_result = mysqli_query($conn, $all_statuses_query);
+// Get distinct order statuses for filter
+$status_query = "SELECT DISTINCT order_status FROM orders ORDER BY order_status";
+$status_result = $conn->query($status_query);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" type="image/png" href="../image/logo.png">
-    <title>JXT Staff - Order Reports</title>
-
-    <!-- Custom fonts -->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Custom styles -->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <link href="css/custom.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Reports - JX Tailoring</title>
+    <?php include 'includes/header_scripts.php'; ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">
+    <style>
+        .filter-section {
+            background-color: #f8f9fc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .btn-export {
+            margin-right: 8px;
+        }
+    </style>
 </head>
-
 <body id="page-top">
     <div id="wrapper">
         <?php include 'sidebar.php'; ?>
-        
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <ul class="navbar-nav ml-auto">
-                        <?php include 'notification.php'; ?>
-                    </ul>
-                </nav>
-
+                <?php include 'topbar.php'; ?>
                 <div class="container-fluid">
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Order Reports</h1>
-                    </div>
-
+                    <h1 class="h3 mb-4 text-gray-800">Order Reports</h1>
+                    
                     <!-- Filters -->
-                    <div class="card filter-card mb-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Filter Options</h6>
+                        </div>
                         <div class="card-body">
-                            <form method="GET" class="row g-3">
-                                <div class="col-md-2">
-                                    <label class="form-label">Date From</label>
-                                    <input type="date" class="form-control" name="date_from" value="<?php echo $date_from; ?>">
+                            <form method="GET" class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="start_date" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" value="<?= htmlspecialchars($start_date) ?>">
                                 </div>
-                                
-                                <div class="col-md-2">
-                                    <label class="form-label">Date To</label>
-                                    <input type="date" class="form-control" name="date_to" value="<?php echo $date_to; ?>">
+                                <div class="col-md-3">
+                                    <label for="end_date" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" value="<?= htmlspecialchars($end_date) ?>">
                                 </div>
-                                
                                 <div class="col-md-2">
-                                    <label class="form-label">Order Status</label>
-                                    <select class="form-select" name="order_status">
-                                        <option value="all">All</option>
-                                        <?php
-                                        if ($all_statuses_result && mysqli_num_rows($all_statuses_result) > 0) {
-                                            while ($status = mysqli_fetch_assoc($all_statuses_result)) {
-                                                $selected = $order_status == $status['order_status'] ? 'selected' : '';
-                                                echo "<option value='" . htmlspecialchars($status['order_status']) . "' $selected>" . 
-                                                     ucfirst(str_replace('_', ' ', $status['order_status'])) . 
-                                                     "</option>";
-                                            }
-                                        }
-                                        ?>
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-control" id="status" name="status">
+                                        <option value="all" <?= $status_filter == 'all' ? 'selected' : '' ?>>All Statuses</option>
+                                        <?php while ($status = $status_result->fetch_assoc()): ?>
+                                            <option value="<?= htmlspecialchars($status['order_status']) ?>" 
+                                                <?= $status_filter == $status['order_status'] ? 'selected' : '' ?>>
+                                                <?= ucfirst(str_replace('_', ' ', $status['order_status'])) ?>
+                                            </option>
+                                        <?php endwhile; ?>
                                     </select>
                                 </div>
-                                
                                 <div class="col-md-2">
-                                    <label class="form-label">Order Type</label>
-                                    <select class="form-select" name="order_type">
-                                        <option value="all" <?php echo $order_type == 'all' ? 'selected' : ''; ?>>All</option>
-                                        <option value="sublimation" <?php echo $order_type == 'sublimation' ? 'selected' : ''; ?>>Sublimation</option>
-                                        <option value="tailoring" <?php echo $order_type == 'tailoring' ? 'selected' : ''; ?>>Tailoring</option>
+                                    <label for="type" class="form-label">Type</label>
+                                    <select class="form-control" id="type" name="type">
+                                        <option value="all" <?= $type_filter == 'all' ? 'selected' : '' ?>>All Types</option>
+                                        <option value="alteration" <?= $type_filter == 'alteration' ? 'selected' : '' ?>>Alteration</option>
+                                        <option value="custom" <?= $type_filter == 'custom' ? 'selected' : '' ?>>Custom</option>
+                                        <option value="repair" <?= $type_filter == 'repair' ? 'selected' : '' ?>>Repair</option>
+                                        <option value="sublimation" <?= $type_filter == 'sublimation' ? 'selected' : '' ?>>Sublimation</option>
                                     </select>
                                 </div>
-                                
                                 <div class="col-md-2">
-                                    <label class="form-label">Search</label>
-                                    <input type="text" class="form-control" name="search" value="<?php echo htmlspecialchars($search_query); ?>" placeholder="Search orders...">
-                                </div>
-                                
-                                <div class="col-md-2 d-flex align-items-end">
                                     <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                                 </div>
                             </form>
                         </div>
                     </div>
-
+                    
                     <!-- Orders Table -->
                     <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Orders Report</h6>
+                        </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="ordersTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>Order ID</th>
+                                            <th>Date</th>
                                             <th>Customer</th>
-                                            <th>Order Type</th>
-                                            <th>Order Date</th>
+                                            <th>Type</th>
                                             <th>Status</th>
-                                            <th>Total Amount</th>
+                                            <th>Payment Status</th>
+                                            <th>Amount</th>
                                             <th>Staff</th>
-                                            <th>Action</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php while ($order = mysqli_fetch_assoc($result)): ?>
+                                        <?php foreach ($orders as $order): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($order['order_id']); ?></td>
-                                                <td><?php echo htmlspecialchars($order['customer_fname'] . ' ' . $order['customer_lname']); ?></td>
-                                                <td><?php echo ucfirst(htmlspecialchars($order['order_type'])); ?></td>
-                                                <td><?php echo date('M d, Y', strtotime($order['created_at'])); ?></td>
+                                                <td><?= htmlspecialchars($order['order_id']) ?></td>
+                                                <td><?= date('M d, Y', strtotime($order['created_at'])) ?></td>
+                                                <td><?= htmlspecialchars($order['first_name'] . ' ' . $order['last_name']) ?></td>
+                                                <td><?= ucfirst(htmlspecialchars($order['order_type'])) ?></td>
                                                 <td>
-                                                    <span class="badge bg-<?php 
-                                                        echo match($order['order_status']) {
-                                                            'pending' => 'warning',
-                                                            'approved' => 'primary',
-                                                            'in_process' => 'info',
-                                                            'ready_for_pickup' => 'success',
-                                                            'completed' => 'secondary',
-                                                            'declined' => 'danger',
-                                                            default => 'secondary'
-                                                        };
-                                                    ?>">
-                                                        <?php echo ucfirst(str_replace('_', ' ', $order['order_status'])); ?>
+                                                    <span class="badge bg-<?= getStatusBadgeClass($order['order_status']) ?>">
+                                                        <?= ucfirst(str_replace('_', ' ', $order['order_status'])) ?>
                                                     </span>
                                                 </td>
-                                                <td>₱<?php echo number_format($order['total_amount'], 2); ?></td>
-                                                <td><?php echo htmlspecialchars($order['staff_fname'] . ' ' . $order['staff_lname']); ?></td>
                                                 <td>
-                                                    <a href="view_order.php?id=<?php echo $order['order_id']; ?>" 
-                                                       class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-eye"></i> View
+                                                    <span class="badge bg-<?= getPaymentBadgeClass($order['payment_status']) ?>">
+                                                        <?= ucfirst(str_replace('_', ' ', $order['payment_status'])) ?>
+                                                    </span>
+                                                </td>
+                                                <td>₱<?= number_format($order['total_amount'], 2) ?></td>
+                                                <td><?= $order['staff_fname'] ? htmlspecialchars($order['staff_fname'] . ' ' . $order['staff_lname']) : 'N/A' ?></td>
+                                                <td>
+                                                    <a href="view_order.php?id=<?= $order['order_id'] ?>" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
                                                 </td>
                                             </tr>
-                                        <?php endwhile; ?>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -252,28 +238,95 @@ $all_statuses_result = mysqli_query($conn, $all_statuses_query);
                     </div>
                 </div>
             </div>
+            <?php include 'includes/footer.php'; ?>
         </div>
     </div>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     
-    <!-- DataTables -->
-    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <?php include 'includes/scripts.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
     
     <script>
+        // Helper functions for status badges
+        <?php
+        function getStatusBadgeClass($status) {
+            switch ($status) {
+                case 'pending_approval':
+                    return 'warning';
+                case 'approved':
+                    return 'info';
+                case 'completed':
+                    return 'success';
+                case 'ready_for_pickup':
+                    return 'primary';
+                case 'in_process':
+                    return 'secondary';
+                case 'declined':
+                    return 'danger';
+                default:
+                    return 'secondary';
+            }
+        }
+        
+        function getPaymentBadgeClass($status) {
+            switch ($status) {
+                case 'paid':
+                case 'fully_paid':
+                    return 'success';
+                case 'partial':
+                case 'downpayment_paid':
+                    return 'warning';
+                case 'unpaid':
+                    return 'danger';
+                default:
+                    return 'secondary';
+            }
+        }
+        ?>
+        
         $(document).ready(function() {
+            // Date picker initialization
+            flatpickr("#start_date", {
+                dateFormat: "Y-m-d"
+            });
+            
+            flatpickr("#end_date", {
+                dateFormat: "Y-m-d"
+            });
+            
+            // Initialize DataTable with export buttons
             $('#ordersTable').DataTable({
-                "order": [[3, "desc"]], // Sort by order date by default
-                "pageLength": 25
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i> Excel',
+                        className: 'btn btn-sm btn-success btn-export',
+                        title: 'JX Tailoring Orders Report <?= date("Y-m-d") ?>'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf"></i> PDF',
+                        className: 'btn btn-sm btn-danger btn-export',
+                        title: 'JX Tailoring Orders Report <?= date("Y-m-d") ?>'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i> Print',
+                        className: 'btn btn-sm btn-primary btn-export',
+                        title: 'JX Tailoring Orders Report'
+                    }
+                ],
+                responsive: true,
+                pageLength: 25
             });
         });
     </script>

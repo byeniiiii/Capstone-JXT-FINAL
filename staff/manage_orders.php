@@ -643,6 +643,7 @@ while ($row = mysqli_fetch_assoc($count_result)) {
                                                     </td>
                                                
 <td>
+    <!-- Replace dropdown with icons in the actions column -->
     <!-- View Details Icon - Always shown for all statuses -->
     <a href="view_order.php?id=<?php echo $order['order_id']; ?>" 
        class="btn btn-sm btn-outline-secondary me-1" 
@@ -1067,6 +1068,94 @@ function markInProcess(orderId) {
                 icon: 'error',
                 title: 'Error',
                 text: 'Failed to check order status: ' + error
+            });
+        }
+    });
+}
+
+// Function to mark an order as ready for pickup
+function markReady(orderId) {
+    // Confirm with the user
+    Swal.fire({
+        title: 'Mark as Ready for Pickup?',
+        text: "This will update the order status to 'Ready for Pickup'.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#17a2b8', // Info blue color
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, mark as ready'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Updating order status',
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+            
+            // Send AJAX request
+            $.ajax({
+                url: 'update_order_status.php',
+                type: 'POST',
+                data: {
+                    order_id: orderId,
+                    status: 'ready_for_pickup',
+                    notes: 'Order is ready for pickup.'
+                },
+                success: function(response) {
+                    try {
+                        const data = typeof response === 'string' ? JSON.parse(response) : response;
+                        
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Status Updated!',
+                                text: 'Order has been marked as ready for pickup.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'An error occurred while updating status.'
+                            });
+                        }
+                    } catch(e) {
+                        // Handle non-JSON responses
+                        if (response === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Status Updated!',
+                                text: 'Order has been marked as ready for pickup.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while updating status: ' + response
+                            });
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX error:", xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Server error: ' + error
+                    });
+                }
             });
         }
     });

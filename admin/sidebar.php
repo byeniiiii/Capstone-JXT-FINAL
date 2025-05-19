@@ -27,6 +27,40 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
             <span>Dashboard</span>
         </a>
     </li>
+    
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">Transactions</div>
+
+    <!-- Nav Item - Approve Orders -->
+    <li class="nav-item <?= ($current_page == 'approve_orders.php') ? 'active' : ''; ?>">
+        <a class="nav-link" href="approve_orders.php">
+            <i class="fas fa-check-circle"></i>
+            <span>Approve Orders</span>
+            <?php
+            // Count pending orders
+            if(isset($conn)) {
+                $pending_count_query = "SELECT COUNT(*) as count FROM orders WHERE order_status = 'pending_approval'";
+                $pending_result = $conn->query($pending_count_query);
+                if ($pending_result && $row = $pending_result->fetch_assoc()) {
+                    $pending_count = $row['count'];
+                    if ($pending_count > 0) {
+                        echo '<span class="badge badge-danger badge-counter">' . $pending_count . '</span>';
+                    }
+                }
+            }
+            ?>
+        </a>
+    </li>
+
+    <li class="nav-item <?= ($current_page == 'approve_payments.php') ? 'active' : ''; ?>">
+        <a class="nav-link" href="approve_payments.php">
+            <i class="fas fa-history"></i>
+            <span>Approve Payments</span>
+        </a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider">
@@ -58,13 +92,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
         <a class="nav-link" href="order_reports.php">
             <i class="fas fa-shopping-cart"></i>
             <span>Order Reports</span>
-        </a>
-    </li>
-
-    <li class="nav-item <?= ($current_page == 'sales_report.php') ? 'active' : ''; ?>">
-        <a class="nav-link" href="sales_report.php">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Sales Report</span>
         </a>
     </li>
 

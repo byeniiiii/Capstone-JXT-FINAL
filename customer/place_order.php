@@ -89,7 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Sanitize and validate inputs
     $order_type = mysqli_real_escape_string($conn, $_POST['order_type']);
-    $total_amount = floatval($_POST['total_amount']); // Ensure it's a valid number
+    
+    // Set total_amount to 0 initially - actual price will be set later
+    $total_amount = 0;
     
     // Add template_id handling if provided
     $template_id = isset($_POST['template_id']) ? mysqli_real_escape_string($conn, $_POST['template_id']) : null;
@@ -99,10 +101,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Invalid order type");
     }
     
-    // Validate total amount
-    if ($total_amount < 100) {
-        die("Minimum order amount is ₱100.00");
-    }
+    // Remove minimum amount validation
+    // if ($total_amount < 100) {
+    //     die("Minimum order amount is ₱100.00");
+    // }
     
     // Use prepared statement for better security
     $query = "INSERT INTO orders (order_id, customer_id, order_type, total_amount) VALUES (?, ?, ?, ?)";
@@ -126,7 +128,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+// Add this after loading customer data but before HTML output
 $selected_template_id = $_GET['template_id'] ?? null;
+$selected_template = null;
+
+if ($selected_template_id) {
+    // Fetch the template details
+    $template_query = "SELECT t.*, u.first_name, u.last_name 
+                      FROM templates t 
+                      JOIN users u ON t.added_by = u.user_id 
+                      WHERE t.template_id = ?";
+    $stmt = $conn->prepare($template_query);
+    $stmt->bind_param("i", $selected_template_id);
+    $stmt->execute();
+    $template_result = $stmt->get_result();
+    $selected_template = $template_result->fetch_assoc();
+}
 ?>
 
 <!DOCTYPE html>
@@ -437,34 +454,45 @@ $selected_template_id = $_GET['template_id'] ?? null;
                             </div>
                             
                             <div class="mb-4">
-                                <label class="form-label">Select Order Type:</label>
-                                
-                                <div class="type-card" onclick="selectOrderType('sublimation')">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="order_type" id="sublimation" value="sublimation" required>
-                                        <label class="form-check-label fw-bold" for="sublimation">Sublimation</label>
+                                <label class="form-label">Order Type</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="type-card" onclick="selectOrderType('sublimation')">
+                                            <div class="type-icon">
+                                                <i class="fas fa-tshirt"></i>
+                                            </div>
+                                            <div class="type-details">
+                                                <h5>Sublimation</h5>
+                                                <p>Custom jersey & uniform printing</p>
+                                                <input type="radio" id="sublimation" name="order_type" value="sublimation" checked class="visually-hidden">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="mb-0 mt-2 small text-muted">Custom printed jerseys, sportswear and apparel with your designs.</p>
-                                </div>
-                                
-                                <div class="type-card" onclick="selectOrderType('tailoring')">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="order_type" id="tailoring" value="tailoring" required>
-                                        <label class="form-check-label fw-bold" for="tailoring">Tailoring</label>
+                                    <div class="col-md-6">
+                                        <div class="type-card" onclick="selectOrderType('tailoring')">
+                                            <div class="type-icon">
+                                                <i class="fas fa-cut"></i>
+                                            </div>
+                                            <div class="type-details">
+                                                <h5>Tailoring</h5>
+                                                <p>Custom garment creation & alterations</p>
+                                                <input type="radio" id="tailoring" name="order_type" value="tailoring" class="visually-hidden">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="mb-0 mt-2 small text-muted">Custom-made clothing tailored to your specific measurements.</p>
-                                </div>
+                                </div>  
                             </div>
                             
                             <div class="mb-4">
-                                <label class="form-label" for="total_amount">Budget Amount (₱):</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-peso-sign"></i></span>
-                                    <input type="number" class="form-control" id="total_amount" name="total_amount" step="0.01" min="100" required>
-                                </div>
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle me-1"></i> Minimum order amount is ₱100.00
-                                </div>
+                                <label class="form-label">Pricing:</label>
+                                <p class="mb-0" id="pricing_info">Please proceed to see detailed pricing options</p>
+                                
+                                <!-- Hidden field for the total amount - initial value set to 0 -->
+                                <input type="hidden" id="total_amount" name="total_amount" value="0">
+                                
+                                <!-- Remove these base price hidden fields -->
+                                <!-- <input type="hidden" id="sublimation_base_price" value="400.00"> -->
+                                <!-- <input type="hidden" id="tailoring_base_price" value="300.00"> -->
                             </div>
                             
                             <button type="submit" class="btn btn-primary w-100">
@@ -557,6 +585,66 @@ $selected_template_id = $_GET['template_id'] ?? null;
         </div>
     </div>
     
+    <!-- Template Modal -->
+    <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="templateModalLabel">Select a Template</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Template filters -->
+                    <div class="mb-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active template-filter" data-category="all">All</button>
+                            <?php
+                            // Get unique categories
+                            $category_query = "SELECT DISTINCT category FROM templates WHERE category IS NOT NULL";
+                            $category_result = $conn->query($category_query);
+                            while ($category = $category_result->fetch_assoc()) {
+                                echo '<button type="button" class="btn btn-outline-primary template-filter" data-category="'
+                                    . htmlspecialchars($category['category']) . '">' 
+                                    . htmlspecialchars($category['category']) . '</button>';
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Template grid -->
+                    <div class="row g-3 template-grid">
+                        <?php 
+                        // Fetch all templates
+                        $templates_query = "SELECT t.*, u.first_name, u.last_name FROM templates t JOIN users u ON t.added_by = u.user_id";
+                        $templates_result = $conn->query($templates_query);
+                        
+                        while ($template = $templates_result->fetch_assoc()) {
+                            $image = $template['image_path'] ? '../sublimator/uploads/' . basename($template['image_path']) : 'placeholder.jpg';
+                        ?>
+                        <div class="col-md-4 template-item" data-category="<?php echo htmlspecialchars($template['category'] ?? 'all'); ?>">
+                            <div class="card h-100 <?php echo ($selected_template_id == $template['template_id']) ? 'border-primary' : ''; ?>" 
+                                 onclick="selectTemplate(<?php echo $template['template_id']; ?>, '<?php echo htmlspecialchars($template['name']); ?>', <?php echo $template['price']; ?>, '<?php echo $image; ?>')">
+                                <img src="<?php echo $image; ?>" class="card-img-top template-thumbnail" alt="<?php echo htmlspecialchars($template['name']); ?>">
+                                <div class="card-body">
+                                    <h6 class="card-title"><?php echo htmlspecialchars($template['name']); ?></h6>
+                                    <p class="card-text small">
+                                        <span class="badge bg-secondary"><?php echo htmlspecialchars($template['category'] ?? 'Uncategorized'); ?></span>
+                                    </p>
+                                    <p class="card-text fw-bold">₱<?php echo number_format($template['price'], 2); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmTemplateBtn" data-bs-dismiss="modal">Confirm Selection</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Bootstrap & JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -589,6 +677,20 @@ $selected_template_id = $_GET['template_id'] ?? null;
         
         // Add selected class to clicked card
         document.getElementById(type).closest('.type-card').classList.add('selected');
+        
+        // Update pricing based on type
+        const totalAmountField = document.getElementById('total_amount');
+        const pricingInfo = document.getElementById('pricing_info');
+        
+        if (type === 'sublimation') {
+            const basePrice = parseFloat(document.getElementById('sublimation_base_price').value);
+            totalAmountField.value = basePrice.toFixed(2);
+            pricingInfo.innerHTML = `<span class="fw-bold">Sublimation Package:</span> ₱${basePrice.toFixed(2)} <small class="text-muted">(Base price for standard design)</small>`;
+        } else if (type === 'tailoring') {
+            const basePrice = parseFloat(document.getElementById('tailoring_base_price').value);
+            totalAmountField.value = basePrice.toFixed(2);
+            pricingInfo.innerHTML = `<span class="fw-bold">Tailoring Package:</span> ₱${basePrice.toFixed(2)} <small class="text-muted">(Base price for standard service)</small>`;
+        }
     }
 
     // Function to show the sublimation form and select template
@@ -643,109 +745,112 @@ function highlightSelectedTemplate(templateId) {
         
         // Add it to the form
         document.querySelector('form').appendChild(hiddenInput);
-    }
-    
-    // Modify form submission to include the template_id when redirecting
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const orderType = document.querySelector('input[name="order_type"]:checked').value;
         
-        // If sublimation is selected and we have a template_id, prevent default form submission
-        if (orderType === 'sublimation' && templateId) {
-            e.preventDefault();
-            
-            // Get the total amount
-            const totalAmount = document.getElementById('total_amount').value;
-            
-            // Submit the form via AJAX with proper data
-            fetch('place_order.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `order_type=sublimation&total_amount=${totalAmount}&template_id=${templateId}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                // Check if the response is a redirect
-                const redirectUrl = response.url;
-                if (redirectUrl && redirectUrl !== window.location.href) {
-                    // If it's a redirect, extract the order_id from the URL
-                    const urlParams = new URLSearchParams(redirectUrl.split('?')[1]);
-                    const orderId = urlParams.get('order_id');
-                    
-                    if (orderId) {
-                        // If we found an order_id, redirect to sublimation_order_request with both IDs
-                        window.location.href = `sublimation_order_request.php?order_id=${orderId}&template_id=${templateId}`;
-                        return null; // Stop processing
-                    }
-                }
-                // If we couldn't extract from redirect, try parsing the response text
-                return response.text();
-            })
-            .then(html => {
-                if (!html) return; // Skip if we already redirected
-                
-                // Look for the order ID in the HTML response (just check for the pattern)
-                const match = html.match(/order_id=([A-Z0-9]+)/);
-                if (match && match[1]) {
-                    const orderId = match[1];
-                    // Redirect to sublimation_order_request.php with both order_id and template_id
-                    window.location.href = `sublimation_order_request.php?order_id=${orderId}&template_id=${templateId}`;
-                } else {
-                    // Direct submission approach as fallback
-                    console.log("Could not extract order_id from response, using direct form submission");
-                    // Create a hidden form to submit instead of trying to parse the HTML
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = 'place_order.php';
-                    
-                    // Add the necessary fields
-                    const fields = {
-                        'order_type': 'sublimation',
-                        'total_amount': totalAmount,
-                        'template_id': templateId
-                    };
-                    
-                    for (const key in fields) {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = fields[key];
-                        form.appendChild(input);
-                    }
-                    
-                    // Add form to body and submit
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // If AJAX fails, use direct form submission with a limited URL length
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'place_order.php';
-                
-                // Add only essential fields to prevent URL length issues
-                const fields = {
-                    'order_type': 'sublimation',
-                    'total_amount': totalAmount,
-                    'template_id': templateId
-                };
-                
-                for (const key in fields) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = fields[key];
-                    form.appendChild(input);
-                }
-                
-                document.body.appendChild(form);
-                form.submit();
+        // You can also adjust the price based on the template if needed
+        // For example, fetch template details and update price accordingly
+    }
+});
+    
+let currentSelectedTemplateId = <?php echo $selected_template_id ? $selected_template_id : 'null'; ?>;
+let currentSelectedTemplateName = '<?php echo $selected_template ? addslashes($selected_template['name']) : ''; ?>';
+let currentSelectedTemplatePrice = <?php echo $selected_template ? $selected_template['price'] : 0; ?>;
+let currentSelectedTemplateImage = '<?php echo $selected_template ? "../sublimator/uploads/" . basename($selected_template['image_path']) : ""; ?>';
+
+function openTemplateModal() {
+    // Only show template modal if sublimation is selected
+    if (document.getElementById('sublimation').checked) {
+        // Show the modal
+        new bootstrap.Modal(document.getElementById('templateModal')).show();
+    } else {
+        alert('Please select Sublimation order type to use templates.');
+        selectOrderType('sublimation');
+    }
+}
+
+function selectTemplate(templateId, templateName, templatePrice, templateImage) {
+    // Update highlighted template in modal
+    document.querySelectorAll('.template-item .card').forEach(card => {
+        card.classList.remove('border-primary');
+    });
+    event.currentTarget.classList.add('border-primary');
+    
+    // Store selected template info
+    currentSelectedTemplateId = templateId;
+    currentSelectedTemplateName = templateName;
+    currentSelectedTemplatePrice = templatePrice;
+    currentSelectedTemplateImage = templateImage;
+    
+    // Update hidden field
+    document.getElementById('template_id').value = templateId;
+    
+    // Update pricing based on template
+    document.getElementById('total_amount').value = templatePrice.toFixed(2);
+    document.getElementById('pricing_info').innerHTML = `<span class="fw-bold">Selected template:</span> ${templateName} - ₱${templatePrice.toFixed(2)}`;
+}
+
+// Filter templates in modal
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.template-filter').forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active button
+            document.querySelectorAll('.template-filter').forEach(btn => {
+                btn.classList.remove('active');
             });
+            this.classList.add('active');
+            
+            // Get selected category
+            const category = this.getAttribute('data-category');
+            
+            // Filter templates
+            document.querySelectorAll('.template-item').forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Update the form when template selection is confirmed
+    document.getElementById('confirmTemplateBtn').addEventListener('click', function() {
+        if (currentSelectedTemplateId) {
+            // Update the template display
+            const templateSection = document.getElementById('template_section');
+            
+            // Create or update the selected template card
+            let selectedCard = document.querySelector('.template-card.selected');
+            if (!selectedCard) {
+                // Create new card if it doesn't exist
+                const cardContainer = document.createElement('div');
+                cardContainer.className = 'col-md-4';
+                
+                cardContainer.innerHTML = `
+                    <div class="template-card selected">
+                        <div class="template-image">
+                            <img src="${currentSelectedTemplateImage}" alt="${currentSelectedTemplateName}">
+                        </div>
+                        <div class="template-details">
+                            <h5>${currentSelectedTemplateName}</h5>
+                            <p class="template-price">₱${currentSelectedTemplatePrice.toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Insert before the browse more card
+                const browseCard = document.querySelector('.template-browse').closest('.col-md-4');
+                templateSection.querySelector('.row').insertBefore(cardContainer, browseCard);
+            } else {
+                // Update existing card
+                selectedCard.querySelector('img').src = currentSelectedTemplateImage;
+                selectedCard.querySelector('h5').textContent = currentSelectedTemplateName;
+                selectedCard.querySelector('.template-price').textContent = `₱${currentSelectedTemplatePrice.toFixed(2)}`;
+            }
+            
+            // Update form fields
+            document.getElementById('template_id').value = currentSelectedTemplateId;
+            document.getElementById('total_amount').value = currentSelectedTemplatePrice.toFixed(2);
+            document.getElementById('pricing_info').innerHTML = `<span class="fw-bold">Selected template:</span> ${currentSelectedTemplateName} - ₱${currentSelectedTemplatePrice.toFixed(2)}`;
         }
     });
 });

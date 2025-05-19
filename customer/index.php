@@ -865,9 +865,19 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
                         </div>
                         <div class="template-price">₱<?php echo number_format($row['price'], 2); ?></div>
                         <div class="template-footer">
-                            <a href="<?php echo $is_logged_in ? 'place_order.php?template_id=' . $row['template_id'] : 'login.php?redirect=place_order.php&template_id=' . $row['template_id']; ?>" class="btn btn-select">
+                            <?php if ($is_logged_in): ?>
+                            <a href="javascript:void(0);" class="btn btn-select" 
+                               onclick="showSublimationOrderModal(<?php echo $row['template_id']; ?>, 
+                                                             '<?php echo addslashes($row['name']); ?>', 
+                                                             <?php echo $row['price']; ?>, 
+                                                             '<?php echo $imagePath; ?>')">
                                 <i class="fas fa-shopping-cart me-1"></i> Select Template
                             </a>
+                            <?php else: ?>
+                            <a href="login.php?redirect=index.php" class="btn btn-select">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login to Order
+                            </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -894,6 +904,132 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
     
     <!-- Include footer -->
     <?php include 'footer.php'; ?>
+
+    <!-- Sublimation Order Modal -->
+<div class="modal fade" id="sublimationOrderModal" tabindex="-1" aria-labelledby="sublimationOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="sublimationOrderModalLabel"><i class="fas fa-tshirt me-2"></i>Sublimation Order Form</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sublimationOrderForm" method="POST" action="process_sublimation_order.php" enctype="multipart/form-data">
+                    <!-- Hidden Fields -->
+                    <input type="hidden" name="template_id" id="modal_template_id">
+                    <input type="hidden" name="total_amount" id="modal_total_amount">
+                    
+                    <div class="row">
+                        <!-- Left side - Template details and preview -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="fw-bold mb-3">Selected Template</h6>
+                                    <img id="modal_template_image" src="" alt="Template Preview" class="img-fluid rounded mb-3" style="max-height: 250px; object-fit: contain;">
+                                    <h5 id="modal_template_name" class="mb-2"></h5>
+                                    <p class="text-primary fw-bold" id="modal_template_price"></p>
+                                    
+                                    <!-- Cost breakdown section -->
+                                    <div class="mt-4 text-start">
+                                        <h6 class="fw-bold">Cost Breakdown:</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td>Jerseys:</td>
+                                                <td id="jersey_cost" class="text-end"></td>
+                                            </tr>
+                                            <tr id="shorts_cost_row" style="display:none;">
+                                                <td>Shorts:</td>
+                                                <td id="shorts_cost" class="text-end"></td>
+                                            </tr>
+                                            <tr class="fw-bold">
+                                                <td>Total:</td>
+                                                <td id="modal_calculated_amount" class="text-end"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="alert alert-info mt-3 small">
+                                        <i class="fas fa-info-circle me-2"></i> This template will be customized based on your specifications.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right side - Order form -->
+                        <div class="col-md-8">
+                            <div class="row g-3">
+                                <!-- Order Type Information -->
+                                <div class="col-md-12">
+                                    <div class="card mb-3 bg-light border-0">
+                                        <div class="card-body">
+                                            <h6><i class="fas fa-info-circle me-2 text-primary"></i>Jersey Customization Details</h6>
+                                            <p class="small text-muted mb-0">Fill out the details below to customize your jersey order.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Customer Name - Only field kept from customer info -->
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="modal_full_name" name="full_name" placeholder="Full Name" required>
+                                        <label for="modal_full_name">Your Name</label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Completion Date -->
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="date" class="form-control" id="modal_completion_date" name="completion_date" required>
+                                        <label for="modal_completion_date">Completion Date</label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Design customization -->
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" id="modal_customization" name="customization" placeholder="Design requirements" style="height: 100px;"></textarea>
+                                        <label for="modal_customization">Design Requirements</label>
+                                    </div>
+                                    <div class="form-text small"><i class="fas fa-info-circle me-1"></i> Describe any specific design requirements, including colors and theme.</div>
+                                </div>
+                                
+                                <!-- Jersey Players Section -->
+                                <div class="col-md-12 mt-3">
+                                    <h6 class="fw-bold mb-3">Player Jerseys</h6>
+                                    <div id="jersey-players-container">
+                                        <!-- Initial player form will be inserted here -->
+                                    </div>
+                                    
+                                    <!-- Add more players button -->
+                                    <div class="text-center mt-3 mb-2">
+                                        <button type="button" class="btn btn-outline-primary" id="add-player-btn">
+                                            <i class="fas fa-plus me-1"></i> Add Another Player
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                
+                                <!-- Additional notes -->
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" id="modal_notes" name="notes" placeholder="Additional notes" style="height: 100px;"></textarea>
+                                        <label for="modal_notes">Additional Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="sublimationOrderForm" class="btn btn-primary">
+                    <i class="fas fa-check me-1"></i> Submit Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Bootstrap & JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -952,6 +1088,238 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
                 allCategoriesButton.click();
             }
         }
+
+        function showSublimationOrderModal(templateId, templateName, templatePrice, templateImage) {
+            // Update the modal with template information
+            document.getElementById('modal_template_id').value = templateId;
+            document.getElementById('modal_template_name').textContent = templateName;
+            document.getElementById('modal_template_price').textContent = '₱' + templatePrice.toFixed(2);
+            document.getElementById('modal_template_image').src = templateImage;
+            document.getElementById('modal_total_amount').value = templatePrice.toFixed(2);
+            
+            // Set base price
+            basePrice = templatePrice;
+            
+            // Pre-fill user information if available
+            <?php if ($is_logged_in): ?>
+            document.getElementById('modal_full_name').value = '<?php echo addslashes($customer_name); ?>';
+            <?php endif; ?>
+            
+            // Set minimum date for completion date (7 days from today)
+            const today = new Date();
+            today.setDate(today.getDate() + 7); // Minimum 7 days from now
+            const minDate = today.toISOString().split('T')[0];
+            document.getElementById('modal_completion_date').setAttribute('min', minDate);
+            
+            // Set default value to 14 days from today
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 14);
+            document.getElementById('modal_completion_date').value = defaultDate.toISOString().split('T')[0];
+            
+            // Clear existing player entries and add the first one
+            const playersContainer = document.getElementById('jersey-players-container');
+            playersContainer.innerHTML = '';
+            addPlayerForm();
+            
+            // Initialize calculated amount display
+            updateTotalAmount();
+            
+            // Show the modal
+            const sublimationOrderModal = new bootstrap.Modal(document.getElementById('sublimationOrderModal'));
+            sublimationOrderModal.show();
+        }
+
+        // Global variables for price calculation
+        let basePrice = 0;
+        const jerseyPrice = 0; // Base price is from template
+        const shortsPrice = 100; // Changed from 150 to 100 pesos
+
+        // Function to update total amount based on selections
+        function updateTotalAmount() {
+            // Count total jerseys and shorts
+            const jerseyCount = document.querySelectorAll('.player-entry').length;
+            const shortsCount = document.querySelectorAll('input[name="include_shorts[]"]:checked').length;
+            
+            // Calculate total
+            const totalAmount = (basePrice * jerseyCount) + (shortsPrice * shortsCount);
+            
+            // Update hidden field and display
+            document.getElementById('modal_total_amount').value = totalAmount.toFixed(2);
+            document.getElementById('modal_calculated_amount').textContent = '₱' + totalAmount.toFixed(2);
+            
+            // Update breakdown
+            document.getElementById('jersey_cost').textContent = `${jerseyCount} × ₱${basePrice.toFixed(2)} = ₱${(basePrice * jerseyCount).toFixed(2)}`;
+            
+            if (shortsCount > 0) {
+                document.getElementById('shorts_cost').textContent = `${shortsCount} × ₱${shortsPrice.toFixed(2)} = ₱${(shortsPrice * shortsCount).toFixed(2)}`;
+                document.getElementById('shorts_cost_row').style.display = 'table-row';
+            } else {
+                document.getElementById('shorts_cost_row').style.display = 'none';
+            }
+        }
+
+        // Function to check if jersey number is unique
+        function isJerseyNumberUnique(number, currentPlayerId) {
+            let isUnique = true;
+            const playerEntries = document.querySelectorAll('.player-entry');
+            
+            playerEntries.forEach(entry => {
+                const entryId = entry.id;
+                if (entryId !== currentPlayerId) {
+                    const numberInput = entry.querySelector('input[name="player_number[]"]');
+                    if (numberInput && numberInput.value === number) {
+                        isUnique = false;
+                    }
+                }
+            });
+            
+            return isUnique;
+        }
+
+        // Function to add a new player jersey form
+        function addPlayerForm() {
+            const playerCount = document.querySelectorAll('.player-entry').length + 1;
+            const playersContainer = document.getElementById('jersey-players-container');
+            const playerId = 'player-' + Date.now(); // Use timestamp as unique ID
+            
+            const playerHtml = `
+                <div class="player-entry card mb-3" id="${playerId}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Player #${playerCount}</h6>
+                        ${playerCount > 1 ? `<button type="button" class="btn btn-sm btn-outline-danger remove-player-btn" 
+                        onclick="removePlayer('${playerId}')">
+                        <i class="fas fa-times"></i> Remove
+                        </button>` : ''}
+
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="player_name_${playerId}" name="player_name[]" placeholder="Player Name" required>
+                                    <label for="player_name_${playerId}">Jersey Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control jersey-number" id="player_number_${playerId}" 
+                                           name="player_number[]" min="0" max="99" placeholder="Number" required
+                                           data-player-id="${playerId}">
+                                    <label for="player_number_${playerId}">Jersey Number</label>
+                                    <div class="invalid-feedback">This jersey number is already taken</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="player_size_${playerId}" name="player_size[]" required>
+                                        <option value="" disabled selected>Select size</option>
+                                        <option value="XS">XS</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+                                    </select>
+                                    <label for="player_size_${playerId}">Jersey Size</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input shorts-checkbox" type="checkbox" id="include_shorts_${playerId}" name="include_shorts[]" value="${playerId}">
+                                    <label class="form-check-label" for="include_shorts_${playerId}">
+                                        Include shorts/lower (+₱${shortsPrice.toFixed(2)})
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            playersContainer.insertAdjacentHTML('beforeend', playerHtml);
+            
+            // Add event listener for shorts checkbox - simplified
+            document.getElementById(`include_shorts_${playerId}`).addEventListener('change', function() {
+                // Update total amount when shorts are added/removed
+                updateTotalAmount();
+            });
+            
+            // Add event listener for jersey number validation
+            const jerseyNumberInput = document.getElementById(`player_number_${playerId}`);
+            jerseyNumberInput.addEventListener('change', function() {
+                const number = this.value;
+                const currentPlayerId = this.getAttribute('data-player-id');
+                
+                if (!isJerseyNumberUnique(number, currentPlayerId)) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+            
+            // Update calculated total
+            updateTotalAmount();
+        }
+
+        // Function to remove a player entry
+        function removePlayer(playerId) {
+            const playerElement = document.getElementById(playerId);
+            if (playerElement) {
+                playerElement.remove();
+                
+                // Renumber the remaining players
+                const playerEntries = document.querySelectorAll('.player-entry');
+                playerEntries.forEach((entry, index) => {
+                    entry.querySelector('.card-header h6').textContent = `Player #${index + 1}`;
+                });
+                
+                // Update total amount
+                updateTotalAmount();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Add click event for adding more players
+            document.getElementById('add-player-btn').addEventListener('click', function() {
+                addPlayerForm();
+            });
+            
+            // Form validation
+            const sublimationOrderForm = document.getElementById('sublimationOrderForm');
+            if (sublimationOrderForm) {
+                sublimationOrderForm.addEventListener('submit', function(e) {
+                    // Validate that at least one player is added
+                    const playerEntries = document.querySelectorAll('.player-entry');
+                    if (playerEntries.length === 0) {
+                        e.preventDefault();
+                        alert('Please add at least one player jersey.');
+                        return;
+                    }
+                    
+                    // Validate unique jersey numbers
+                    let hasDuplicates = false;
+                    const jerseyNumbers = [];
+                    
+                    document.querySelectorAll('.jersey-number').forEach(input => {
+                        const number = input.value;
+                        if (jerseyNumbers.includes(number)) {
+                            input.classList.add('is-invalid');
+                            hasDuplicates = true;
+                        } else {
+                            jerseyNumbers.push(number);
+                        }
+                    });
+                    
+                    if (hasDuplicates) {
+                        e.preventDefault();
+                        alert('Each player must have a unique jersey number.');
+                        return;
+                    }
+                });
+            }
+            
+            // Other existing event listeners...
+        });
     </script>
 </body>
 </html>

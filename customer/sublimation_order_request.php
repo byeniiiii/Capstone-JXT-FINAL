@@ -129,10 +129,10 @@ $selected_template_id = isset($_GET['template_id']) ? $_GET['template_id'] : nul
             <a href="index.php" class="btn btn-light btn-sm"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
         </div>
         <div class="card-body p-4">
-            <form action="submit_order.php" method="POST" enctype="multipart/form-data" class="needs-validation" onsubmit="return validateTotalAmount()" novalidate>
+            <form action="submit_order.php" method="POST" enctype="multipart/form-data" class="needs-validation" onsubmit="return validateForm()" novalidate>
                 
                 <input type="hidden" name="order_id" value="<?= htmlspecialchars($order_id); ?>">
-                <input type="hidden" id="allowed_total" value="<?= $allowed_total ?>">
+                <input type="hidden" name="total_amount" id="total_amount_field" value="0">
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -256,15 +256,21 @@ $selected_template_id = isset($_GET['template_id']) ? $_GET['template_id'] : nul
                               placeholder="Any specific requirements or details for your order..."></textarea>
                 </div>
 
-                <div class="mb-4">
-                    <label for="calculated_total" class="form-label">Total Cost (Auto-calculated):</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-calculator"></i></span>
-                        <input type="text" id="calculated_total" class="form-control price-display fw-bold" value="₱0" readonly>
-                    </div>
-                    <div class="form-text text-danger" id="total-warning" style="display: none;">
-                        <i class="fas fa-exclamation-triangle me-1"></i>
-                        Warning: Order exceeds the allowed total of ₱<span id="allowed-total-display"><?= $allowed_total ?></span>
+                <div class="mt-3 price-display p-3">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Price Breakdown:</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-tshirt me-2"></i> Jersey: Base price per player</li>
+                                <li><i class="fas fa-plus me-2"></i> Include Lower: +₱100.00 per player</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="calculated_total">Total Amount:</label>
+                                <input type="text" id="calculated_total" class="form-control-plaintext fw-bold fs-5" readonly>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -371,29 +377,89 @@ function removePlayer(button) {
 function calculateTotal(forcedPrice = null) {
     const playerCount = document.querySelectorAll(".player").length;
     let price = forcedPrice || document.getElementById("template_id").selectedOptions[0]?.getAttribute("data-price") || 0;
+    
+    // Count how many players selected "Yes" for "Include Lower"
+    let lowerCount = 0;
+    document.querySelectorAll('select[name="include_lower[]"]').forEach(select => {
+        if (select.value === "Yes") {
+            lowerCount++;
+        }
+    });
+    
+    // Base jersey price
     let total = playerCount * parseFloat(price);
+    
+    // Add ₱100 for each included lower
+    const lowerPrice = 100; // Price per lower is ₱100
+    total += lowerCount * lowerPrice;
+    
+    // Update the displayed total
     document.getElementById("calculated_total").value = `₱${total.toFixed(2)}`;
     
-    // Check if total exceeds allowed amount and show warning
-    const totalAllowed = parseFloat(document.getElementById("allowed_total").value);
-    const warningEl = document.getElementById("total-warning");
-    
-    if (total > totalAllowed) {
-        warningEl.style.display = "block";
-    } else {
-        warningEl.style.display = "none";
-    }
+    // Also update the hidden input field
+    document.getElementById("total_amount_field").value = total.toFixed(2);
     
     return total;
 }
 
-function validateTotalAmount() {
-    const totalAllowed = parseFloat(document.getElementById("allowed_total").value);
-    const calculatedTotal = calculateTotal();
-    if (calculatedTotal > totalAllowed) {
-        alert(`⚠️ Error: Order exceeds the allowed total of ₱${totalAllowed}.`);
+// Remove the validateTotalAmount function
+// function validateTotalAmount() {
+//     const total = calculateTotal();
+//     const allowed = parseFloat(document.getElementById("allowed_total").value);
+//     
+//     if (total > allowed) {
+//         if (!confirm(`Your order total (₱${total.toFixed(2)}) exceeds your budget (₱${allowed.toFixed(2)}). Do you want to proceed anyway?`)) {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
+
+function validateForm() {
+    // Remove the total amount validation
+    // if (!validateTotalAmount()) {
+    //     return false;
+    // }
+    
+    // Check for duplicate jersey numbers
+    const jerseyNumbers = [];
+    const jerseyInputs = document.querySelectorAll('input[name="jersey_number[]"]');
+    
+    let hasDuplicates = false;
+    let duplicateNumber = '';
+    
+    jerseyInputs.forEach(input => {
+        // Reset any previous error styling
+        input.classList.remove('is-invalid');
+        
+        const num = input.value.trim();
+        if (num && jerseyNumbers.includes(num)) {
+            input.classList.add('is-invalid');
+            hasDuplicates = true;
+            duplicateNumber = num;
+            
+            // Create error message if it doesn't exist
+            let errorDiv = input.parentNode.querySelector('.invalid-feedback');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback';
+                input.parentNode.appendChild(errorDiv);
+            }
+            errorDiv.textContent = 'This jersey number is already used';
+        } else if (num) {
+            jerseyNumbers.push(num);
+        }
+    });
+    
+    if (hasDuplicates) {
+        alert(`⚠️ Error: Duplicate jersey number found (${duplicateNumber}). Each jersey number must be unique.`);
         return false;
     }
+    
+    // Set the final calculated amount to the hidden field
+    const calculatedTotal = calculateTotal();
+    document.getElementById('total_amount_field').value = calculatedTotal;
+    
     return true;
 }
 
@@ -431,12 +497,118 @@ function resetForm() {
         
         // Reset validation state
         document.querySelector('form').classList.remove('was-validated');
-        
-        // Hide warning if visible
-        document.getElementById("total-warning").style.display = "none";
     }
 }
+
+// Keep all existing functions
+
+function addEventListeners() {
+    // Recalculate total when "Include Lower" changes
+    document.querySelectorAll('select[name="include_lower[]"]').forEach(select => {
+        select.addEventListener('change', calculateTotal);
+    });
+    
+    // For dynamically added players
+    document.getElementById('players').addEventListener('change', function(e) {
+        if (e.target.name === 'include_lower[]') {
+            calculateTotal();
+        }
+    });
+    
+    // Update validation for jersey numbers whenever they change
+    document.getElementById('players').addEventListener('input', function(e) {
+        if (e.target.name === 'jersey_number[]') {
+            // Clear error styling when user starts typing again
+            e.target.classList.remove('is-invalid');
+            const errorDiv = e.target.parentNode.querySelector('.invalid-feedback');
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+    });
+}
+
+// Call this when document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach event listeners
+    addEventListeners();
+    
+    // Initialize total calculation
+    calculateTotal();
+    
+    // Set up event delegation for dynamically added players
+    document.getElementById('players').addEventListener('change', function(event) {
+        if (event.target.matches('select[name="include_lower[]"]')) {
+            calculateTotal();
+        }
+    });
+});
+
+// Update addPlayer to include new event listeners
+function addPlayer() {
+    const playerContainer = document.getElementById("players");
+    const newPlayer = document.querySelector(".player").cloneNode(true);
+    
+    // Reset input values
+    newPlayer.querySelectorAll("input").forEach(input => input.value = "");
+    
+    // Reset select elements to default options
+    newPlayer.querySelectorAll("select").forEach(select => {
+        if (select.name === "size[]") {
+            select.value = "M";
+        } else if (select.name === "include_lower[]") {
+            select.value = "No";
+        }
+    });
+    
+    playerContainer.appendChild(newPlayer);
+    calculateTotal(); // recalculate on add
+    
+    // Animate the new player card
+    setTimeout(() => {
+        newPlayer.style.backgroundColor = '#f0f8ff';
+        setTimeout(() => {
+            newPlayer.style.backgroundColor = '#f8f9fa';
+        }, 500);
+    }, 10);
+}
 </script>
+
+<!-- Add a success modal for order confirmation -->
+<div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="orderSuccessModalLabel"><i class="fas fa-check-circle me-2"></i> Order Submitted Successfully!</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <div class="mb-4">
+          <i class="fas fa-tshirt fa-3x text-success mb-3"></i>
+          <h4>Thank you for your order!</h4>
+          <p class="mb-0">Your sublimation jerseys order has been submitted.</p>
+          <p class="mb-3">Order ID: <strong><?= $order_id; ?></strong></p>
+          <div class="alert alert-light border">
+            <p class="mb-1"><strong>Next steps:</strong></p>
+            <ul class="text-start mb-0">
+              <li>Our staff will review your order details</li>
+              <li>You'll receive a notification when your order is approved</li>
+              <li>Payment will be collected once your order is approved</li>
+            </ul>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+          <a href="index.php" class="btn btn-primary me-2">
+            <i class="fas fa-home me-1"></i> Go to Dashboard
+          </a>
+          <a href="orders.php" class="btn btn-outline-secondary">
+            <i class="fas fa-list-alt me-1"></i> View My Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

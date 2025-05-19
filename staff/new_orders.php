@@ -191,51 +191,189 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_sublimation'])) 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_tailoring'])) {
     $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
     $customer_id = mysqli_real_escape_string($conn, $_POST['customer_id']);
-    $tailoring_type = mysqli_real_escape_string($conn, $_POST['tailoring_type']);
-    $fabric_type = mysqli_real_escape_string($conn, $_POST['fabric_type']);
-    $design_details = mysqli_real_escape_string($conn, $_POST['design_details']);
-    $quantity = (int)$_POST['quantity'];
-    $total_amount = (float)$_POST['total_amount'];
-    $needs_seamstress = isset($_POST['needs_seamstress']) ? 1 : 0;
-    $special_instructions = mysqli_real_escape_string($conn, $_POST['special_instructions'] ?? '');
+    $service_type = mysqli_real_escape_string($conn, $_POST['service_type']);
     $completion_date = mysqli_real_escape_string($conn, $_POST['completion_date']);
+    $needs_seamstress = isset($_POST['needs_seamstress']) ? 1 : 0;
     
-    // Upload measurement file if provided
-    $measurement_file = "";
-    if (isset($_FILES['measurement_file']) && $_FILES['measurement_file']['error'] == 0) {
-        $upload_dir = "../uploads/measurements/";
-        if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-        
-        $filename = $order_id . '_' . basename($_FILES['measurement_file']['name']);
-        $target_file = $upload_dir . $filename;
-        
-        if (move_uploaded_file($_FILES['measurement_file']['tmp_name'], $target_file)) {
-            $measurement_file = $filename;
-        }
+    // For price and downpayment data to update in orders table
+    $price = (float)$_POST['price'];
+    $downpayment = (float)$_POST['downpayment'];
+    $quantity = (int)$_POST['quantity'];
+    $instructions = mysqli_real_escape_string($conn, $_POST['special_instructions'] ?? '');
+    
+    // Handle seamstress appointment if needed
+    $seamstress_appointment = null;
+    if ($needs_seamstress && !empty($_POST['appointment_date']) && !empty($_POST['appointment_time'])) {
+        $appointment_date = mysqli_real_escape_string($conn, $_POST['appointment_date']);
+        $appointment_time = mysqli_real_escape_string($conn, $_POST['appointment_time']);
+        $seamstress_appointment = $appointment_date . ' ' . $appointment_time;
     }
     
-    // Update the order with tailoring details
-    $update_query = "UPDATE orders SET 
-                    tailoring_type = '$tailoring_type',
-                    fabric_type = '$fabric_type',
-                    design_details = '$design_details',
-                    quantity = $quantity,
-                    total_amount = $total_amount,
-                    needs_seamstress = $needs_seamstress,
-                    special_instructions = '$special_instructions',
-                    completion_date = '$completion_date',
-                    measurement_file = '$measurement_file',
-                    updated_at = NOW()
-                    WHERE order_id = '$order_id'";
+    // Start a transaction to ensure data consistency
+    mysqli_begin_transaction($conn);
     
-    if (mysqli_query($conn, $update_query)) {
+    try {
+        // Update the main orders table first
+        $update_order_query = "UPDATE orders SET 
+                              quantity = $quantity,
+                              total_amount = $price,
+                              downpayment_amount = $downpayment,
+                              instructions = '$instructions',
+                              completion_date = '$completion_date',
+                              updated_at = NOW()
+                              WHERE order_id = '$order_id'";
+        
+        if (!mysqli_query($conn, $update_order_query)) {
+            throw new Exception("Error updating order: " . mysqli_error($conn));
+        }
+        
+        // Insert into tailoring_orders table
+        $insert_tailoring_query = "INSERT INTO tailoring_orders (
+                                  order_id,
+                                  service_type,
+                                  completion_date,
+                                  needs_seamstress,
+                                  seamstress_appointment
+                                ) VALUES (
+                                  '$order_id',
+                                  '$service_type',
+                                  '$completion_date',
+                                  $needs_seamstress,
+                                  " . ($seamstress_appointment ? "'$seamstress_appointment'" : "NULL") . "
+                                )";
+        
+        if (!mysqli_query($conn, $insert_tailoring_query)) {
+            throw new Exception("Error creating tailoring order: " . mysqli_error($conn));
+        }
+        
+        // Based on service type, insert into the appropriate specialized table
+        if ($service_type == 'custom made') {
+            $design_details = mysqli_real_escape_string($conn, $_POST['design_details'] ?? '');
+            $fabric_type = mysqli_real_escape_string($conn, $_POST['fabric_type'] ?? '');
+            $special_instructions = mysqli_real_escape_string($conn, $_POST['special_instructions'] ?? '');
+            
+            // Handle file uploads for custom made orders
+            $body_measurement_file = "";
+            if (isset($_FILES['measurement_file']) && $_FILES['measurement_file']['error'] == 0) {
+                $upload_dir = "../uploads/measurements/";
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $filename = $order_id . '_measurements_' . basename($_FILES['measurement_file']['name']);
+                $target_file = $upload_dir . $filename;
+                
+                if (move_uploaded_file($_FILES['measurement_file']['tmp_name'], $target_file)) {
+                    $body_measurement_file = $filename;
+                }
+            }
+            
+            // Handle reference image upload
+            $reference_image = "";
+            if (isset($_FILES['reference_image']) && $_FILES['reference_image']['error'] == 0) {
+                $upload_dir = "../uploads/references/";
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $filename = $order_id . '_reference_' . basename($_FILES['reference_image']['name']);
+                $target_file = $upload_dir . $filename;
+                
+                if (move_uploaded_file($_FILES['reference_image']['tmp_name'], $target_file)) {
+                    $reference_image = $filename;
+                }
+            }
+            
+            // Insert into custom_made table
+            $insert_custom_query = "INSERT INTO custom_made (
+                                  order_id,
+                                  design_details,
+                                  body_measurement_file,
+                                  fabric_type,
+                                  quantity,
+                                  reference_image,
+                                  special_instructions
+                                ) VALUES (
+                                  '$order_id',
+                                  '$design_details',
+                                  '$body_measurement_file',
+                                  '$fabric_type',
+                                  $quantity,
+                                  '$reference_image',
+                                  '$special_instructions'
+                                )";
+            
+            if (!mysqli_query($conn, $insert_custom_query)) {
+                throw new Exception("Error creating custom order details: " . mysqli_error($conn));
+            }
+            
+        } elseif ($service_type == 'alterations' || $service_type == 'resize' || $service_type == 'repairs') {
+            $alteration_type = mysqli_real_escape_string($conn, $_POST['alteration_type'] ?? '');
+            
+            // Determine if measurements were uploaded or manually entered
+            $measurement_method = 'manual';
+            $measurements = null;
+            $measurement_file = null;
+            
+            if (isset($_FILES['measurement_file']) && $_FILES['measurement_file']['error'] == 0) {
+                // File was uploaded
+                $measurement_method = 'upload';
+                
+                $upload_dir = "../uploads/measurements/";
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $filename = $order_id . '_measurements_' . basename($_FILES['measurement_file']['name']);
+                $target_file = $upload_dir . $filename;
+                
+                if (move_uploaded_file($_FILES['measurement_file']['tmp_name'], $target_file)) {
+                    $measurement_file = $filename;
+                }
+            } elseif (isset($_POST['measurements']) && is_array($_POST['measurements'])) {
+                // Manual measurements were entered
+                $measurements_array = [];
+                foreach ($_POST['measurements'] as $key => $value) {
+                    if (!empty($value)) {
+                        $measurements_array[$key] = floatval($value);
+                    }
+                }
+                $measurements = json_encode($measurements_array);
+            }
+            
+            // Insert into alterations table
+            $insert_alteration_query = "INSERT INTO alterations (
+                                      order_id,
+                                      alteration_type,
+                                      measurement_method,
+                                      measurements,
+                                      measurement_file,
+                                      instructions
+                                    ) VALUES (
+                                      '$order_id',
+                                      '$alteration_type',
+                                      '$measurement_method',
+                                      " . ($measurements ? "'$measurements'" : "NULL") . ",
+                                      " . ($measurement_file ? "'$measurement_file'" : "NULL") . ",
+                                      '$instructions'
+                                    )";
+            
+            if (!mysqli_query($conn, $insert_alteration_query)) {
+                throw new Exception("Error creating alteration details: " . mysqli_error($conn));
+            }
+        }
+        
+        // If everything successful, commit transaction
+        mysqli_commit($conn);
+        
         // Redirect to step 4 (payment)
         header("Location: new_orders.php?step=4&customer_id=$customer_id&order_id=$order_id&order_type=tailoring");
         exit();
-    } else {
-        $error_message = "Error saving tailoring details: " . mysqli_error($conn);
+        
+    } catch (Exception $e) {
+        // An error occurred, rollback the transaction
+        mysqli_rollback($conn);
+        $error_message = $e->getMessage();
     }
 }
 
@@ -894,64 +1032,193 @@ if ($order_id) {
                             <form action="" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="order_id" value="<?= htmlspecialchars($order_id) ?>">
                                 <input type="hidden" name="customer_id" value="<?= htmlspecialchars($customer_id) ?>">
+                                
                                 <div class="mb-4">
-                                    <label for="tailoring_type" class="form-label">Clothing Style *</label>
-                                    <select class="form-select" id="tailoring_type" name="tailoring_type" required onchange="showTemplatePreview('tailoring', this.value)">
-                                        <option value="">Select a style</option>
-                                        <option value="dress-formal" data-img="../assets/templates/tailoring/dress-formal.jpg">Formal Dress</option>
-                                        <option value="dress-casual" data-img="../assets/templates/tailoring/dress-casual.jpg">Casual Dress</option>
-                                        <option value="suit-business" data-img="../assets/templates/tailoring/suit-business.jpg">Business Suit</option>
-                                        <option value="suit-wedding" data-img="../assets/templates/tailoring/suit-wedding.jpg">Wedding Suit</option>
-                                        <option value="uniform-school" data-img="../assets/templates/tailoring/uniform-school.jpg">School Uniform</option>
-                                        <option value="uniform-corporate" data-img="../assets/templates/tailoring/uniform-corporate.jpg">Corporate Uniform</option>
-                                        <option value="costume-event" data-img="../assets/templates/tailoring/costume-event.jpg">Event Costume</option>
-                                        <option value="custom-design" data-img="../assets/templates/tailoring/custom-design.jpg">Custom Design</option>
+                                    <label for="service_type" class="form-label">Service Type *</label>
+                                    <select class="form-control" id="service_type" name="service_type" required onchange="toggleServiceFields(this.value)">
+                                        <option value="">Select Service Type</option>
+                                        <option value="alterations">Alterations</option>
+                                        <option value="repairs">Repairs</option>
+                                        <option value="resize">Resize</option>
+                                        <option value="custom made">Custom Made</option>
                                     </select>
-                                    
-                                    <div id="template-preview-tailoring" class="mt-3 template-preview">
-                                        <p class="text-muted small">Select a template to see preview</p>
+                                </div>
+                                
+                                <!-- Fields that appear for Alterations, Repairs, or Resize -->
+                                <div id="alteration-fields" style="display: none;">
+                                    <div class="mb-4">
+                                        <label for="alteration_type" class="form-label">Alteration Type *</label>
+                                        <select class="form-control" id="alteration_type" name="alteration_type">
+                                            <option value="">Select Alteration Type</option>
+                                            <option value="hem">Hem Adjustment</option>
+                                            <option value="shorten">Shorten</option>
+                                            <option value="lengthen">Lengthen</option>
+                                            <option value="waist_adjustment">Waist Adjustment</option>
+                                            <option value="zipper_repair">Zipper Repair</option>
+                                            <option value="patch">Patch</option>
+                                            <option value="resize_larger">Resize - Larger</option>
+                                            <option value="resize_smaller">Resize - Smaller</option>
+                                            <option value="other">Other</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="fabric_type" class="form-label">Fabric Type *</label>
-                                    <input type="text" class="form-control" id="fabric_type" name="fabric_type" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="design_details" class="form-label">Design Details *</label>
-                                    <textarea class="form-control" id="design_details" name="design_details" rows="3" required></textarea>
-                                </div>
+                                
+                                <!-- Common fields for all tailoring orders -->
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="quantity" class="form-label">Quantity *</label>
-                                        <input type="number" class="form-control" id="quantity" name="quantity" required>
+                                        <label for="completion_date" class="form-label">Required Completion Date *</label>
+                                        <input type="date" class="form-control" id="completion_date" name="completion_date" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="total_amount" class="form-label">Total Amount *</label>
-                                        <input type="number" step="0.01" class="form-control" id="total_amount" name="total_amount" required>
+                                        <label for="quantity" class="form-label">Quantity *</label>
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="needs_seamstress" class="form-label">Needs Seamstress</label>
-                                    <input type="checkbox" id="needs_seamstress" name="needs_seamstress">
+                                
+                                <!-- Custom Made specific fields -->
+                                <div id="custom-made-fields" style="display: none;">
+                                    <div class="mb-4">
+                                        <label for="fabric_type" class="form-label">Fabric Type</label>
+                                        <select class="form-control" id="fabric_type" name="fabric_type">
+                                            <option value="">Select Fabric</option>
+                                            <option value="cotton">Cotton</option>
+                                            <option value="polyester">Polyester</option>
+                                            <option value="silk">Silk</option>
+                                            <option value="wool">Wool</option>
+                                            <option value="linen">Linen</option>
+                                            <option value="denim">Denim</option>
+                                            <option value="blend">Blend</option>
+                                            <option value="customer_supplied">Customer Supplied</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="design_details" class="form-label">Design Details</label>
+                                        <textarea class="form-control" id="design_details" name="design_details" rows="3" placeholder="Describe the design details, style preferences, etc."></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="reference_image" class="form-label">Reference Image (optional)</label>
+                                        <input type="file" class="form-control" id="reference_image" name="reference_image" accept="image/*">
+                                        <div class="form-text">Upload a reference image for the design (JPG, JPEG, PNG)</div>
+                                    </div>
                                 </div>
+                                
+                                <!-- Measurements section - common but with different fields shown based on service type -->
+                                <div class="mb-3">
+                                    <label class="form-label">Measurements</label>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="measurement_method" id="manual_measurements" value="manual" checked onchange="toggleMeasurementMethod(this.value)">
+                                                    <label class="form-check-label" for="manual_measurements">Enter Measurements</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="measurement_method" id="upload_measurements" value="upload" onchange="toggleMeasurementMethod(this.value)">
+                                                <label class="form-check-label" for="upload_measurements">Upload Measurements</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="manual-measurement-fields">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="chest" class="form-label">Chest (inches)</label>
+                                                    <input type="number" class="form-control" id="chest" name="measurements[chest]" step="0.1">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="waist" class="form-label">Waist (inches)</label>
+                                                    <input type="number" class="form-control" id="waist" name="measurements[waist]" step="0.1">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="hip" class="form-label">Hip (inches)</label>
+                                                    <input type="number" class="form-control" id="hip" name="measurements[hip]" step="0.1">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="shoulder" class="form-label">Shoulder (inches)</label>
+                                                    <input type="number" class="form-control" id="shoulder" name="measurements[shoulder]" step="0.1">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="sleeve" class="form-label">Sleeve Length (inches)</label>
+                                                    <input type="number" class="form-control" id="sleeve" name="measurements[sleeve]" step="0.1">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="inseam" class="form-label">Inseam (inches)</label>
+                                                    <input type="number" class="form-control" id="inseam" name="measurements[inseam]" step="0.1">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="neck" class="form-label">Neck (inches)</label>
+                                                    <input type="number" class="form-control" id="neck" name="measurements[neck]" step="0.1">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="length" class="form-label">Length (inches)</label>
+                                                    <input type="number" class="form-control" id="length" name="measurements[length]" step="0.1">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="upload-measurement-fields" style="display: none;">
+                                            <div class="mb-2">
+                                                <label for="measurement_file" class="form-label">Upload Measurement Sheet *</label>
+                                                <input type="file" class="form-control" id="measurement_file" name="measurement_file" accept=".pdf,.jpg,.jpeg,.png">
+                                                <div class="form-text">Upload a measurement sheet (PDF, JPG, JPEG, PNG)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="mb-3">
                                     <label for="special_instructions" class="form-label">Special Instructions</label>
-                                    <textarea class="form-control" id="special_instructions" name="special_instructions" rows="3"></textarea>
+                                    <textarea class="form-control" id="special_instructions" name="special_instructions" rows="2" placeholder="Any special instructions or requirements"></textarea>
                                 </div>
+                                
                                 <div class="mb-3">
-                                    <label for="completion_date" class="form-label">Completion Date *</label>
-                                    <input type="date" class="form-control" id="completion_date" name="completion_date" required>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="needs_seamstress" name="needs_seamstress" onchange="toggleSeamstressFields(this.checked)">
+                                        <label class="form-check-label" for="needs_seamstress">
+                                            Requires Seamstress Appointment
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="measurement_file" class="form-label">Upload Measurement File</label>
-                                    <input type="file" class="form-control" id="measurement_file" name="measurement_file">
+                                
+                                <div id="seamstress-fields" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="appointment_date" class="form-label">Appointment Date</label>
+                                            <input type="date" class="form-control" id="appointment_date" name="appointment_date">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="appointment_time" class="form-label">Appointment Time</label>
+                                            <input type="time" class="form-control" id="appointment_time" name="appointment_time">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mt-4 d-flex justify-content-between">
+                                
+                                <hr>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="price" class="form-label">Price (₱) *</label>
+                                        <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="downpayment" class="form-label">Downpayment Required (₱) *</label>
+                                        <input type="number" class="form-control" id="downpayment" name="downpayment" min="0" step="0.01" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-4">
                                     <a href="new_orders.php?step=2&customer_id=<?= htmlspecialchars($customer_id) ?>" class="btn back-btn">
                                         <i class="fas fa-arrow-left mr-1"></i> Back
                                     </a>
                                     <button type="submit" name="save_tailoring" class="btn btn-primary-custom">
-                                        <i class="fas fa-save mr-1"></i> Save & Continue
+                                        <i class="fas fa-save me-2"></i> Save Tailoring Order
                                     </button>
                                 </div>
                             </form>
@@ -1058,5 +1325,81 @@ if ($order_id) {
     <!-- Bootstrap 5 JS and jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Set minimum date for completion date (today + 3 days)
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            today.setDate(today.getDate() + 3); // Minimum 3 days from now
+            
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            
+            const minDate = `${yyyy}-${mm}-${dd}`;
+            
+            // Set minimum date for completion date and appointment date
+            document.getElementById('completion_date').setAttribute('min', minDate);
+            if (document.getElementById('appointment_date')) {
+                document.getElementById('appointment_date').setAttribute('min', minDate);
+            }
+            
+            // Set default completion date to 7 days from now
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 7);
+            const defYyyy = defaultDate.getFullYear();
+            const defMm = String(defaultDate.getMonth() + 1).padStart(2, '0');
+            const defDd = String(defaultDate.getDate()).padStart(2, '0');
+            document.getElementById('completion_date').value = `${defYyyy}-${defMm}-${defDd}`;
+            
+            // Calculate downpayment as 50% of price
+            document.getElementById('price').addEventListener('input', function() {
+                const price = parseFloat(this.value) || 0;
+                document.getElementById('downpayment').value = (price * 0.5).toFixed(2);
+            });
+        });
+        
+        // Toggle fields based on service type
+        function toggleServiceFields(serviceType) {
+            const alterationFields = document.getElementById('alteration-fields');
+            const customMadeFields = document.getElementById('custom-made-fields');
+            
+            if (serviceType === 'custom made') {
+                alterationFields.style.display = 'none';
+                customMadeFields.style.display = 'block';
+            } else if (serviceType === 'alterations' || serviceType === 'repairs' || serviceType === 'resize') {
+                alterationFields.style.display = 'block';
+                customMadeFields.style.display = 'none';
+            } else {
+                alterationFields.style.display = 'none';
+                customMadeFields.style.display = 'none';
+            }
+        }
+        
+        // Toggle measurement method
+        function toggleMeasurementMethod(method) {
+            const manualFields = document.getElementById('manual-measurement-fields');
+            const uploadFields = document.getElementById('upload-measurement-fields');
+            
+            if (method === 'manual') {
+                manualFields.style.display = 'block';
+                uploadFields.style.display = 'none';
+            } else {
+                manualFields.style.display = 'none';
+                uploadFields.style.display = 'block';
+            }
+        }
+        
+        // Toggle seamstress appointment fields
+        function toggleSeamstressFields(needsSeamstress) {
+            const seamstressFields = document.getElementById('seamstress-fields');
+            
+            if (needsSeamstress) {
+                seamstressFields.style.display = 'block';
+            } else {
+                seamstressFields.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

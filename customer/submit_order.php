@@ -1,3 +1,31 @@
+<?php
+include '../db.php';
+session_start();
+
+// Make sure we have all required data
+if (!isset($_POST['order_id']) || !isset($_POST['total_amount'])) {
+    echo "Missing required data";
+    exit;
+}
+
+// Get order ID and calculated total amount from form
+$order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
+$total_amount = (float)$_POST['total_amount'];
+
+// Get customer ID from session
+$customer_id = $_SESSION['customer_id'];
+
+// Process other form data...
+
+// Update order with final calculated total
+$update_total_query = "UPDATE orders SET total_amount = ? WHERE order_id = ?";
+$stmt = $conn->prepare($update_total_query);
+$stmt->bind_param("ds", $total_amount, $order_id);
+$stmt->execute();
+
+// Process the rest of the order as usual...
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,47 +33,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Confirmation</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body { 
             font-family: 'Poppins', sans-serif; 
             background-color: #f8f9fa; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0;
-        }
-        .container {
-            text-align: center; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .btn-home {
-            background-color: orange; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            border-radius: 5px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-home:hover {
-            background-color: darkorange;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 class="text-success">✅ Order Submitted Successfully!</h2>
-    <p>Your order is now <strong>Awaiting Approval</strong>.</p>
-
-    <a href="index.php" class="btn-home">🏠 Go Back Home</a>
+<!-- Success Modal -->
+<div class="modal fade" id="orderSuccessModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="orderSuccessModalLabel"><i class="fas fa-check-circle me-2"></i> Order Submitted Successfully!</h5>
+      </div>
+      <div class="modal-body text-center py-4">
+        <div class="mb-4">
+          <i class="fas fa-tshirt fa-3x text-success mb-3"></i>
+          <h4>Thank you for your order!</h4>
+          <p class="mb-0">Your sublimation jerseys order has been submitted.</p>
+          <p class="mb-3">Order ID: <strong><?php echo htmlspecialchars($order_id); ?></strong></p>
+          <div class="alert alert-light border">
+            <p class="mb-1"><strong>Next steps:</strong></p>
+            <ul class="text-start mb-0">
+              <li>Our staff will review your order details</li>
+              <li>You'll receive a notification when your order is approved</li>
+              <li>Your total amount: <strong>₱<?php echo number_format($total_amount, 2); ?></strong></li>
+              <li>Payment will be collected once your order is approved</li>
+            </ul>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+          <a href="index.php" class="btn btn-primary me-2">
+            <i class="fas fa-home me-1"></i> Go to Dashboard
+          </a>
+          <a href="orders.php" class="btn btn-outline-secondary">
+            <i class="fas fa-list-alt me-1"></i> View My Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show the success modal automatically
+        var orderSuccessModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+        orderSuccessModal.show();
+        
+        // Prevent back button after submission
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+        });
+    });
+</script>
 </body>
 </html>
