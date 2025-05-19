@@ -1,0 +1,14 @@
+2025-05-09 02:59:10 - Request: []
+2025-05-09 02:59:10 - Error: Missing required parameters
+2025-05-09 03:00:48 - Request: []
+2025-05-09 03:00:48 - Error: Missing required parameters
+2025-05-09 03:00:53 - Request: {"action":"approve","payment_id":"10","order_id":"AOQWW","payment_type":"downpayment","amount":"400.00","order_total":"800.00","note":"ok nani"}
+2025-05-09 03:00:53 - Error: Unknown column 'verified_by' in 'field list'
+2025-05-09 03:08:27 - Request: []
+2025-05-09 03:08:27 - Error: Missing required parameters
+2025-05-09 03:08:36 - Request: {"action":"approve","payment_id":"10","order_id":"AOQWW","payment_type":"downpayment","amount":"400.00","order_total":"800.00","note":"ok nani"}
+2025-05-09 03:08:36 - Success: Payment approved
+2025-05-09 03:08:37 - Request: []
+2025-05-09 03:08:37 - Error: Missing required parameters
+2025-05-09 03:16:36 - Request: []
+2025-05-09 03:16:36 - Error: Missing required parameters

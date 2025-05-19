@@ -1,0 +1,415 @@
+<?php
+session_start();
+include '../db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+// Pagination setup
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$records_per_page = 10;
+$offset = ($page - 1) * $records_per_page;
+
+// Get search term and status filter
+$search_term = isset($_GET['search']) ? $_GET['search'] : '';
+$status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
+
+// Build the query with filters
+$where_clauses = ["o.order_type = 'sublimation'"];
+$params = [];
+$types = "";
+
+if ($status_filter != 'all') {
+    $where_clauses[] = "o.order_status = ?";
+    $params[] = $status_filter;
+    $types .= "s";
+}
+
+if (!empty($search_term)) {
+    $where_clauses[] = "(o.order_id LIKE ? OR c.first_name LIKE ? OR c.last_name LIKE ? OR c.phone_number LIKE ?)";
+    $search_pattern = "%$search_term%";
+    $params[] = $search_pattern;
+    $params[] = $search_pattern;
+    $params[] = $search_pattern;
+    $params[] = $search_pattern;
+    $types .= "ssss";
+}
+
+$params[] = $records_per_page;
+$params[] = $offset;
+$types .= "ii";
+
+$where_clause = implode(" AND ", $where_clauses);
+
+// Main query for orders
+$query = "SELECT o.*, c.first_name, c.last_name, c.phone_number,
+          s.sublimation_id, s.printing_type, s.sublimator_id,
+          t.template_id, t.name as template_name, t.image_path as template_image,
+          sp.player_name, sp.jersey_number, sp.size as jersey_size,
+          COALESCE(u.first_name, '') as sublimator_fname,
+          COALESCE(u.last_name, '') as sublimator_lname
+          FROM orders o
+          LEFT JOIN customers c ON o.customer_id = c.customer_id
+          LEFT JOIN sublimation_orders s ON o.order_id = s.order_id
+          LEFT JOIN users u ON s.sublimator_id = u.user_id
+          LEFT JOIN templates t ON s.template_id = t.template_id
+          LEFT JOIN sublimation_players sp ON s.sublimation_id = sp.sublimation_id
+          WHERE $where_clause
+          ORDER BY o.created_at DESC
+          LIMIT ? OFFSET ?";
+
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "ii", $records_per_page, $offset);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+// Get total records for pagination
+$count_query = "SELECT COUNT(*) as total FROM orders WHERE order_type = 'sublimation'";
+$count_result = mysqli_query($conn, $count_query);
+$total_records = mysqli_fetch_assoc($count_result)['total'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// Get list of available sublimators
+$sublimators_query = "SELECT user_id, first_name, last_name FROM users WHERE role = 'sublimator'";
+$sublimators_result = mysqli_query($conn, $sublimators_query);
+$sublimators = mysqli_fetch_all($sublimators_result, MYSQLI_ASSOC);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JXT - Sublimation Orders</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <?php include 'sidebar.php'; ?>
+        
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <?php include 'topbar.php'; ?>
+
+                <div class="container-fluid">                    <h1 class="h3 mb-4 text-gray-800">Sublimation Orders</h1>
+
+                    <!-- Status Filter Cards -->
+                    <div class="row mb-4">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2 <?= $status_filter == 'pending_approval' ? 'bg-light' : '' ?>">
+                                <a href="?status=pending_approval" class="text-decoration-none">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                    Pending Approval</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2 <?= $status_filter == 'in_process' ? 'bg-light' : '' ?>">
+                                <a href="?status=in_process" class="text-decoration-none">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                    In Process</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2 <?= $status_filter == 'ready_for_pickup' ? 'bg-light' : '' ?>">
+                                <a href="?status=ready_for_pickup" class="text-decoration-none">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                    Ready for Pickup</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-check fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-secondary shadow h-100 py-2 <?= $status_filter == 'completed' ? 'bg-light' : '' ?>">
+                                <a href="?status=completed" class="text-decoration-none">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                                    Completed</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-flag-checkered fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <?php echo $status_filter == 'all' ? 'All Sublimation Orders' : ucwords(str_replace('_', ' ', $status_filter)) . ' Orders'; ?>
+                            </h6>
+                            <?php if (!empty($search_term) || $status_filter != 'all'): ?>
+                                <a href="sublimation_orders.php" class="btn btn-sm btn-outline-primary">Clear Filters</a>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">                                <table class="table table-bordered table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-id">ID</th>
+                                            <th class="col-type d-none d-md-table-cell">Template</th>
+                                            <th class="col-customer">Customer</th>
+                                            <th class="col-total d-none d-lg-table-cell">Total</th>
+                                            <th class="col-payment">Payment</th>
+                                            <th class="col-status">Status</th>
+                                            <th class="col-sublimator d-none d-lg-table-cell">Sublimator</th>
+                                            <th class="col-created d-none d-md-table-cell">Created</th>
+                                            <th class="col-actions">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($order = mysqli_fetch_assoc($result)): ?>                                            <tr class="order-row">
+                                                <td>
+                                                    <a href="view_order.php?id=<?= htmlspecialchars($order['order_id']) ?>" class="font-weight-bold">
+                                                        #<?= htmlspecialchars($order['order_id']) ?>
+                                                    </a>
+                                                </td>
+                                                <td class="d-none d-md-table-cell">
+                                                    <?php if ($order['template_name']): ?>
+                                                        <div class="text-truncate-custom">
+                                                            <?= htmlspecialchars($order['template_name']) ?>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">Custom Design</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <div class="text-truncate-custom">
+                                                        <?= htmlspecialchars($order['first_name'] . ' ' . $order['last_name']) ?>
+                                                    </div>
+                                                    <small class="text-muted d-block text-truncate-custom">
+                                                        <?= htmlspecialchars($order['phone_number']) ?>
+                                                    </small>
+                                                </td>
+                                                <td class="d-none d-lg-table-cell">
+                                                    ₱<?= number_format($order['total_amount'], 2) ?>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    $payment_class = '';
+                                                    switch ($order['payment_status']) {
+                                                        case 'pending':
+                                                            $payment_class = 'payment-pending';
+                                                            break;
+                                                        case 'downpayment_paid':
+                                                            $payment_class = 'payment-partial';
+                                                            break;
+                                                        case 'fully_paid':
+                                                            $payment_class = 'payment-paid';
+                                                            break;
+                                                    }
+                                                    $payment_status = str_replace('_', ' ', ucwords($order['payment_status']));
+                                                    if ($order['payment_status'] === 'downpayment_paid') {
+                                                        $payment_status = 'Partial';
+                                                    }
+                                                    ?>
+                                                    <span class="payment-badge <?= $payment_class ?>">
+                                                        <?= $payment_status ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge <?= getStatusBadgeClass($order['order_status']) ?>">
+                                                        <?= formatStatus($order['order_status']) ?>
+                                                    </span>
+                                                </td>
+                                                <td class="d-none d-lg-table-cell">
+                                                    <?php 
+                                                    if ($order['sublimator_id']) {
+                                                        echo htmlspecialchars($order['sublimator_fname'] . ' ' . $order['sublimator_lname']);
+                                                    } else {
+                                                        echo '<span class="text-muted">Unassigned</span>';
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td class="d-none d-md-table-cell">
+                                                    <?= date('M d', strtotime($order['created_at'])) ?>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <?php if ($order['order_status'] === 'approved' && !$order['sublimator_id']): ?>
+                                                            <button class="btn btn-sm btn-success" onclick="assignSublimator('<?= $order['order_id'] ?>')">
+                                                                Forward to Sublimator
+                                                            </button>
+                                                        <?php endif; ?>
+
+                                                        <?php if ($order['order_status'] === 'completed_by_sublimator'): ?>
+                                                            <button class="btn btn-sm btn-primary" onclick="markReadyForPickup('<?= $order['order_id'] ?>')">
+                                                                Mark Ready for Pickup
+                                                            </button>
+                                                        <?php endif; ?>
+
+                                                        <a href="view_order.php?id=<?= $order['order_id'] ?>" class="btn btn-sm btn-info">
+                                                            View Details
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <?php if ($total_pages > 1): ?>
+                            <div class="d-flex justify-content-center mt-4">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination">
+                                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                            <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                                                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                            </li>
+                                        <?php endfor; ?>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Sublimator Modal -->
+    <div class="modal fade" id="assignSublimatorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Forward to Sublimator</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignSublimatorForm">
+                        <input type="hidden" id="order_id" name="order_id">
+                        <div class="form-group">
+                            <label>Select Sublimator</label>
+                            <select class="form-control" name="sublimator_id" required>
+                                <option value="">Choose a sublimator...</option>
+                                <?php foreach ($sublimators as $sublimator): ?>
+                                    <option value="<?= $sublimator['user_id'] ?>">
+                                        <?= htmlspecialchars($sublimator['first_name'] . ' ' . $sublimator['last_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Notes (Optional)</label>
+                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAssignment()">Forward Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function assignSublimator(orderId) {
+        document.getElementById('order_id').value = orderId;
+        new bootstrap.Modal(document.getElementById('assignSublimatorModal')).show();
+    }
+
+    function submitAssignment() {
+        const formData = new FormData(document.getElementById('assignSublimatorForm'));
+        fetch('assign_sublimator.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+
+    function markReadyForPickup(orderId) {
+        if(confirm('Mark this order as ready for pickup?')) {
+            fetch('update_order_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    status: 'ready_for_pickup'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    }
+
+    function getStatusBadgeClass(status) {
+        switch(status) {
+            case 'pending_approval': return 'warning';
+            case 'approved': return 'primary';
+            case 'forwarded_to_sublimator': return 'info';
+            case 'in_process': return 'info';
+            case 'completed_by_sublimator': return 'secondary';
+            case 'ready_for_pickup': return 'success';
+            case 'completed': return 'secondary';
+            case 'declined': return 'danger';
+            default: return 'secondary';
+        }
+    }
+
+    function formatStatus(status) {
+        return status.split('_').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+    }
+    </script>
+</body>
+</html>
