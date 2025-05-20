@@ -8,101 +8,110 @@ include '../db.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
     exit();
 }
 
-// Get order ID from POST request
-$order_id = isset($_POST['order_id']) ? $_POST['order_id'] : null;
+// Check if request is POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+    exit();
+}
+
+// Get request data
+$order_id = $_POST['order_id'] ?? '';
+$notes = $_POST['notes'] ?? '';
 $user_id = $_SESSION['user_id'];
 
-if (!$order_id) {
+// Validate order ID
+if (empty($order_id)) {
+    header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Order ID is required']);
     exit();
 }
 
-// Start transaction
+// Begin transaction
 $conn->begin_transaction();
 
 try {
-    // Update the order status to completed
-    $update_order = "UPDATE orders SET 
-                    order_status = 'completed',
-                    completed_at = NOW(),
-                    completed_by = ?,
-                    updated_at = NOW()
-                    WHERE order_id = ?";
-                    
-    $stmt = $conn->prepare($update_order);
-    if (!$stmt) {
-        throw new Exception("Database error occurred");
+    // Check order current status and payment status
+    $check_query = $conn->prepare("SELECT order_status, payment_status, customer_id, order_type FROM orders WHERE order_id = ?");
+    $check_query->bind_param("s", $order_id);
+    $check_query->execute();
+    $result = $check_query->get_result();
+    
+    if ($result->num_rows === 0) {
+        throw new Exception("Order not found");
     }
     
-    $stmt->bind_param("is", $user_id, $order_id);
+    $order_data = $result->fetch_assoc();
     
-    if (!$stmt->execute()) {
-        throw new Exception("Database error occurred");
+    // Verify order is ready for pickup and fully paid
+    if ($order_data['order_status'] !== 'ready_for_pickup') {
+        throw new Exception("Order must be in 'Ready for Pickup' status to mark as completed");
     }
     
-    // Get customer details for notification
-    $customer_query = "SELECT c.customer_id, c.first_name, c.last_name, o.order_type 
-                      FROM orders o
-                      JOIN customers c ON o.customer_id = c.customer_id
-                      WHERE o.order_id = ?";
-                      
-    $stmt = $conn->prepare($customer_query);
-    if (!$stmt) {
-        throw new Exception("Database error occurred");
+    if ($order_data['payment_status'] !== 'fully_paid') {
+        throw new Exception("Order must be fully paid before marking as completed");
     }
     
-    $stmt->bind_param("s", $order_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $customer_data = $result->fetch_assoc();
+    // Update order status to completed
+    $update_order = $conn->prepare("UPDATE orders SET 
+                                   order_status = 'completed',
+                                   updated_at = NOW() 
+                                   WHERE order_id = ?");
+    $update_order->bind_param("s", $order_id);
+    $update_order->execute();
     
-    if (!$customer_data) {
-        throw new Exception("Customer information not found");
+    // Add entry to order history
+    if (empty($notes)) {
+        $notes = "Order marked as completed by " . $_SESSION['first_name'] . " " . ($_SESSION['last_name'] ?? '');
     }
     
-    // Create a notification for the customer
-    $title = "Order Completed";
-    $message = "Great news! Your " . ucfirst($customer_data['order_type']) . " order (#$order_id) has been marked as completed.";
+    $add_history = $conn->prepare("INSERT INTO order_status_history 
+                                 (order_id, status, updated_by, notes, created_at) 
+                                 VALUES (?, 'completed', ?, ?, NOW())");
+    $add_history->bind_param("sis", $order_id, $user_id, $notes);
+    $add_history->execute();
     
-    $notification_query = "INSERT INTO notifications (customer_id, order_id, title, message, created_at) 
-                          VALUES (?, ?, ?, ?, NOW())";
-                          
-    $stmt = $conn->prepare($notification_query);
-    if (!$stmt) {
-        throw new Exception("Database error occurred");
-    }
+    // Add note
+    $add_note = $conn->prepare("INSERT INTO notes 
+                             (order_id, user_id, note, created_at) 
+                             VALUES (?, ?, ?, NOW())");
+    $add_note->bind_param("sis", $order_id, $user_id, $notes);
+    $add_note->execute();
     
-    $stmt->bind_param("isss", $customer_data['customer_id'], $order_id, $title, $message);
+    // Create customer notification
+    $notification_title = "Order Completed";
+    $notification_message = "Your " . ucfirst($order_data['order_type']) . " order #$order_id has been marked as completed. Thank you for your business!";
     
-    if (!$stmt->execute()) {
-        throw new Exception("Database error occurred");
-    }
-    
-    // Optional: Add a note about the completion
-    $note = "Order marked as completed by " . $_SESSION['first_name'] . " " . ($_SESSION['last_name'] ?? '');
-    $note_query = "INSERT INTO notes (order_id, user_id, note, created_at)
-                  VALUES (?, ?, ?, NOW())";
-                  
-    $stmt = $conn->prepare($note_query);
-    if (!$stmt) {
-        throw new Exception("Database error occurred");
-    }
-    
-    $stmt->bind_param("sis", $order_id, $user_id, $note);
-    $stmt->execute(); // We don't need to throw an exception if this fails
+    $add_notification = $conn->prepare("INSERT INTO notifications 
+                                      (customer_id, order_id, title, message, is_read, created_at) 
+                                      VALUES (?, ?, ?, ?, 0, NOW())");
+    $add_notification->bind_param("isss", $order_data['customer_id'], $order_id, $notification_title, $notification_message);
+    $add_notification->execute();
     
     // Commit the transaction
     $conn->commit();
     
-    echo json_encode(['status' => 'success', 'message' => 'Order marked as completed successfully']);
+    // Return success response
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'success',
+        'message' => "Order #$order_id has been marked as completed"
+    ]);
     
 } catch (Exception $e) {
-    // Rollback the transaction on error
+    // Rollback on error
     $conn->rollback();
-    echo json_encode(['status' => 'error', 'message' => 'An error occurred. Please try again.']);
+    
+    // Return error response
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'error',
+        'message' => $e->getMessage()
+    ]);
 }
 ?>

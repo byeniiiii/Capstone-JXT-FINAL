@@ -21,7 +21,7 @@ $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
 
 try {
     // Get order details to check status and payment status
-    $order_query = "SELECT o.order_status, o.payment_status FROM orders o WHERE o.order_id = ?";
+    $order_query = "SELECT o.order_status, o.payment_status, o.total_amount FROM orders o WHERE o.order_id = ?";
     $stmt = mysqli_prepare($conn, $order_query);
     
     if (!$stmt) {
@@ -45,11 +45,12 @@ try {
         exit();
     }
     
-    // Return both the order status and payment status
+    // Return order data
     echo json_encode([
         'status' => 'success',
         'order_status' => $order['order_status'],
-        'payment_status' => $order['payment_status']
+        'payment_status' => $order['payment_status'],
+        'total_amount' => $order['total_amount']
     ]);
     
 } catch (Exception $e) {

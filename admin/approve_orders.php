@@ -1,21 +1,25 @@
 <?php
-// Start the session
 session_start();
+include_once '../db.php';
 
-// Check if user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+// If the user is not logged in, redirect to index.php
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../index.php");
     exit();
 }
 
-// Include database connection
-include '../db.php';
+// Filtering options
+$status_filter = isset($_GET['status']) ? $_GET['status'] : 'pending_approval';
+$order_type = isset($_GET['type']) ? $_GET['type'] : 'all';
 
 // Process status changes if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id']) && isset($_POST['status'])) {
     $order_id = $_POST['order_id'];
     $new_status = $_POST['status'];
     $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
+    
+    // Debug - log the form submission
+    error_log("Form submitted: Order ID=$order_id, New Status=$new_status");
     
     // Start transaction
     $conn->begin_transaction();
@@ -66,13 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id']) && isset(
     }
     
     // Redirect to prevent form resubmission
-    header("Location: approve_orders.php");
+    $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $status = isset($_GET['status']) ? $_GET['status'] : 'pending_approval';
+    $type = isset($_GET['type']) ? $_GET['type'] : 'all';
+
+    header("Location: approve_orders.php?page=$current_page&status=$status&type=$type");
     exit();
 }
-
-// Filtering options
-$status_filter = isset($_GET['status']) ? $_GET['status'] : 'pending_approval';
-$order_type = isset($_GET['type']) ? $_GET['type'] : 'all';
 
 // Build query based on filters
 $query = "SELECT o.*, 
@@ -90,183 +94,505 @@ if ($order_type !== 'all') {
     $query .= " AND o.order_type = '$order_type'";
 }
 
-$query .= " ORDER BY o.created_at DESC";
+// Count total records for pagination
+$count_query = $query;
+$count_result = $conn->query("SELECT COUNT(*) as total FROM ($count_query) as count_table");
+$total_records = $count_result->fetch_assoc()['total'];
+
+// Pagination
+$records_per_page = 10;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($current_page - 1) * $records_per_page;
+$total_pages = ceil($total_records / $records_per_page);
+
+// Add pagination limits to the main query
+$query .= " ORDER BY o.created_at DESC LIMIT $offset, $records_per_page";
 
 // Execute query
 $result = $conn->query($query);
 
-// Include header
-$page_title = "Approve Orders";
-include 'header.php';
+// Get current date info
+$today = date('Y-m-d');
+$current_week_start = date('Y-m-d', strtotime('monday this week'));
+$current_week_end = date('Y-m-d', strtotime('sunday this week'));
+$current_month_start = date('Y-m-01');
+$current_month_end = date('Y-m-t');
+
+// Get total orders
+$total_orders_query = "SELECT COUNT(*) as total FROM orders";
+$total_orders_result = $conn->query($total_orders_query);
+$total_orders = $total_orders_result->fetch_assoc()['total'];
+
+// Get monthly orders
+$monthly_orders_query = "SELECT COUNT(*) as monthly FROM orders 
+                        WHERE created_at BETWEEN '$current_month_start 00:00:00' AND '$current_month_end 23:59:59'";
+$monthly_orders_result = $conn->query($monthly_orders_query);
+$monthly_orders = $monthly_orders_result->fetch_assoc()['monthly'];
 ?>
 
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Order Approval</h1>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" type="image/png" href="../image/logo.png">
+    <title>JXT Admin - Approve Orders</title>
 
-    <?php if (isset($_SESSION['success_message'])): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?php 
-        echo $_SESSION['success_message'];
-        unset($_SESSION['success_message']); 
-        ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <?php endif; ?>
+    <!-- Custom fonts -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <?php if (isset($_SESSION['error_message'])): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?php 
-        echo $_SESSION['error_message'];
-        unset($_SESSION['error_message']); 
-        ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <?php endif; ?>
+    <!-- Custom styles -->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
-    <!-- Filters -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Orders</h6>
-        </div>
-        <div class="card-body">
-            <form method="GET" action="approve_orders.php" class="row">
-                <div class="col-md-5 mb-3">
-                    <label for="status">Order Status</label>
-                    <select class="form-control" id="status" name="status">
-                        <option value="all" <?= $status_filter === 'all' ? 'selected' : '' ?>>All Statuses</option>
-                        <option value="pending_approval" <?= $status_filter === 'pending_approval' ? 'selected' : '' ?>>Pending Approval</option>
-                        <option value="approved" <?= $status_filter === 'approved' ? 'selected' : '' ?>>Approved</option>
-                        <option value="rejected" <?= $status_filter === 'rejected' ? 'selected' : '' ?>>Rejected</option>
-                        <option value="in_progress" <?= $status_filter === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
-                        <option value="completed" <?= $status_filter === 'completed' ? 'selected' : '' ?>>Completed</option>
-                        <option value="delivered" <?= $status_filter === 'delivered' ? 'selected' : '' ?>>Delivered</option>
-                        <option value="cancelled" <?= $status_filter === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                    </select>
-                </div>
-                <div class="col-md-5 mb-3">
-                    <label for="type">Order Type</label>
-                    <select class="form-control" id="type" name="type">
-                        <option value="all" <?= $order_type === 'all' ? 'selected' : '' ?>>All Types</option>
-                        <option value="sublimation" <?= $order_type === 'sublimation' ? 'selected' : '' ?>>Sublimation</option>
-                        <option value="tailoring" <?= $order_type === 'tailoring' ? 'selected' : '' ?>>Tailoring</option>
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fc;
+            color: #5a5c69;
+            overflow-x: hidden;
+        }
 
-    <!-- Orders List -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">
-                <?= $result->num_rows ?> Orders 
-                <?= $status_filter !== 'all' ? '(' . ucfirst(str_replace('_', ' ', $status_filter)) . ')' : '' ?>
-                <?= $order_type !== 'all' ? '- ' . ucfirst($order_type) : '' ?>
-            </h6>
-        </div>
-        <div class="card-body">
-            <?php if ($result && $result->num_rows > 0): ?>
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="ordersTable" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Amount</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td>
-                                        <a href="#" data-toggle="modal" data-target="#orderModal<?= $row['order_id'] ?>">
-                                            <?= $row['order_id'] ?>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <?= htmlspecialchars($row['customer_name']) ?><br>
-                                        <small class="text-muted"><?= $row['email'] ?></small>
-                                    </td>
-                                    <td>
-                                        <?php if ($row['order_type'] === 'sublimation'): ?>
-                                            <span class="badge badge-info">Sublimation</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-secondary">Tailoring</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?= date('M d, Y', strtotime($row['created_at'])) ?></td>
-                                    <td>
+        /* Remove all sidebar styling since it's handled in sidebar.php */
+        /* Keep only the main content styling */
+        
+        .card {
+            border: none !important;
+            border-radius: 0.35rem;
+            background-color: #ffffff !important;
+            color: #5a5c69 !important;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.15) !important;
+        }
+
+        .card-header {
+            background-color: #f8f9fc !important;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .btn-primary {
+            background-color: #4e73df !important;
+            border-color: #4e73df !important;
+            box-shadow: 0 0.125rem 0.25rem 0 rgba(58, 59, 69, 0.2) !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9 !important;
+            border-color: #2653d4 !important;
+            transform: translateY(-1px);
+        }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .footer {
+            background-color: #f8f9fc !important;
+            color: #858796 !important;
+            border-top: 1px solid #e3e6f0;
+            font-size: 0.85rem;
+        }
+
+        /* Card highlight colors */
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        /* Modern table styling */
+        .table {
+            color: #5a5c69;
+        }
+
+        .table-bordered {
+            border: 1px solid #e3e6f0;
+        }
+
+        .table th {
+            background-color: #f8f9fc;
+            border-bottom: 2px solid #e3e6f0;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+        .badge {
+            font-weight: 600;
+            padding: 0.35em 0.65em;
+            border-radius: 0.35rem;
+        }
+
+        .badge.bg-light {
+            background-color: #f8f9fc !important;
+            color: #5a5c69;
+            border: 1px solid #e3e6f0;
+        }
+
+        .badge.bg-warning {
+            background-color: #f6c23e !important;
+            color: #fff;
+        }
+
+        .badge.bg-danger {
+            background-color: #e74a3b !important;
+        }
+
+        .badge.bg-info {
+            background-color: #36b9cc !important;
+        }
+
+        .badge.bg-primary {
+            background-color: #4e73df !important;
+        }
+
+        .badge.bg-success {
+            background-color: #1cc88a !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #858796 !important;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <?php include 'sidebar.php'; ?>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow">
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <?php include 'notifications.php'; ?>
+
+                        <!-- User Info -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    <?php echo htmlspecialchars($_SESSION['first_name']); ?>
+                                    <i class='fas fa-user-circle' style="font-size:20px; margin-left: 10px;"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Order Approval</h1>
+                    </div>
+
+                    <?php if (isset($_SESSION['success_message'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <?php 
+                        echo $_SESSION['success_message'];
+                        unset($_SESSION['success_message']); 
+                        ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($_SESSION['error_message'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <?php 
+                        echo $_SESSION['error_message'];
+                        unset($_SESSION['error_message']); 
+                        ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Filters -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Filter Orders</h6>
+                        </div>
+                        <div class="card-body">
+                            <form method="GET" action="approve_orders.php" class="row">
+                                <div class="col-md-5 mb-3">
+                                    <label for="status">Order Status</label>
+                                    <select class="form-control" id="status" name="status">
+                                        <option value="all" <?= $status_filter === 'all' ? 'selected' : '' ?>>All Statuses</option>
+                                        <option value="pending_approval" <?= $status_filter === 'pending_approval' ? 'selected' : '' ?>>Pending Approval</option>
+                                        <option value="approved" <?= $status_filter === 'approved' ? 'selected' : '' ?>>Approved</option>
+                                        <option value="rejected" <?= $status_filter === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                                        <option value="in_progress" <?= $status_filter === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
+                                        <option value="completed" <?= $status_filter === 'completed' ? 'selected' : '' ?>>Completed</option>
+                                        <option value="delivered" <?= $status_filter === 'delivered' ? 'selected' : '' ?>>Delivered</option>
+                                        <option value="cancelled" <?= $status_filter === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5 mb-3">
+                                    <label for="type">Order Type</label>
+                                    <select class="form-control" id="type" name="type">
+                                        <option value="all" <?= $order_type === 'all' ? 'selected' : '' ?>>All Types</option>
+                                        <option value="sublimation" <?= $order_type === 'sublimation' ? 'selected' : '' ?>>Sublimation</option>
+                                        <option value="tailoring" <?= $order_type === 'tailoring' ? 'selected' : '' ?>>Tailoring</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Orders List -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <?= $result->num_rows ?> Orders 
+                                <?= $status_filter !== 'all' ? '(' . ucfirst(str_replace('_', ' ', $status_filter)) . ')' : '' ?>
+                                <?= $order_type !== 'all' ? '- ' . ucfirst($order_type) : '' ?>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <?php if ($result && $result->num_rows > 0): ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="ordersTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Amount</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php while ($row = $result->fetch_assoc()): ?>
+                                                <tr>
+                                                    <td>
+                                                        <a href="#" data-toggle="modal" data-target="#orderModal<?= $row['order_id'] ?>">
+                                                            <?= $row['order_id'] ?>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <?= htmlspecialchars($row['customer_name']) ?><br>
+                                                        <small class="text-muted"><?= $row['email'] ?></small>
+                                                    </td>
+                                                    <td>
+                                                        <?php if ($row['order_type'] === 'sublimation'): ?>
+                                                            <span class="badge badge-info">Sublimation</span>
+                                                        <?php else: ?>
+                                                            <span class="badge badge-secondary">Tailoring</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td><?= date('M d, Y', strtotime($row['created_at'])) ?></td>
+                                                    <td>
+                                                        <?php
+                                                            switch ($row['order_status']) {
+                                                                case 'pending_approval':
+                                                                    echo '<span class="badge badge-warning">Pending Approval</span>';
+                                                                    break;
+                                                                case 'approved':
+                                                                    echo '<span class="badge badge-success">Approved</span>';
+                                                                    break;
+                                                                case 'rejected':
+                                                                    echo '<span class="badge badge-danger">Rejected</span>';
+                                                                    break;
+                                                                case 'in_progress':
+                                                                    echo '<span class="badge badge-primary">In Progress</span>';
+                                                                    break;
+                                                                case 'completed':
+                                                                    echo '<span class="badge badge-info">Completed</span>';
+                                                                    break;
+                                                                case 'delivered':
+                                                                    echo '<span class="badge badge-success">Delivered</span>';
+                                                                    break;
+                                                                case 'cancelled':
+                                                                    echo '<span class="badge badge-dark">Cancelled</span>';
+                                                                    break;
+                                                                default:
+                                                                    echo '<span class="badge badge-secondary">Unknown</span>';
+                                                            }
+                                                        ?>
+                                                    </td>
+                                                    <td>₱<?= number_format($row['total_amount'], 2) ?></td>
+                                                    <td>
+                                                        <!-- View button as icon -->
+                                                        <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#orderModal<?= $row['order_id'] ?>" title="View Order Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        
+                                                        <?php if ($row['order_status'] === 'pending_approval'): ?>
+                                                            <!-- Approve button as icon -->
+                                                            <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#approveModal<?= $row['order_id'] ?>" title="Approve Order">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                            
+                                                            <!-- Reject button as icon -->
+                                                            <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#rejectModal<?= $row['order_id'] ?>" title="Reject Order">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <?php if ($total_pages > 1): ?>
+                                <nav aria-label="Order pagination" class="mt-4">
+                                    <ul class="pagination justify-content-center">
+                                        <!-- Previous Button -->
+                                        <li class="page-item <?= ($current_page <= 1) ? 'disabled' : '' ?>">
+                                            <a class="page-link" href="<?= ($current_page > 1) ? '?page='.($current_page-1).'&status='.$status_filter.'&type='.$order_type : '#' ?>" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        
+                                        <!-- Page Numbers -->
                                         <?php
-                                            switch ($row['order_status']) {
-                                                case 'pending_approval':
-                                                    echo '<span class="badge badge-warning">Pending Approval</span>';
-                                                    break;
-                                                case 'approved':
-                                                    echo '<span class="badge badge-success">Approved</span>';
-                                                    break;
-                                                case 'rejected':
-                                                    echo '<span class="badge badge-danger">Rejected</span>';
-                                                    break;
-                                                case 'in_progress':
-                                                    echo '<span class="badge badge-primary">In Progress</span>';
-                                                    break;
-                                                case 'completed':
-                                                    echo '<span class="badge badge-info">Completed</span>';
-                                                    break;
-                                                case 'delivered':
-                                                    echo '<span class="badge badge-success">Delivered</span>';
-                                                    break;
-                                                case 'cancelled':
-                                                    echo '<span class="badge badge-dark">Cancelled</span>';
-                                                    break;
-                                                default:
-                                                    echo '<span class="badge badge-secondary">Unknown</span>';
+                                        $start_page = max(1, $current_page - 2);
+                                        $end_page = min($total_pages, $current_page + 2);
+                                        
+                                        if ($start_page > 1) {
+                                            echo '<li class="page-item"><a class="page-link" href="?page=1&status='.$status_filter.'&type='.$order_type.'">1</a></li>';
+                                            if ($start_page > 2) {
+                                                echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
                                             }
+                                        }
+                                        
+                                        for ($i = $start_page; $i <= $end_page; $i++) {
+                                            echo '<li class="page-item '.($current_page == $i ? 'active' : '').'">
+                                                <a class="page-link" href="?page='.$i.'&status='.$status_filter.'&type='.$order_type.'">'.$i.'</a>
+                                              </li>';
+                                        }
+                                        
+                                        if ($end_page < $total_pages) {
+                                            if ($end_page < $total_pages - 1) {
+                                                echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+                                            }
+                                            echo '<li class="page-item"><a class="page-link" href="?page='.$total_pages.'&status='.$status_filter.'&type='.$order_type.'">'.$total_pages.'</a></li>';
+                                        }
                                         ?>
-                                    </td>
-                                    <td>₱<?= number_format($row['total_amount'], 2) ?></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#orderModal<?= $row['order_id'] ?>">
-                                            <i class="fas fa-eye"></i> View
-                                        </button>
-                                        <?php if ($row['order_status'] === 'pending_approval'): ?>
-                                            <button class="btn btn-sm btn-success mt-1" data-toggle="modal" data-target="#approveModal<?= $row['order_id'] ?>">
-                                                <i class="fas fa-check"></i> Approve
-                                            </button>
-                                            <button class="btn btn-sm btn-danger mt-1" data-toggle="modal" data-target="#rejectModal<?= $row['order_id'] ?>">
-                                                <i class="fas fa-times"></i> Reject
-                                            </button>
+                                        
+                                        <!-- Next Button -->
+                                        <li class="page-item <?= ($current_page >= $total_pages) ? 'disabled' : '' ?>">
+                                            <a class="page-link" href="<?= ($current_page < $total_pages) ? '?page='.($current_page+1).'&status='.$status_filter.'&type='.$order_type : '#' ?>" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <div class="text-center py-4">
+                                    <h5>No orders found with the selected filters</h5>
+                                    <p class="text-muted">Try changing your filter criteria or check back later</p>
+                                    <a href="approve_orders.php" class="btn btn-outline-primary">Reset Filters</a>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">
+                                Showing <?= $offset + 1 ?> to <?= min($offset + $records_per_page, $total_records) ?> of <?= $total_records ?> entries
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+                                <ul class="pagination justify-content-end">
+                                    <?php if ($current_page > 1): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="approve_orders.php?page=1&status=<?= $status_filter ?>&type=<?= $order_type ?>" aria-label="First">
+                                                <span aria-hidden="true">&laquo;&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="approve_orders.php?page=<?= $current_page - 1 ?>&status=<?= $status_filter ?>&type=<?= $order_type ?>" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    
+                                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                        <?php if ($i == $current_page): ?>
+                                            <li class="page-item active">
+                                                <a class="page-link" href="#"><?= $i ?></a>
+                                            </li>
+                                        <?php else: ?>
+                                            <li class="page-item">
+                                                <a class="page-link" href="approve_orders.php?page=<?= $i ?>&status=<?= $status_filter ?>&type=<?= $order_type ?>"><?= $i ?></a>
+                                            </li>
                                         <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
+                                    <?php endfor; ?>
+                                    
+                                    <?php if ($current_page < $total_pages): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="approve_orders.php?page=<?= $current_page + 1 ?>&status=<?= $status_filter ?>&type=<?= $order_type ?>" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="approve_orders.php?page=<?= $total_pages ?>&status=<?= $status_filter ?>&type=<?= $order_type ?>" aria-label="Last">
+                                                <span aria-hidden="true">&raquo;&raquo;</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            <?php else: ?>
-                <div class="text-center py-4">
-                    <h5>No orders found with the selected filters</h5>
-                    <p class="text-muted">Try changing your filter criteria or check back later</p>
-                    <a href="approve_orders.php" class="btn btn-outline-primary">Reset Filters</a>
-                </div>
-            <?php endif; ?>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <footer class="footer text-center py-3">
+                    <span>Copyright &copy; JXT Tailoring and Printing Services</span>
+                </footer>
+                <!-- End of Footer -->
+            </div>
+            <!-- End of Content Wrapper -->
         </div>
     </div>
-</div>
 
 <?php
 // Reset result pointer
@@ -479,7 +805,7 @@ if ($result && $result->num_rows > 0) {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="POST" action="approve_orders.php">
+            <form method="POST" action="approve_orders.php?page=<?= $current_page ?>&status=<?= $status_filter ?>&type=<?= $order_type ?>">
                 <div class="modal-body">
                     <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
                     <input type="hidden" name="status" value="approved">
@@ -507,6 +833,7 @@ if ($result && $result->num_rows > 0) {
 </div>
 
 <!-- Reject Order Modal -->
+<?php if ($row['order_status'] === 'pending_approval'): ?>
 <div class="modal fade" id="rejectModal<?= $row['order_id'] ?>" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel<?= $row['order_id'] ?>" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -518,7 +845,7 @@ if ($result && $result->num_rows > 0) {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="POST" action="approve_orders.php">
+            <form method="POST" action="approve_orders.php?page=<?= $current_page ?>&status=<?= $status_filter ?>&type=<?= $order_type ?>">
                 <div class="modal-body">
                     <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
                     <input type="hidden" name="status" value="rejected">
@@ -545,24 +872,48 @@ if ($result && $result->num_rows > 0) {
     </div>
 </div>
 <?php endif; ?>
-
 <?php endwhile; ?>
 <?php } ?>
+
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 <script>
     $(document).ready(function() {
         // Initialize DataTable
         $('#ordersTable').DataTable({
             order: [[3, 'desc']], // Sort by date column descending
-            pageLength: 10,
+            paging: false,         // Disable client-side paging
+            searching: true,       // Keep searching
+            info: false,           // Remove "Showing X of Y entries"
             language: {
                 search: "Search orders:"
             }
         });
+        
+        // Debug modal interactions
+        $('.modal').on('show.bs.modal', function (e) {
+            console.log('Modal opening: ' + $(this).attr('id'));
+        });
+        
+        // Ensure submit buttons work
+        $('form').on('submit', function() {
+            console.log('Form submitted: ' + $(this).serialize());
+            return true; // Allow form submission
+        });
     });
 </script>
 
-<?php
-// Include footer
-include 'footer.php';
-?>
+</body>
+</html>

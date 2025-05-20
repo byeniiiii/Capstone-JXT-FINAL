@@ -1,14 +1,18 @@
 <?php
 // Add these lines at the very top of approve_payments.php, right after <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
 // Start the session
 session_start();
 
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
+    header("Location: ../index.php");
+    exit();
+}
+
 // Include database connection
 include '../db.php';
-
+include 'sidebar.php';
+include 'topbar.php';
 // Check if payment_history table exists
 $check_table_query = "SHOW TABLES LIKE 'payment_history'";
 $table_exists = $conn->query($check_table_query);
@@ -23,7 +27,7 @@ if ($table_exists->num_rows == 0) {
         notes TEXT,
         changed_at DATETIME NOT NULL,
         changed_by INT
-    )"; // <- Fixed: Added closing parenthesis here
+    )";
     $conn->query($create_table_query);
 }
 
@@ -150,7 +154,7 @@ $result = $conn->query($query);
 
 // Include header
 $page_title = "Approve Payments";
-include 'header.php';
+
 ?>
 
 <div class="container-fluid">
@@ -521,7 +525,8 @@ if ($result && $result->num_rows > 0) {
             <form method="POST" action="approve_payments.php">
                 <div class="modal-body">
                     <input type="hidden" name="payment_id" value="<?= $row['payment_id'] ?>">
-                    <input type="hidden" name="status" value="approved">
+                   <option value="approved" <?= $status_filter === 'approved' ? 'selected' : '' ?>>Approved</option>
+
                     
                     <div class="text-center mb-4">
                         <i class="fas fa-check-circle text-success fa-4x mb-3"></i>

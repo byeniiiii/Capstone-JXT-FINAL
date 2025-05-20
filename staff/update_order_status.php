@@ -5,152 +5,137 @@ header('Content-Type: application/json');
 session_start();
 include '../db.php';
 
-// Check if staff is logged in
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'Staff' && $_SESSION['role'] != 'Manager')) {
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
     exit();
 }
 
-// Check if required parameters are present
-if (!isset($_POST['order_id']) || !isset($_POST['status'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Missing required parameters']);
+// Check if request is POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
     exit();
 }
 
-$order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
-$status = mysqli_real_escape_string($conn, $_POST['status']);
-$notes = isset($_POST['notes']) ? mysqli_real_escape_string($conn, $_POST['notes']) : '';
+// Get request data
+$order_id = $_POST['order_id'] ?? '';
+$status = $_POST['status'] ?? '';
+$notes = $_POST['notes'] ?? '';
 $user_id = $_SESSION['user_id'];
 
-// Start transaction
-mysqli_begin_transaction($conn);
+// Validate input
+if (empty($order_id) || empty($status)) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Order ID and status are required']);
+    exit();
+}
+
+// Validate status
+$valid_statuses = ['approved', 'in_process', 'ready_for_pickup', 'completed'];
+if (!in_array($status, $valid_statuses)) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Invalid status value']);
+    exit();
+}
+
+// Begin transaction
+$conn->begin_transaction();
 
 try {
-    // Check if this is a sublimation order being approved
-    if ($status === 'approved') {
-        // Check if it's a sublimation order with a template
-        $check_query = "SELECT s.template_id, t.added_by 
-                       FROM sublimation_orders s
-                       LEFT JOIN templates t ON s.template_id = t.template_id
-                       WHERE s.order_id = ? AND s.template_id IS NOT NULL";
-        $check_stmt = mysqli_prepare($conn, $check_query);
-        mysqli_stmt_bind_param($check_stmt, "s", $order_id);
-        mysqli_stmt_execute($check_stmt);
-        $check_result = mysqli_stmt_get_result($check_stmt);
-
-        if ($row = mysqli_fetch_assoc($check_result)) {
-            $sublimator_id = $row['added_by'];
-            if ($sublimator_id) {
-                // Update sublimation_orders table
-                $update_query = "UPDATE sublimation_orders 
-                               SET sublimator_id = ?
-                               WHERE order_id = ?";
-                $stmt = $conn->prepare($update_query);
-                $stmt->bind_param("is", $sublimator_id, $order_id);
-                $stmt->execute();
-
-                // Update order status to forwarded
-                $status = 'forward_to_sublimator';
-
-                // Create notification for sublimator
-                $notify_query = "INSERT INTO notifications (user_id, order_id, message, type) 
-                               VALUES (?, ?, 'New sublimation order assigned to you', 'order_assignment')";
-                $stmt = $conn->prepare($notify_query);
-                $stmt->bind_param("is", $sublimator_id, $order_id);
-                $stmt->execute();
-            }
+    // Update order status
+    $update_order = $conn->prepare("UPDATE orders SET 
+                                    order_status = ?,
+                                    updated_at = NOW() 
+                                    WHERE order_id = ?");
+    $update_order->bind_param("ss", $status, $order_id);
+    $update_order->execute();
+    
+    // Check if order was updated
+    if ($update_order->affected_rows === 0) {
+        // Check if the order exists
+        $check_order = $conn->prepare("SELECT order_id, order_status, customer_id FROM orders WHERE order_id = ?");
+        $check_order->bind_param("s", $order_id);
+        $check_order->execute();
+        $result = $check_order->get_result();
+        
+        if ($result->num_rows === 0) {
+            throw new Exception("Order not found");
         }
     }
-
-    // Update order status
-    $update_order = "UPDATE orders 
-                    SET order_status = ?,
-                        updated_at = NOW() 
-                    WHERE order_id = ?";
-    $stmt = mysqli_prepare($conn, $update_order);
-    mysqli_stmt_bind_param($stmt, "ss", $status, $order_id);
     
-    if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception("Error updating order status");
+    // Get customer information
+    $get_customer = $conn->prepare("SELECT customer_id, order_type FROM orders WHERE order_id = ?");
+    $get_customer->bind_param("s", $order_id);
+    $get_customer->execute();
+    $customer_result = $get_customer->get_result();
+    $order_data = $customer_result->fetch_assoc();
+    $customer_id = $order_data['customer_id'];
+    $order_type = $order_data['order_type'];
+    
+    // Add entry to order history
+    if (empty($notes)) {
+        $notes = "Order status updated to " . str_replace('_', ' ', $status);
     }
     
-    // Get customer ID for notification
-    $customer_query = "SELECT customer_id FROM orders WHERE order_id = ?";
-    $stmt = mysqli_prepare($conn, $customer_query);
-    mysqli_stmt_bind_param($stmt, "s", $order_id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $order = mysqli_fetch_assoc($result);
+    $add_history = $conn->prepare("INSERT INTO order_status_history 
+                                 (order_id, status, updated_by, notes, created_at) 
+                                 VALUES (?, ?, ?, ?, NOW())");
+    $add_history->bind_param("siss", $order_id, $user_id, $notes);
+    $add_history->execute();
     
-    if (!$order) {
-        throw new Exception("Order not found");
-    }
-    
-    $customer_id = $order['customer_id'];
-    
-    // Create a notification for the customer
-    $title = "";
-    $message = "";
+    // Create customer notification
+    $notification_title = "Order Status Update";
+    $notification_message = "";
     
     switch ($status) {
-        case 'ready_for_pickup':
-            $title = "Order Ready for Pickup";
-            $message = "Your order #$order_id is now ready for pickup.";
-            break;
-        case 'forward_to_sublimator':
-            $title = "Order Forwarded to Sublimator";
-            $message = "Your order #$order_id has been forwarded to our sublimator.";
-            break;
         case 'in_process':
-            $title = "Order In Process";
-            $message = "Your order #$order_id is now being processed.";
+            $notification_title = "Order In Process";
+            $notification_message = "Your " . ucfirst($order_type) . " order #$order_id is now being processed.";
+            break;
+        case 'ready_for_pickup':
+            $notification_title = "Order Ready for Pickup";
+            $notification_message = "Your order #$order_id is now ready for pickup.";
             break;
         case 'completed':
-            $title = "Order Completed";
-            $message = "Your order #$order_id has been completed.";
-            break;
-        case 'declined':
-            $title = "Order Declined";
-            $message = "Your order #$order_id has been declined.";
+            $notification_title = "Order Completed";
+            $notification_message = "Your order #$order_id has been marked as completed. Thank you for your business!";
             break;
         default:
-            $title = "Order Update";
-            $message = "Your order #$order_id has been updated to: " . str_replace('_', ' ', ucwords($status));
+            $notification_message = "Your " . ucfirst($order_type) . " order #$order_id status has been updated to " . str_replace('_', ' ', $status);
     }
     
-    $notification_query = "INSERT INTO notifications (customer_id, order_id, title, message, created_at) 
-                         VALUES (?, ?, ?, ?, NOW())";
-    $stmt = mysqli_prepare($conn, $notification_query);
-    mysqli_stmt_bind_param($stmt, "isss", $customer_id, $order_id, $title, $message);
+    // Add note to orders table
+    $update_note = $conn->prepare("INSERT INTO notes (order_id, user_id, note, created_at) VALUES (?, ?, ?, NOW())");
+    $update_note->bind_param("sis", $order_id, $user_id, $notes);
+    $update_note->execute();
     
-    if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception("Error creating notification");
-    }
+    $add_notification = $conn->prepare("INSERT INTO notifications 
+                                      (customer_id, order_id, title, message, is_read, created_at) 
+                                      VALUES (?, ?, ?, ?, 0, NOW())");
+    $add_notification->bind_param("isss", $customer_id, $order_id, $notification_title, $notification_message);
+    $add_notification->execute();
     
-    // Add order note if provided
-    if (!empty($notes)) {
-        $note_query = "INSERT INTO notes (order_id, user_id, note, created_at) 
-                      VALUES (?, ?, ?, NOW())";
-        $stmt = mysqli_prepare($conn, $note_query);
-        mysqli_stmt_bind_param($stmt, "sis", $order_id, $user_id, $notes);
-        
-        if (!mysqli_stmt_execute($stmt)) {
-            throw new Exception("Error adding order note");
-        }
-    }
-
-    // For sublimation orders, no need to update the sublimation_orders table status
-    // since we don't have a status column in sublimation_orders table
-    // We only need to update the orders table which is already done above
+    // Commit the transaction
+    $conn->commit();
     
-    // Commit transaction
-    mysqli_commit($conn);
-    
-    echo json_encode(['status' => 'success', 'message' => 'Order status updated successfully']);
+    // Return success response
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'success',
+        'message' => "Order status updated to " . str_replace('_', ' ', $status)
+    ]);
     
 } catch (Exception $e) {
-    // Rollback transaction
-    mysqli_rollback($conn);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    // Rollback on error
+    $conn->rollback();
+    
+    // Return error response
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'error',
+        'message' => $e->getMessage()
+    ]);
 }
-// No closing PHP tag to prevent accidental whitespace
+?>
