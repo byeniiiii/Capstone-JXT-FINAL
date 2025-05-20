@@ -2,10 +2,11 @@
 // Include database connection
 include '../db.php';
 
-// Replace the existing query with this:
+// Updated query that only tracks staff, manager, and sublimator activities
 $query = "SELECT l.*, CONCAT(u.first_name, ' ', u.last_name) AS user_name 
           FROM activity_logs l
           LEFT JOIN users u ON l.user_id = u.user_id
+          WHERE l.user_type IN ('Staff', 'Manager', 'Sublimator')
           ORDER BY l.created_at DESC";
 
 $result = mysqli_query($conn, $query);
@@ -188,7 +189,6 @@ if (!$result) {
                                     <th>User Type</th>
                                     <th>Action</th>
                                     <th>Description</th>
-                                    <th>IP Address</th>
                                     <th>Date & Time</th>
                                 </tr>
                             </thead>
@@ -215,12 +215,11 @@ if (!$result) {
                                                 </span>
                                             </td>
                                             <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                            <td><small class="text-muted"><?php echo htmlspecialchars($row['ip_address']); ?></small></td>
                                             <td><?php echo date('M d, Y h:i A', strtotime($row['created_at'])); ?></td>
                                         </tr>
                                 <?php }
                                 } else {
-                                    echo "<tr><td colspan='7' class='text-center'>No activity logs found</td></tr>";
+                                    echo "<tr><td colspan='6' class='text-center'>No activity logs found</td></tr>";
                                 }
                                 ?>
                             </tbody>
@@ -298,7 +297,7 @@ if (!$result) {
     <script>
     $(document).ready(function() {
         $('#logsTable').DataTable({
-            order: [[6, 'desc']],
+            order: [[5, 'desc']],
             pageLength: 5,
             responsive: true,
             lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],

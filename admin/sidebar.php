@@ -149,6 +149,23 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
 
     .sidebar {
         transition: all 0.3s ease;
+        background-color: #451717 !important; /* Changed to deep burgundy color */
+    }
+
+    /* Make sure all sidebar elements use the new background color */
+    .sidebar-dark .nav-item .nav-link,
+    .sidebar-dark .sidebar-brand,
+    .sidebar-dark .sidebar-heading {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .sidebar-dark .sidebar-divider {
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Active state for the new color */
+    .sidebar-dark .nav-item.active .nav-link {
+        background-color: rgba(255, 255, 255, 0.2);
     }
 
     /* Fix Burger Menu Position */

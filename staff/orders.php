@@ -57,12 +57,10 @@ $result = mysqli_query($conn, $query);
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
     <style>
-        /* Modern color scheme */
+        /* Simplified color scheme */
         :root {
             --primary: #443627;
-            --primary-light: #5a4835;
             --secondary: #D98324;
-            --secondary-light: #f09e45;
             --light-bg: #f8f9fc;
             --white: #ffffff;
             --text-dark: #333333;
@@ -78,14 +76,14 @@ $result = mysqli_query($conn, $query);
             background-color: var(--light-bg);
             color: var(--text-dark);
         }
-
-        /* Page header enhancements */
+        
+        /* Simplified header */
         .page-header {
             background-color: var(--white);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -96,409 +94,92 @@ $result = mysqli_query($conn, $query);
             font-weight: 700;
             color: var(--primary);
             margin: 0;
-            position: relative;
         }
         
-        .page-header h1:after {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 3px;
-            background-color: var(--secondary);
-            margin-top: 8px;
-        }
-        
-        /* Filter section */
+        /* Simplified filter section */
         .filters-container {
             background-color: var(--white);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 1rem;
-            transition: all 0.3s ease;
         }
         
         .filter-form {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
             align-items: flex-end;
         }
         
         .filter-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 150px;
         }
         
-        .filter-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-light);
-            margin-bottom: 0.3rem;
-            display: block;
-        }
-        
-        .form-select, .form-control {
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 0.5rem;
-            background-color: #f9f9f9;
-            transition: all 0.2s;
-        }
-        
-        .form-select:focus, .form-control:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 0.2rem rgba(217, 131, 36, 0.25);
-        }
-        
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        /* Enhanced table styling */
+        /* Smaller compact table */
         .table-container {
             background-color: var(--white);
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .table-container:hover {
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
         }
 
         .table {
             margin-bottom: 0;
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            font-size: 0.85rem; /* Smaller font */
         }
         
         .table th {
-            background: linear-gradient(to right, var(--secondary), var(--secondary-light));
+            background-color: var(--secondary);
             color: white;
             font-weight: 600;
-            border: none;
-            padding: 14px 15px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-        
-        .table th:first-child {
-            border-top-left-radius: 12px;
-        }
-        
-        .table th:last-child {
-            border-top-right-radius: 12px;
+            padding: 0.5rem; /* Reduced padding */
         }
         
         .table td {
-            padding: 14px 15px;
+            padding: 0.5rem; /* Reduced padding */
             vertical-align: middle;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.2s;
         }
         
-        .table tbody tr {
-            transition: background-color 0.2s, transform 0.2s;
-        }
-        
-        .table tbody tr:hover {
-            background-color: rgba(217, 131, 36, 0.05);
-            transform: translateY(-2px);
-        }
-        
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        
-        /* Order ID styling */
-        .order-id {
-            font-weight: 600;
-            color: var(--primary);
-            display: inline-block;
-            border-radius: 4px;
-            padding: 0.25rem 0.5rem;
-            background-color: rgba(68, 54, 39, 0.08);
-        }
-        
-        /* Customer name styling */
-        .customer-name {
-            font-weight: 500;
-        }
-        
-        /* Enhanced action buttons styling */
-        .actions-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
+        /* Simplified button styles */
         .btn-action {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
+            width: 30px; /* Smaller */
+            height: 30px; /* Smaller */
+            border-radius: 4px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
             border: none;
-            transition: all 0.3s;
             color: white;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            margin: 0 2px;
         }
         
-        .btn-action:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.1);
-            transform: scale(0);
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
+        .btn-view { background-color: var(--info); }
+        .btn-approve { background-color: var(--success); }
+        .btn-decline { background-color: var(--danger); }
         
-        .btn-action:hover:before {
-            transform: scale(1);
-        }
-        
-        .btn-view {
-            background-color: var(--info);
-        }
-        
-        .btn-view:hover {
-            background-color: #138496;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 8px rgba(19, 132, 150, 0.3);
-        }
-        
-        .btn-approve {
-            background-color: var(--success);
-        }
-        
-        .btn-approve:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 8px rgba(40, 167, 69, 0.3);
-        }
-        
-        .btn-decline {
-            background-color: var(--danger);
-        }
-        
-        .btn-decline:hover {
-            background-color: #c82333;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 8px rgba(220, 53, 69, 0.3);
-        }
-        
-        .btn-action i {
-            font-size: 1rem;
-            transition: transform 0.2s;
-        }
-        
-        .btn-action:hover i {
-            transform: scale(1.2);
-        }
-        
-        /* Enhanced status badges */
+        /* Simple status badges */
         .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
             display: inline-block;
-            text-transform: capitalize;
-            letter-spacing: 0.3px;
         }
         
         .status-pending {
             background-color: #fff3cd;
             color: #856404;
-            border: 1px dashed #ffeeba;
         }
         
-        .status-approved {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px dashed #c3e6cb;
-        }
-        
-        .status-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px dashed #f5c6cb;
-        }
-        
-        /* Price/amount styling */
-        .amount {
-            font-family: 'Roboto Mono', monospace;
-            font-weight: 500;
-        }
-        
-        /* Improved pagination styling */
+        /* Basic pagination */
         .pagination-container {
             display: flex;
             justify-content: center;
-            margin-top: 1.5rem;
-        }
-        
-        .pagination {
-            background-color: var(--white);
-            border-radius: 30px;
-            padding: 5px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-        }
-        
-        .page-link {
-            color: var(--text-dark);
-            border: none;
-            padding: 8px 16px;
-            margin: 0 3px;
-            border-radius: 20px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .page-item.active .page-link {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-            color: white;
-            box-shadow: 0 3px 6px rgba(217, 131, 36, 0.3);
-        }
-        
-        .page-link:hover:not(.active) {
-            background-color: rgba(217, 131, 36, 0.1);
-            color: var(--secondary);
-            transform: translateY(-2px);
-        }
-        
-        /* Enhanced Modal styling */
-        .modal-content {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .modal-header {
-            background: linear-gradient(to right, var(--secondary), var(--secondary-light));
-            color: white;
-            border-bottom: none;
-            padding: 1.2rem 1.5rem;
-        }
-        
-        .modal-header h5 {
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        
-        .modal-body {
-            padding: 1.5rem;
-        }
-        
-        .modal-footer {
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 1rem 1.5rem;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-        
-        .btn-confirm {
-            background: linear-gradient(to right, var(--secondary), var(--secondary-light));
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            transition: all 0.3s;
-            box-shadow: 0 3px 6px rgba(217, 131, 36, 0.3);
-        }
-        
-        .btn-confirm:hover {
-            background: linear-gradient(to right, var(--secondary-light), var(--secondary));
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(217, 131, 36, 0.4);
-        }
-        
-        /* Empty state styling */
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem 1rem;
-            text-align: center;
-        }
-        
-        .empty-state-icon {
-            font-size: 4rem;
-            color: rgba(68, 54, 39, 0.2);
-            margin-bottom: 1.5rem;
-        }
-        
-        .empty-state-text {
-            color: var(--text-light);
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-        
-        /* Animated loading indicators */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .loading {
-            animation: pulse 1.5s infinite;
-        }
-        
-        /* Tooltips */
-        [data-tooltip] {
-            position: relative;
-            cursor: pointer;
-        }
-        
-        [data-tooltip]:before {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 5px 10px;
-            border-radius: 5px;
-            background-color: rgba(0,0,0,0.8);
-            color: white;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s, transform 0.2s;
-            transform: translateX(-50%) translateY(10px);
-            z-index: 10;
-        }
-        
-        [data-tooltip]:hover:before {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -781,66 +462,28 @@ $result = mysqli_query($conn, $query);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        // Update approval function to use modal
+        // Function to approve an order
         function approveOrder(orderId) {
-            // Set the order ID in the modal
-            document.getElementById('approveOrderId').value = orderId;
-            
-            // Show the approval modal
-            var approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
-            approveModal.show();
-        }
-        
-        function confirmApproval() {
-            const orderId = document.getElementById('approveOrderId').value;
-            const notes = document.getElementById('approveNotes').value;
-            
-            // Show loading state on button
-            const approveButton = document.querySelector('#approveModal .btn-success');
-            const originalContent = approveButton.innerHTML;
-            approveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-            approveButton.disabled = true;
-            
-            $.ajax({
-                url: "orders.php",
-                type: "POST",
-                data: { 
-                    order_id: orderId, 
-                    approve: true,
-                    notes: notes 
-                },
-                success: function(response) {
-                    // Close the modal
-                    bootstrap.Modal.getInstance(document.getElementById('approveModal')).hide();
-                    
-                    // Show success message using SweetAlert2
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Order Approved',
-                        text: 'The order has been approved successfully.',
-                        confirmButtonColor: '#28a745'
-                    }).then((result) => {
+            if (confirm('Are you sure you want to approve this order?')) {
+                $.ajax({
+                    url: "process_approval.php",
+                    type: "POST",
+                    data: { 
+                        order_id: orderId, 
+                        action: 'approve'
+                    },
+                    success: function(response) {
+                        alert('Order has been approved successfully!');
                         location.reload();
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    
-                    // Show error message
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'There was an error approving the order. Please try again.',
-                        confirmButtonColor: '#dc3545'
-                    });
-                    
-                    // Reset button state
-                    approveButton.innerHTML = originalContent;
-                    approveButton.disabled = false;
-                }
-            });
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
+                    }
+                });
+            }
         }
         
+        // Function to decline an order
         function setDeclineOrderId(orderId) {
             document.getElementById('declineOrderId').value = orderId;
         }
@@ -850,71 +493,27 @@ $result = mysqli_query($conn, $query);
             const reason = document.getElementById('declineReason').value;
             
             if (!reason.trim()) {
-                // Highlight the textarea with error styling
-                document.getElementById('declineReason').classList.add('is-invalid');
+                alert('Please provide a reason for declining the order.');
                 return;
             }
             
-            // Remove error styling if present
-            document.getElementById('declineReason').classList.remove('is-invalid');
-            
-            // Show loading state on button
-            const declineButton = document.querySelector('#declineModal .btn-confirm');
-            const originalContent = declineButton.innerHTML;
-            declineButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-            declineButton.disabled = true;
-            
             $.ajax({
-                url: "decline_order.php",
+                url: "process_approval.php",
                 type: "POST",
                 data: { 
-                    order_id: orderId, 
+                    order_id: orderId,
+                    action: 'decline',
                     reason: reason 
                 },
                 success: function(response) {
-                    // Close the modal
-                    bootstrap.Modal.getInstance(document.getElementById('declineModal')).hide();
-                    
-                    // Show success message
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Order Declined',
-                        text: 'The order has been declined successfully.',
-                        confirmButtonColor: '#17a2b8'
-                    }).then((result) => {
-                        location.reload();
-                    });
+                    alert('Order has been declined successfully!');
+                    $('#declineModal').modal('hide');
+                    location.reload();
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    
-                    // Show error message
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'There was an error declining the order. Please try again.',
-                        confirmButtonColor: '#dc3545'
-                    });
-                    
-                    // Reset button state
-                    declineButton.innerHTML = originalContent;
-                    declineButton.disabled = false;
+                    alert('Error: ' + error);
                 }
             });
-        }
-        
-        // Add input validation
-        document.getElementById('declineReason').addEventListener('input', function() {
-            if (this.value.trim()) {
-                this.classList.remove('is-invalid');
-            }
-        });
-        
-        // Add SweetAlert2 if not already included
-        if (typeof Swal === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-            document.head.appendChild(script);
         }
     </script>
 </body>

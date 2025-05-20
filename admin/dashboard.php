@@ -104,96 +104,175 @@ $recent_orders_result = $conn->query($recent_orders_query);
     <!-- Custom fonts -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- Custom styles -->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
     <style>
         body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #443627;
-        color: #EFDCAB;
-        overflow-x: hidden;
-    }
-
-    .sidebar {
-        transition: all 0.3s ease-in-out;
-    }
-
-    .sidebar.toggled {
-        width: 80px !important;
-    }
-
-    .sidebar .nav-item .nav-link {
-        color: #EFDCAB !important;
-    }
-
-    .navbar {
-        background-color: #ffffff !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .navbar a {
-        color: #443627 !important;
-    }
-
-    .card {
-        border-left: 4px solid #D98324 !important;
-        background-color: #EFDCAB !important;
-        color: #443627 !important;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    }
-
-    .btn-primary {
-        background-color: #D98324 !important;
-        border-color: #D98324 !important;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        background-color: #443627 !important;
-        border-color: #443627 !important;
-    }
-
-    .text-primary {
-        color: #D98324 !important;
-    }
-
-    .text-gray-800 {
-        color: #443627 !important;
-    }
-
-    .footer {
-        background-color: #443627 !important;
-        color: #EFDCAB !important;
-        font-size: 14px;
-    }
-
-    /* Burger Menu Fix */
-    #sidebarToggleTop {
-        color: #443627;
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .sidebar {
-            width: 100% !important;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fc;
+            color: #5a5c69;
+            overflow-x: hidden;
         }
 
-        .sidebar .nav-item {
-            text-align: center;
-        }
-
+        /* Remove all sidebar styling since it's handled in sidebar.php */
+        /* Keep only the main content styling */
+        
+        
         .card {
-            margin-bottom: 1rem;
+            border: none !important;
+            border-radius: 0.35rem;
+            background-color: #ffffff !important;
+            color: #5a5c69 !important;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.15) !important;
+        }
+
+        .card-header {
+            background-color: #f8f9fc !important;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .btn-primary {
+            background-color: #4e73df !important;
+            border-color: #4e73df !important;
+            box-shadow: 0 0.125rem 0.25rem 0 rgba(58, 59, 69, 0.2) !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9 !important;
+            border-color: #2653d4 !important;
+            transform: translateY(-1px);
+        }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+
+        .footer {
+            background-color: #f8f9fc !important;
+            color: #858796 !important;
+            border-top: 1px solid #e3e6f0;
+            font-size: 0.85rem;
+        }
+
+        /* Card highlight colors */
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        /* Modern table styling */
+        .table {
+            color: #5a5c69;
+        }
+
+        .table-bordered {
+            border: 1px solid #e3e6f0;
+        }
+
+        .table th {
+            background-color: #f8f9fc;
+            border-bottom: 2px solid #e3e6f0;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+        .badge {
+            font-weight: 600;
+            padding: 0.35em 0.65em;
+            border-radius: 0.35rem;
+        }
+
+        .badge.bg-light {
+            background-color: #f8f9fc !important;
+            color: #5a5c69;
+            border: 1px solid #e3e6f0;
+        }
+
+        .badge.bg-warning {
+            background-color: #f6c23e !important;
+            color: #fff;
+        }
+
+        .badge.bg-danger {
+            background-color: #e74a3b !important;
+        }
+
+        .badge.bg-info {
+            background-color: #36b9cc !important;
+        }
+
+        .badge.bg-primary {
+            background-color: #4e73df !important;
+        }
+
+        .badge.bg-success {
+            background-color: #1cc88a !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #858796 !important;
+        }
+
+        /* Animated counters */
+        .counter-animation {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            margin: auto;
+        }
+
+        /* Card icons */
+        .card-icon {
+            color: #dddfeb;
+            font-size: 2rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Important: Add this line to ensure sidebar styles remain intact */
+        #sidebar-wrapper, .sidebar { background-color: #4e73df !important; }
     </style>
 </head>
 
@@ -242,16 +321,16 @@ $recent_orders_result = $conn->query($recent_orders_query);
                     <div class="row">
                         <!-- Total Orders Card -->
                         <div class="col-xl-3 col-md-6 mb-4 animate__animated animate__fadeIn">
-                            <div class="card shadow h-100 py-2">
+                            <div class="card border-left-primary shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                 Total Orders</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo number_format($total_orders); ?></div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800 counter-animation"><?php echo number_format($total_orders); ?></div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-shopping-bag fa-2x text-gray-300"></i>
+                                            <i class="fas fa-shopping-bag fa-2x card-icon"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -260,16 +339,16 @@ $recent_orders_result = $conn->query($recent_orders_query);
 
                          <!-- Monthly Orders Card -->
                          <div class="col-xl-3 col-md-6 mb-4 animate__animated animate__fadeIn" style="animation-delay: 0.1s;">
-                            <div class="card shadow h-100 py-2">
+                            <div class="card border-left-warning shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                                 Orders This Month</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo number_format($monthly_orders); ?></div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800 counter-animation"><?php echo number_format($monthly_orders); ?></div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                            <i class="fas fa-calendar fa-2x card-icon"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -278,16 +357,16 @@ $recent_orders_result = $conn->query($recent_orders_query);
 
                         <!-- Total Revenue Card -->
                         <div class="col-xl-3 col-md-6 mb-4 animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
-                            <div class="card shadow h-100 py-2">
+                            <div class="card border-left-success shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                                 Total Revenue</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">₱<?php echo number_format($total_income, 2); ?></div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800 counter-animation">₱<?php echo number_format($total_income, 2); ?></div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-peso-sign fa-2x text-gray-300"></i>
+                                            <i class="fas fa-coins fa-2x card-icon"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -296,16 +375,16 @@ $recent_orders_result = $conn->query($recent_orders_query);
 
                         <!-- Monthly Revenue Card -->
                         <div class="col-xl-3 col-md-6 mb-4 animate__animated animate__fadeIn" style="animation-delay: 0.3s;">
-                            <div class="card shadow h-100 py-2">
+                            <div class="card border-left-info shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                                 Revenue This Month</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">₱<?php echo number_format($monthly_income, 2); ?></div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800 counter-animation">₱<?php echo number_format($monthly_income, 2); ?></div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                            <i class="fas fa-dollar-sign fa-2x card-icon"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -445,7 +524,17 @@ $recent_orders_result = $conn->query($recent_orders_query);
     <script src="js/sb-admin-2.min.js"></script>
 
     <script>
-        // Daily orders chart
+        // Utility function for random colors with high lightness
+        function generatePastelColor() {
+            const hue = Math.floor(Math.random() * 360);
+            return `hsla(${hue}, 70%, 80%, 0.7)`;
+        }
+
+        // Updated chart theme
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+        Chart.defaults.color = "#5a5c69";
+        
+        // Daily orders chart with modern styling
         const ordersChartCtx = document.getElementById('ordersChart').getContext('2d');
         new Chart(ordersChartCtx, {
             type: 'line',
@@ -454,32 +543,82 @@ $recent_orders_result = $conn->query($recent_orders_query);
                 datasets: [{
                     label: 'Daily Orders',
                     data: <?php echo json_encode($daily_counts); ?>,
-                    backgroundColor: 'rgba(217, 131, 36, 0.2)',
-                    borderColor: 'rgba(217, 131, 36, 1)',
-                    borderWidth: 2,
-                    tension: 0.4,
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    borderColor: 'rgba(78, 115, 223, 1)',
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "#fff",
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointBorderWidth: 2,
+                    borderWidth: 3,
+                    tension: 0.3,
                     fill: true
                 }]
             },
             options: {
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
+                            padding: 10,
                             precision: 0
+                        },
+                        grid: {
+                            color: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineColor: "rgb(234, 236, 244)"
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            padding: 10
                         }
                     }
                 },
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        titleMarginBottom: 10,
+                        titleColor: "#6e707e",
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        padding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Orders: ' + context.parsed.y;
+                            }
+                        }
                     }
                 }
             }
         });
 
-        // Order status chart
+        // Order status chart with modern styling
         const statusChartCtx = document.getElementById('orderStatusChart').getContext('2d');
         new Chart(statusChartCtx, {
             type: 'doughnut',
@@ -504,28 +643,53 @@ $recent_orders_result = $conn->query($recent_orders_query);
                         <?php echo $statuses['declined'] ?? 0; ?>
                     ],
                     backgroundColor: [
-                        '#ffc107', // warning - pending
-                        '#17a2b8', // info - approved
-                        '#6c757d', // secondary - in process
-                        '#007bff', // primary - forward to sublimator
-                        '#6610f2', // indigo - ready for pickup
-                        '#28a745', // success - completed
-                        '#dc3545'  // danger - declined
+                        '#f6c23e', // warning - pending
+                        '#36b9cc', // info - approved
+                        '#858796', // secondary - in process
+                        '#4e73df', // primary - forward to sublimator
+                        '#8540f5', // indigo - ready for pickup
+                        '#1cc88a', // success - completed
+                        '#e74a3b'  // danger - declined
                     ],
-                    borderWidth: 1
+                    hoverBackgroundColor: [
+                        '#f4b619',
+                        '#2ca8bf',
+                        '#717384',
+                        '#2e59d9',
+                        '#7032d6',
+                        '#17a673',
+                        '#d52a1a'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 5
                 }]
             },
             options: {
                 maintainAspectRatio: false,
+                cutout: '70%',
                 plugins: {
                     legend: {
-                        position: 'right'
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        titleColor: "#6e707e",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        padding: 15,
+                        displayColors: true
                     }
                 }
             }
         });
 
-        // Order type chart
+        // Order type chart with modern styling
         const typeChartCtx = document.getElementById('orderTypeChart').getContext('2d');
         new Chart(typeChartCtx, {
             type: 'pie',
@@ -537,20 +701,49 @@ $recent_orders_result = $conn->query($recent_orders_query);
                         <?php echo $order_types['sublimation'] ?? 0; ?>
                     ],
                     backgroundColor: [
-                        'rgba(217, 131, 36, 0.8)',
-                        'rgba(68, 54, 39, 0.8)'
+                        '#4e73df',
+                        '#1cc88a'
                     ],
-                    borderWidth: 1
+                    hoverBackgroundColor: [
+                        '#2e59d9',
+                        '#17a673'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 5
                 }]
             },
             options: {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        titleColor: "#6e707e",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        padding: 15,
+                        displayColors: true
                     }
                 }
             }
+        });
+
+        // Animation for counters
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.counter-animation').forEach(function(element, index) {
+                    element.style.animationDelay = (index * 0.1) + 's';
+                    element.style.animationPlayState = 'running';
+                });
+            }, 300);
         });
     </script>
 </body>

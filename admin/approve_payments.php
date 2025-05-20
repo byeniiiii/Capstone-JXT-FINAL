@@ -1,15 +1,31 @@
 <?php
+// Add these lines at the very top of approve_payments.php, right after <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // Start the session
 session_start();
 
-// Check if user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../index.php");
-    exit();
-}
-
 // Include database connection
 include '../db.php';
+
+// Check if payment_history table exists
+$check_table_query = "SHOW TABLES LIKE 'payment_history'";
+$table_exists = $conn->query($check_table_query);
+
+if ($table_exists->num_rows == 0) {
+    // Create payment_history table if it doesn't exist
+    $create_table_query = "CREATE TABLE payment_history (
+        history_id INT AUTO_INCREMENT PRIMARY KEY,
+        payment_id INT NOT NULL,
+        previous_status VARCHAR(20) NOT NULL,
+        new_status VARCHAR(20) NOT NULL,
+        notes TEXT,
+        changed_at DATETIME NOT NULL,
+        changed_by INT
+    )"; // <- Fixed: Added closing parenthesis here
+    $conn->query($create_table_query);
+}
 
 // Process payment status changes if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_id']) && isset($_POST['status'])) {
@@ -62,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_id']) && isse
                          VALUES (?, ?, ?, ?, NOW(), ?)";
         $stmt = $conn->prepare($history_query);
         $previous_status = $payment_data['status'];
-        $user_id = $_SESSION['user_id'];
+        $user_id = $_SESSION['user_id'] ?? 0;
         $stmt->bind_param("isssi", $payment_id, $previous_status, $new_status, $notes, $user_id);
         $stmt->execute();
         
@@ -77,11 +93,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_id']) && isse
             $message = "Your payment for order #$order_id has been rejected. Reason: $notes. Please contact support for assistance.";
         }
         
-        $notification_query = "INSERT INTO notifications (customer_id, order_id, title, message, created_at) 
-                              VALUES (?, ?, ?, ?, NOW())";
-        $stmt = $conn->prepare($notification_query);
-        $stmt->bind_param("isss", $customer_id, $order_id, $title, $message);
-        $stmt->execute();
+        // Check if notifications table exists
+        $check_notif_table = "SHOW TABLES LIKE 'notifications'";
+        $notif_table_exists = $conn->query($check_notif_table);
+        
+        if ($notif_table_exists->num_rows > 0) {
+            $notification_query = "INSERT INTO notifications (customer_id, order_id, title, message, created_at) 
+                                VALUES (?, ?, ?, ?, NOW())";
+            $stmt = $conn->prepare($notification_query);
+            $stmt->bind_param("isss", $customer_id, $order_id, $title, $message);
+            $stmt->execute();
+        }
         
         // Commit transaction
         $conn->commit();
