@@ -46,10 +46,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $completion_date = isset($_POST['completion_date']) ? $_POST['completion_date'] : '';
     $seamstress_appointment = ($needs_seamstress && isset($_POST['seamstress_appointment'])) ? $_POST['seamstress_appointment'] : NULL;
     
+    // Calculate fee - 150 pesos per clothing item
+    $fee_per_item = 150.00;
+    $total_amount = $fee_per_item * $quantity;
+    $downpayment_amount = $total_amount * 0.5; // 50% downpayment
+    
     // Validation
     if (empty($order_id)) $errors[] = "Order ID is required";
     if (empty($alteration_type)) $errors[] = "Alteration type is required";
     if (empty($completion_date)) $errors[] = "Completion date is required";
+    
+    // Add quantity validation
+    if ($quantity < 1) {
+        $errors[] = "Quantity must be at least 1";
+    }
+    if ($quantity > 100) {
+        $errors[] = "Quantity cannot exceed 100";
+    }
     
     if ($measurement_method == 'manual' && empty($measurements)) {
         $errors[] = "Measurements are required when selecting manual entry";
@@ -97,9 +110,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($check_result->num_rows == 0) {
             $order_sql = "INSERT INTO orders (order_id, customer_id, order_type, order_status, 
                           total_amount, downpayment_amount, payment_method, payment_status) 
-                          VALUES (?, ?, 'tailoring', 'pending_approval', 0.00, 0.00, 'cash', 'pending')";
+                          VALUES (?, ?, 'tailoring', 'pending_approval', ?, ?, 'cash', 'pending')";
             $order_stmt = $conn->prepare($order_sql);
-            $order_stmt->bind_param("si", $order_id, $customer_id);
+            $order_stmt->bind_param("sidd", $order_id, $customer_id, $total_amount, $downpayment_amount);
             
             if (!$order_stmt->execute()) {
                 $errors[] = "Error creating order: " . $order_stmt->error;
@@ -356,12 +369,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <!-- Basic Details -->
                     <div class="form-section">
                         <h5 class="form-section-title"><i class="fas fa-list-ul me-2 text-primary"></i>Order Details</h5>
-                        
-                        <div class="mb-3">
+                          <div class="mb-3">
                             <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-sort-amount-up"></i></span>
-                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" max="100" value="<?php echo $quantity; ?>" required>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" max="100" value="<?php echo $quantity; ?>" required onchange="calculatePrice()">
+                            </div>
+                        </div>
+                        
+                        <!-- Price Calculation Section -->
+                        <div class="mb-3">
+                            <label class="form-label">Price Calculation</label>
+                            <div class="card bg-light">
+                                <div class="card-body py-2">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Alteration Fee:</span>
+                                        <span>₱150.00 per item</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Quantity:</span>
+                                        <span id="quantity-display">1</span>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <span>Total Amount:</span>
+                                        <span id="total-amount">₱150.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted small">
+                                        <span>Required Downpayment (50%):</span>
+                                        <span id="downpayment-amount">₱75.00</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -508,6 +546,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 appointmentInput.removeAttribute('required');
             }
         }
+          // Price calculation function
+        function calculatePrice() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const feePerItem = 150;
+            const totalAmount = quantity * feePerItem;
+            const downpayment = totalAmount * 0.5;
+            
+            document.getElementById('quantity-display').textContent = quantity;
+            document.getElementById('total-amount').textContent = '₱' + totalAmount.toFixed(2);
+            document.getElementById('downpayment-amount').textContent = '₱' + downpayment.toFixed(2);
+        }
         
         // Initialize form based on existing values
         window.addEventListener('DOMContentLoaded', function() {
@@ -523,6 +572,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             // Add initialization for seamstress options
             toggleSeamstressOptions();
+            
+            // Initialize price calculation
+            calculatePrice();
+            
+            // Add event listener for quantity changes
+            document.getElementById('quantity').addEventListener('input', calculatePrice);
         });
     </script>
 </body>
