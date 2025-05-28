@@ -180,7 +180,7 @@ $order_id = generateUniqueOrderId($conn);
                     </div>
                     
                     <!-- Custom Made Service Option -->
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <div class="service-option" onclick="location.href='custom_made.php?order_id=<?php echo $order_id; ?>';">
                                 <div class="service-icon">
@@ -188,7 +188,7 @@ $order_id = generateUniqueOrderId($conn);
                                 </div>
                                 <h5 class="service-title">Custom Made Clothing</h5>
                                 <p class="service-description">
-                                    Create brand new clothing items from scratch according to your specifications.
+                                    Create brand new clothing items from scratch for personal use.
                                     Perfect for unique designs and special occasions.
                                 </p>
                                 <ul class="text-start mb-4">
@@ -199,6 +199,60 @@ $order_id = generateUniqueOrderId($conn);
                                 </ul>
                                 <button class="btn btn-primary btn-lg">
                                     <i class="fas fa-tshirt me-2"></i> Choose Custom Made
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Made-to-Order Service Option -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="service-option" onclick="location.href='made_to_order.php?order_id=<?php echo $order_id; ?>';">
+                                <div class="service-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h5 class="service-title">Made-to-Order Uniforms</h5>
+                                <p class="service-description">
+                                    Order customized uniforms in bulk for your organization.
+                                    Perfect for schools, bands, or security teams.
+                                </p>
+                                <ul class="text-start mb-4">
+                                    <li>School uniforms</li>
+                                    <li>Band uniforms</li>
+                                    <li>Security uniforms</li>
+                                    <li>Bulk orders welcome</li>
+                                </ul>
+                                <button class="btn btn-primary btn-lg">
+                                    <i class="fas fa-users me-2"></i> Choose Made-to-Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Repairs Service Option -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="service-option" onclick="location.href='alteration.php?order_id=<?php echo $order_id; ?>&type=repairs';">
+                                <div class="service-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <h5 class="service-title">Clothing Repairs</h5>
+                                <p class="service-description">
+                                    Professional repair services to fix damaged clothing.
+                                    Extend the life of your favorite garments.
+                                </p>
+                                <ul class="text-start mb-4">
+                                    <li>Fix tears and holes</li>
+                                    <li>Replace buttons and zippers</li>
+                                    <li>Repair seams</li>
+                                    <li>Patch work available</li>
+                                </ul>
+                                <button class="btn btn-primary btn-lg">
+                                    <i class="fas fa-tools me-2"></i> Choose Repairs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                                 </button>
                             </div>
                         </div>

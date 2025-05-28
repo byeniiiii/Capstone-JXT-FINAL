@@ -1,0 +1,174 @@
+2025-05-21 01:50:34 - Process Payment Called
+2025-05-21 01:50:34 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 26
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:51:20 - Process Payment Called
+2025-05-21 01:51:20 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 25
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:51:31 - Process Payment Called
+2025-05-21 01:51:31 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 19
+    [order_id] => EOPR0
+    [payment_type] => full_payment
+    [amount] => 500.00
+    [order_total] => 500.00
+)
+
+2025-05-21 01:53:02 - Process Payment Called
+2025-05-21 01:53:02 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 24
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:53:06 - Process Payment Called
+2025-05-21 01:53:06 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 23
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:53:13 - Process Payment Called
+2025-05-21 01:53:13 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 22
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:53:15 - Process Payment Called
+2025-05-21 01:53:15 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 21
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:53:18 - Process Payment Called
+2025-05-21 01:53:18 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 20
+    [order_id] => ZBUI0
+    [payment_type] => downpayment
+    [amount] => 75.00
+    [order_total] => 150.00
+)
+
+2025-05-21 01:53:32 - Process Payment Called
+2025-05-21 01:53:32 - POST Data: Array
+(
+    [action] => reject
+    [payment_id] => 17
+    [order_id] => RNSWI
+    [reason] => asrde
+)
+
+2025-05-21 02:08:02 - Process Payment Called
+2025-05-21 02:08:02 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 16
+    [order_id] => RNSWI
+    [payment_type] => downpayment
+    [amount] => 200.00
+    [order_total] => 400.00
+)
+
+2025-05-21 02:08:04 - Process Payment Called
+2025-05-21 02:08:04 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 13
+    [order_id] => AOQWW
+    [payment_type] => 
+    [amount] => 400.00
+    [order_total] => 800.00
+)
+
+2025-05-21 02:08:50 - Process Payment Called
+2025-05-21 02:08:50 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 7
+    [order_id] => DYRHS
+    [payment_type] => downpayment
+    [amount] => 225.00
+    [order_total] => 450.00
+)
+
+2025-05-21 02:08:54 - Process Payment Called
+2025-05-21 02:08:54 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 6
+    [order_id] => 17F3B
+    [payment_type] => downpayment
+    [amount] => 200.00
+    [order_total] => 400.00
+)
+
+2025-05-21 02:08:57 - Process Payment Called
+2025-05-21 02:08:57 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 5
+    [order_id] => B1PVL
+    [payment_type] => downpayment
+    [amount] => 225.00
+    [order_total] => 450.00
+)
+
+2025-05-21 02:08:59 - Process Payment Called
+2025-05-21 02:08:59 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 4
+    [order_id] => PJP9N
+    [payment_type] => downpayment
+    [amount] => 0.00
+    [order_total] => 400.00
+)
+
+2025-05-21 03:52:42 - Process Payment Called
+2025-05-21 03:52:42 - POST Data: Array
+(
+    [action] => approve
+    [payment_id] => 33
+    [order_id] => HU9YE
+    [payment_type] => full_payment
+    [amount] => 450.00
+    [order_total] => 450.00
+)
+

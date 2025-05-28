@@ -29,12 +29,23 @@ $count_result = mysqli_query($conn, $count_query);
 $total_records = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
+// Check if we're in "reload after action" mode
+$show_action_results = isset($_GET['action_completed']) && $_GET['action_completed'] == 1;
+$action_order_id = isset($_GET['order_id']) ? mysqli_real_escape_string($conn, $_GET['order_id']) : '';
+
 // Fetch orders that are "Pending Approval" with pagination
+// If we just completed an action, also include the recently changed order for status feedback
 $query = "SELECT o.order_id, c.first_name, c.last_name, o.order_type, o.total_amount, o.downpayment_amount, o.order_status, o.created_at
           FROM orders o
           JOIN customers c ON o.customer_id = c.customer_id
-          WHERE o.order_status = 'pending_approval'
-          ORDER BY o.created_at DESC
+          WHERE o.order_status = 'pending_approval'";
+          
+// If we're showing an action result, add the specific order to the results even if status changed
+if($show_action_results && !empty($action_order_id)) {
+    $query .= " OR o.order_id = '$action_order_id'";
+}
+          
+$query .= " ORDER BY o.created_at DESC
           LIMIT $offset, $records_per_page";
 
 $result = mysqli_query($conn, $query);
@@ -268,7 +279,7 @@ $result = mysqli_query($conn, $query);
                                 </thead>
                                 <tbody>
                                     <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                                        <tr>
+                                        <tr<?= ($show_action_results && $action_order_id == $row['order_id']) ? ' class="highlight-row" style="background-color: #fffbea;"' : '' ?>>
                                             <td><span class="order-id"><?= htmlspecialchars($row['order_id']) ?></span></td>
                                             <td>
                                                 <span class="customer-name"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></span>
@@ -284,27 +295,48 @@ $result = mysqli_query($conn, $query);
                                             <td><span class="amount">₱<?= number_format($row['downpayment_amount'], 2) ?></span></td>
                                             <td><?= date('M d, Y', strtotime($row['created_at'])) ?></td>
                                             <td>
+                                                <?php if($row['order_status'] == 'pending_approval'): ?>
                                                 <div class="status-badge status-pending">
+                                                        Pending Approval
+                                                    </div>
+                                                <?php elseif($row['order_status'] == 'approved'): ?>
+                                                    <div class="status-badge status-approved" style="background-color: #d4edda; color: #155724;">
+                                                        Approved
+                                                    </div>
+                                                <?php elseif($row['order_status'] == 'declined'): ?>
+                                                    <div class="status-badge status-declined" style="background-color: #f8d7da; color: #721c24;">
+                                                        Declined
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="status-badge">
                                                     <?= htmlspecialchars(str_replace('_', ' ', ucfirst($row['order_status']))) ?>
                                                 </div>
+                                                <?php endif; ?>
                                             </td>
                                             <td class="text-center">
                                                 <div class="actions-container">
                                                     <!-- View button with tooltip -->
-                                                    <a href="view_order.php?id=<?= $row['order_id'] ?>" class="btn-action btn-view" data-tooltip="View Details">
+                                                    <a href="view_orders.php?id=<?= $row['order_id'] ?>" class="btn-action btn-view" data-tooltip="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     
                                                     <!-- Approve button with tooltip -->
-                                                    <button class="btn-action btn-approve" onclick="approveOrder('<?= $row['order_id'] ?>')" data-tooltip="Approve Order">
+                                                    <?php if($row['order_status'] == 'pending_approval'): ?>
+                                                    <button class="btn-action btn-approve approve-order" data-order-id="<?= $row['order_id'] ?>" data-tooltip="Approve Order">
                                                         <i class="fas fa-thumbs-up"></i>
                                                     </button>
                                                     
                                                     <!-- Decline button with tooltip -->
-                                                    <button class="btn-action btn-decline" data-bs-toggle="modal" data-bs-target="#declineModal" 
-                                                            onclick="setDeclineOrderId('<?= $row['order_id'] ?>')" data-tooltip="Decline Order">
+                                                    <button class="btn-action btn-decline decline-order" data-order-id="<?= $row['order_id'] ?>" 
+                                                            data-tooltip="Decline Order">
                                                         <i class="fas fa-thumbs-down"></i>
                                                     </button>
+                                                    <?php else: ?>
+                                                    <!-- Status buttons disabled for non-pending orders -->
+                                                    <button class="btn-action" style="background-color: #6c757d; cursor: default;" disabled>
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </button>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
@@ -414,7 +446,7 @@ $result = mysqli_query($conn, $query);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-confirm" onclick="declineOrder()">
+                    <button type="button" class="btn btn-confirm" id="confirmRejection">
                         <i class="fas fa-check me-1"></i> Confirm Decline
                     </button>
                 </div>
@@ -449,7 +481,7 @@ $result = mysqli_query($conn, $query);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn" style="background-color: #28a745; color: white;" onclick="confirmApproval()">
+                    <button type="button" class="btn" style="background-color: #28a745; color: white;" id="confirmApproval">
                         <i class="fas fa-check me-1"></i> Confirm Approval
                     </button>
                 </div>
@@ -460,61 +492,179 @@ $result = mysqli_query($conn, $query);
     <!-- Bootstrap 5 JS and jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.20/dist/sweetalert2.all.min.js"></script>
 
     <script>
-        // Function to approve an order
-        function approveOrder(orderId) {
-            if (confirm('Are you sure you want to approve this order?')) {
+        $(document).ready(function() {
+            // Auto-dismiss the status feedback after 5 seconds
+            <?php if($show_action_results && !empty($action_order_id)): ?>
+            setTimeout(function() {
+                window.location.href = 'approve_orders.php';
+            }, 5000); // 5 seconds
+            <?php endif; ?>
+            
+            // Variables to store current order being processed
+            let currentOrderId = null;
+            
+            // Handle approve order button click
+            $('.approve-order').click(function() {
+                currentOrderId = $(this).data('order-id');
+                
+                // Set the order ID in the modal
+                $('#approveOrderId').val(currentOrderId);
+                
+                // Show the approve modal
+                $('#approveModal').modal('show');
+            });
+            
+            // Handle approve confirmation from modal
+            $('#confirmApproval').click(function() {
+                const orderId = $('#approveOrderId').val();
+                const notes = $('#approveNotes').val();
+                
+                // Hide the modal
+                $('#approveModal').modal('hide');
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Processing...',
+                    html: 'Approving order, please wait.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Send approval request
                 $.ajax({
                     url: "process_approval.php",
                     type: "POST",
+                    dataType: 'json',
                     data: { 
                         order_id: orderId, 
-                        action: 'approve'
+                        action: 'approve',
+                        notes: notes
                     },
                     success: function(response) {
-                        alert('Order has been approved successfully!');
-                        location.reload();
+                                                        if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Order Approved!',
+                                        text: response.message,
+                                        confirmButtonColor: '#28a745'
+                                    }).then(() => {
+                                        // Reload with parameters to show the action result
+                                        window.location.href = 'approve_orders.php?action_completed=1&order_id=' + orderId;
+                                    });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'An error occurred during approval',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
                     },
                     error: function(xhr, status, error) {
-                        alert('Error: ' + error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Server error. Please try again later.',
+                            confirmButtonColor: '#dc3545'
+                        });
                     }
                 });
-            }
-        }
-        
-        // Function to decline an order
-        function setDeclineOrderId(orderId) {
-            document.getElementById('declineOrderId').value = orderId;
-        }
-        
-        function declineOrder() {
-            const orderId = document.getElementById('declineOrderId').value;
-            const reason = document.getElementById('declineReason').value;
+            });
+            
+            // Handle decline order button click
+            $('.decline-order').click(function() {
+                currentOrderId = $(this).data('order-id');
+                
+                // Show decline modal
+                $('#declineOrderId').val(currentOrderId);
+                $('#declineModal').modal('show');
+            });
+            
+            // Handle decline confirmation
+            $('#confirmRejection').click(function() {
+                const orderId = $('#declineOrderId').val();
+                const reason = $('#declineReason').val();
             
             if (!reason.trim()) {
-                alert('Please provide a reason for declining the order.');
+                    // Show validation error
+                    $('#declineReason').addClass('is-invalid');
                 return;
             }
             
+                // Hide modal
+                $('#declineModal').modal('hide');
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Processing...',
+                    html: 'Declining order, please wait.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Send decline request
             $.ajax({
                 url: "process_approval.php",
                 type: "POST",
+                    dataType: 'json',
                 data: { 
                     order_id: orderId,
                     action: 'decline',
                     reason: reason 
                 },
                 success: function(response) {
-                    alert('Order has been declined successfully!');
-                    $('#declineModal').modal('hide');
-                    location.reload();
+                                                        if (response.status === 'success') {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Order Declined',
+                                        text: response.message,
+                                        confirmButtonColor: '#28a745'
+                                    }).then(() => {
+                                        // Reload with parameters to show the action result
+                                        window.location.href = 'approve_orders.php?action_completed=1&order_id=' + orderId;
+                                    });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'An error occurred during decline',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
                 },
                 error: function(xhr, status, error) {
-                    alert('Error: ' + error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Server error. Please try again later.',
+                            confirmButtonColor: '#dc3545'
+                        });
                 }
             });
-        }
+            });
+            
+            // Clear validation on input
+            $('#declineReason').on('input', function() {
+                $(this).removeClass('is-invalid');
+            });
+            
+            // Reset modals when they're closed
+            $('#declineModal').on('hidden.bs.modal', function() {
+                $('#declineReason').val('').removeClass('is-invalid');
+            });
+            
+            $('#approveModal').on('hidden.bs.modal', function() {
+                $('#approveNotes').val('');
+            });
+        });
     </script>
 </body>
 </html>

@@ -295,7 +295,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center py-3">
                 <h4 class="mb-0"><i class="fas fa-tshirt me-2"></i>Submit Tailoring Order</h4>
-                <a href="home.php" class="btn btn-light btn-sm"><i class="fas fa-arrow-left me-1"></i> Back to Home</a>
+                <a href="index.php" class="btn btn-light btn-sm"><i class="fas fa-arrow-left me-1"></i> Back to Home</a>
             </div>
             <div class="card-body p-4">
                 

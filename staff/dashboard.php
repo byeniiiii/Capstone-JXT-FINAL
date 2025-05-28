@@ -105,8 +105,8 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         
         /* Dashboard heading */
         .page-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
@@ -117,11 +117,11 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         
         /* Modern Stat Cards */
         .stat-cards-row {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
         
         .stat-card-container {
-            padding: 0 8px;
+            padding: 0 4px;
         }
         
         .stat-card {
@@ -129,7 +129,7 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
             border-radius: 12px;
             display: flex;
             align-items: center;
-            padding: 15px;
+            padding: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             height: 100%;
             position: relative;
@@ -143,18 +143,18 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         }
         
         .stat-icon {
-            width: 48px;
-            height: 48px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 6px;
             flex-shrink: 0;
         }
         
         .stat-icon i {
-            font-size: 20px;
+            font-size: 13px;
             color: white;
         }
         
@@ -163,15 +163,15 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         }
         
         .stat-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: #6c757d;
             letter-spacing: 0.5px;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
         
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: #343a40;
         }
@@ -221,15 +221,16 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         .chart-container {
             background-color: white;
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            height: 250px !important;
         }
         
         .chart-heading {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
             color: var(--secondary);
         }
 
@@ -242,15 +243,15 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         .table-container {
             background-color: white;
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 0.75rem;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         
         .table-heading {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
             color: var(--secondary);
             display: flex;
             justify-content: space-between;
@@ -273,10 +274,12 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         .order-table td {
             vertical-align: middle;
             color: var(--secondary);
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8rem;
         }
         
         .status-badge {
-            padding: 0.35rem 0.65rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: 500;
@@ -303,6 +306,7 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
             color: var(--secondary) !important;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             font-size: 0.9rem;
+            padding: 0.5rem 0 !important;
         }
         
         /* Button styling */
@@ -322,71 +326,38 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
         }
         
         .btn-sm {
-            font-size: 0.85rem;
-            padding: 0.4rem 1rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .stat-card .card-body {
-                padding: 1.25rem;
+        /* Reduce overall width */
+        .container-fluid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        /* Adjust responsive breakpoints */
+        @media (max-width: 1400px) {
+            .chart-container {
+                height: 220px !important;
             }
             
-            .stat-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 1.5rem;
+            .chart-container div {
+                height: 180px !important;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .chart-container {
+                height: 200px !important;
             }
             
-            .stat-content h6 {
-                font-size: 0.75rem;
-            }
-            
-            .stat-content h2 {
-                font-size: 1.5rem;
+            .chart-container div {
+                height: 160px !important;
             }
         }
-        
-        /* More compact card styling */
-        .stat-card .card-body {
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        .stat-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            margin-right: 0.75rem;
-            color: white;
-        }
-        
-        .stat-content h6 {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.25rem;
-            color: var(--gray);
-            font-weight: 500;
-        }
-        
-        .stat-content h2 {
-            font-size: 1.3rem;
-            margin-bottom: 0;
-            font-weight: 600;
-            color: var(--secondary);
-        }
-        
-        /* Hide trend indicators to save space */
-        .trend-indicator {
-            display: none;
-        }
-        
+
         @media (max-width: 1200px) {
             .stat-content h2 {
                 font-size: 1.1rem;
@@ -399,10 +370,44 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
             }
         }
         
-        @media (max-width: 767px) {
-            .stat-card .card-body {
-                padding: 0.75rem;
+        @media (max-width: 992px) {
+            .stat-card-container {
+                flex: 0 0 33.333%;
+                max-width: 33.333%;
+                margin-bottom: 8px;
             }
+        }
+        
+        @media (max-width: 768px) {
+            .stat-card-container {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stat-card-container {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+        
+        /* Adjust chart columns for better fit */
+        @media (max-width: 992px) {
+            .col-lg-8, .col-lg-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* Smaller charts */
+        .chart-container {
+            padding: 10px;
+            height: 250px !important;
+        }
+
+        .chart-container div {
+            height: 200px !important;
         }
     </style>
 </head>
@@ -469,69 +474,69 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
                         </div>
                     </div>
 
-                    <!-- Modern Stat Cards -->
+                    <!-- Modern Stat Cards - Compact Version -->
                     <div class="row stat-cards-row">
                         <!-- Total Orders Card -->
-                        <div class="col stat-card-container">
+                        <div class="col-6 col-md-4 col-lg stat-card-container mb-2">
                             <div class="stat-card" id="total-orders">
                                 <div class="stat-icon">
                                     <i class="fas fa-shopping-cart"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-label">TOTAL ORDERS</div>
+                                    <div class="stat-label">TOTAL</div>
                                     <div class="stat-value"><?php echo number_format($total_orders); ?></div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Weekly Orders Card -->
-                        <div class="col stat-card-container">
+                        <div class="col-6 col-md-4 col-lg stat-card-container mb-2">
                             <div class="stat-card" id="weekly-orders">
                                 <div class="stat-icon">
                                     <i class="fas fa-calendar-week"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-label">WEEKLY ORDERS</div>
+                                    <div class="stat-label">WEEKLY</div>
                                     <div class="stat-value"><?php echo number_format($weekly_orders); ?></div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Pending Orders Card -->
-                        <div class="col stat-card-container">
+                        <div class="col-6 col-md-4 col-lg stat-card-container mb-2">
                             <div class="stat-card" id="pending-orders">
                                 <div class="stat-icon">
                                     <i class="fas fa-clock"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-label">PENDING ORDERS</div>
+                                    <div class="stat-label">PENDING</div>
                                     <div class="stat-value"><?php echo number_format($pending_orders); ?></div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Total Income Card -->
-                        <div class="col stat-card-container">
+                        <div class="col-6 col-md-6 col-lg stat-card-container mb-2">
                             <div class="stat-card" id="total-income">
                                 <div class="stat-icon">
                                     <i class="fas fa-dollar-sign"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-label">TOTAL INCOME</div>
-                                    <div class="stat-value">₱<?php echo number_format($total_income, 2); ?></div>
+                                    <div class="stat-label">INCOME</div>
+                                    <div class="stat-value">₱<?php echo number_format($total_income, 0); ?></div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Weekly Income Card -->
-                        <div class="col stat-card-container">
+                        <div class="col-6 col-md-6 col-lg stat-card-container mb-2">
                             <div class="stat-card" id="weekly-income">
                                 <div class="stat-icon">
                                     <i class="fas fa-chart-line"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <div class="stat-label">WEEKLY INCOME</div>
-                                    <div class="stat-value">₱<?php echo number_format($weekly_income, 2); ?></div>
+                                    <div class="stat-label">WEEKLY ₱</div>
+                                    <div class="stat-value">₱<?php echo number_format($weekly_income, 0); ?></div>
                                 </div>
                             </div>
                         </div>
@@ -540,20 +545,20 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
                     <!-- Content Row - Charts -->
                     <div class="row">
                         <!-- Weekly Sales Chart -->
-                        <div class="col-lg-8 mb-4">
-                            <div class="chart-container" style="position: relative; height:400px;">
-                                <h5 class="chart-heading">Weekly Sales Overview</h5>
-                                <div style="height: 350px;">
+                        <div class="col-md-8 mb-2">
+                            <div class="chart-container" style="position: relative; height: 250px;">
+                                <h5 class="chart-heading">Weekly Sales</h5>
+                                <div style="height: 200px;">
                                     <canvas id="weeklySalesChart"></canvas>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Order Status Chart -->
-                        <div class="col-lg-4 mb-4">
-                            <div class="chart-container" style="position: relative; height:400px;">
-                                <h5 class="chart-heading">Order Status Distribution</h5>
-                                <div style="height: 350px;">
+                        <div class="col-md-4 mb-2">
+                            <div class="chart-container" style="position: relative; height: 250px;">
+                                <h5 class="chart-heading">Order Status</h5>
+                                <div style="height: 200px;">
                                     <canvas id="orderStatusChart"></canvas>
                                 </div>
                             </div>

@@ -6,6 +6,10 @@ include '../db.php';
 $is_logged_in = isset($_SESSION['customer_id']);
 $customer_id = $is_logged_in ? $_SESSION['customer_id'] : null;
 
+if (isset($conn)) {
+    $db_conn = $conn;
+}
+
 // Fetch logged-in customer's details if logged in
 $customer_name = 'Guest';
 if ($is_logged_in) {
@@ -30,6 +34,40 @@ $result = mysqli_query($conn, $query);
 // Get unique categories for filtering
 $categoryQuery = "SELECT DISTINCT category FROM templates WHERE category IS NOT NULL";
 $categoryResult = mysqli_query($conn, $categoryQuery);
+
+
+
+//akoy ga add ani - cadiz
+// Random order ID generation with recursion
+function getOrderId($n = 10) {
+    global $conn; 
+    
+    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $randomStr = "";
+
+   
+    for ($i = 0; $i < $n; $i++) {
+        $index = random_int(0, strlen($characters) - 1);
+        $randomStr .= $characters[$index];
+    }
+
+    
+    $qry1 = "SELECT order_id FROM orders WHERE order_id = ?";
+    $stmt1 = $conn->prepare($qry1);
+    $stmt1->bind_param("s", $randomStr);
+    $stmt1->execute();
+    $result1 = $stmt1->get_result();
+    
+    // If the order ID exists, regenerate
+    if ($result1->num_rows > 0) {
+        return getOrderId($n); 
+    }
+
+    return $randomStr;
+}
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -867,7 +905,9 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
                         <div class="template-footer">
                             <?php if ($is_logged_in): ?>
                             <a href="javascript:void(0);" class="btn btn-select" 
-                               onclick="showSublimationOrderModal(<?php echo $row['template_id']; ?>, 
+                               onclick="showSublimationOrderModal(
+                                                            '<?=  getOrderId(); ?>',
+                                                            <?php echo $row['template_id']; ?>, 
                                                              '<?php echo addslashes($row['name']); ?>', 
                                                              <?php echo $row['price']; ?>, 
                                                              '<?php echo $imagePath; ?>')">
@@ -900,9 +940,150 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
                 <i class="fas fa-undo me-1"></i> Reset Filters
             </button>
         </div>
-    </div>
-    
-    <!-- Include footer -->
+
+        <!-- Made-to-Order Services Section -->
+        <div class="made-to-order-section mt-5">
+            <h3 class="text-center mb-4">Made-to-Order Services</h3>
+            <ul class="nav nav-tabs nav-fill mb-4" id="mtoTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="alterations-tab" data-bs-toggle="tab" data-bs-target="#alterations" type="button" role="tab" aria-controls="alterations" aria-selected="true">
+                        <i class="fas fa-cut me-2"></i>Alterations
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="repairs-tab" data-bs-toggle="tab" data-bs-target="#repairs" type="button" role="tab" aria-controls="repairs" aria-selected="false">
+                        <i class="fas fa-tools me-2"></i>Repairs
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="resize-tab" data-bs-toggle="tab" data-bs-target="#resize" type="button" role="tab" aria-controls="resize" aria-selected="false">
+                        <i class="fas fa-compress-arrows-alt me-2"></i>Resize
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom" type="button" role="tab" aria-controls="custom" aria-selected="false">
+                        <i class="fas fa-tshirt me-2"></i>Custom Made
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="mtoTabContent">
+                <!-- Alterations Tab -->
+                <div class="tab-pane fade show active" id="alterations" role="tabpanel" aria-labelledby="alterations-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="service-description">
+                                <h4>Alteration Services</h4>
+                                <p>Professional clothing alterations to achieve the perfect fit for your garments.</p>
+                                <ul class="service-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>Hem adjustments</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Taking in or letting out seams</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Sleeve length modifications</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Waist adjustments</li>
+                                </ul>
+                                <div class="price-info mt-3">
+                                    <p class="mb-1"><strong>Starting at ₱300</strong></p>
+                                    <small class="text-muted">Final price depends on complexity and type of alteration</small>
+                                </div>
+                                <a href="<?php echo $is_logged_in ? 'tailoring_order_request.php' : 'login.php?redirect=tailoring_order_request.php'; ?>" class="btn btn-primary mt-3">
+                                    <i class="fas fa-scissors me-2"></i>Request Alteration
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="../image/alteration-service.jpg" alt="Alteration Services" class="img-fluid rounded shadow-sm">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Repairs Tab -->
+                <div class="tab-pane fade" id="repairs" role="tabpanel" aria-labelledby="repairs-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="service-description">
+                                <h4>Repair Services</h4>
+                                <p>Expert clothing repairs to fix damages and extend the life of your garments.</p>
+                                <ul class="service-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>Seam repairs</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Zipper replacement</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Button replacement</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Patch repairs</li>
+                                </ul>
+                                <div class="price-info mt-3">
+                                    <p class="mb-1"><strong>Starting at ₱300</strong></p>
+                                    <small class="text-muted">Final price depends on repair type and complexity</small>
+                                </div>
+                                <a href="<?php echo $is_logged_in ? 'tailoring_order_request.php' : 'login.php?redirect=tailoring_order_request.php'; ?>" class="btn btn-primary mt-3">
+                                    <i class="fas fa-tools me-2"></i>Request Repair
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="../image/repair-service.jpg" alt="Repair Services" class="img-fluid rounded shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resize Tab -->
+                <div class="tab-pane fade" id="resize" role="tabpanel" aria-labelledby="resize-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="service-description">
+                                <h4>Resizing Services</h4>
+                                <p>Professional garment resizing to make your clothing fit perfectly.</p>
+                                <ul class="service-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>Size up or down</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Precise measurements</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Expert tailoring</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>All types of garments</li>
+                                </ul>
+                                <div class="price-info mt-3">
+                                    <p class="mb-1"><strong>Starting at ₱500</strong></p>
+                                    <small class="text-muted">Final price depends on garment type and size adjustment needed</small>
+                                </div>
+                                <a href="<?php echo $is_logged_in ? 'tailoring_order_request.php' : 'login.php?redirect=tailoring_order_request.php'; ?>" class="btn btn-primary mt-3">
+                                    <i class="fas fa-compress-arrows-alt me-2"></i>Request Resizing
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="../image/resize-service.jpg" alt="Resizing Services" class="img-fluid rounded shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Made Tab -->
+                <div class="tab-pane fade" id="custom" role="tabpanel" aria-labelledby="custom-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="service-description">
+                                <h4>Custom Made Clothing</h4>
+                                <p>Bespoke clothing tailored to your exact measurements and specifications.</p>
+                                <ul class="service-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>Custom designs</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Premium fabrics available</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Perfect fit guarantee</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Professional consultation</li>
+                                </ul>
+                                <div class="price-info mt-3">
+                                    <p class="mb-1"><strong>Starting at ₱1,500</strong></p>
+                                    <small class="text-muted">Additional cost for shop-provided fabric (+₱500)</small>
+                                </div>
+                                <a href="<?php echo $is_logged_in ? 'tailoring_order_request.php' : 'login.php?redirect=tailoring_order_request.php'; ?>" class="btn btn-primary mt-3">
+                                    <i class="fas fa-tshirt me-2"></i>Request Custom Made
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="../image/custom-made-service.jpg" alt="Custom Made Services" class="img-fluid rounded shadow-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Include footer -->
     <?php include 'footer.php'; ?>
 
     <!-- Sublimation Order Modal -->
@@ -916,7 +1097,7 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
             <div class="modal-body">
                 <form id="sublimationOrderForm" method="POST" action="process_sublimation_order.php" enctype="multipart/form-data">
                     <!-- Hidden Fields -->
-                    <input type="hidden" name="template_id" id="modal_template_id">
+
                     <input type="hidden" name="total_amount" id="modal_total_amount">
                     
                     <div class="row">
@@ -965,6 +1146,21 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
                                             <h6><i class="fas fa-info-circle me-2 text-primary"></i>Jersey Customization Details</h6>
                                             <p class="small text-muted mb-0">Fill out the details below to customize your jersey order.</p>
                                         </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="modal_order_id" name="order_id" placeholder="ORDER ID"  readonly>
+                                        <label for="modal_order_id">Order ID</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="modal_template_id" name="template_id" placeholder="Template ID" readonly>
+                                        <label for="modal_template_id">Template ID</label>
                                     </div>
                                 </div>
                                 
@@ -1089,8 +1285,11 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
             }
         }
 
-        function showSublimationOrderModal(templateId, templateName, templatePrice, templateImage) {
+        function showSublimationOrderModal(orderId,templateId, templateName, templatePrice, templateImage) {
+
+            console.log(orderId);
             // Update the modal with template information
+            document.getElementById('modal_order_id').value = orderId;
             document.getElementById('modal_template_id').value = templateId;
             document.getElementById('modal_template_name').textContent = templateName;
             document.getElementById('modal_template_price').textContent = '₱' + templatePrice.toFixed(2);
@@ -1173,7 +1372,7 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
                 }
             });
             
-            return isUnique;
+            return isJerseyNumberUnique;
         }
 
         // Function to add a new player jersey form
@@ -1321,5 +1520,69 @@ $categoryResult = mysqli_query($conn, $categoryQuery);
             // Other existing event listeners...
         });
     </script>
+
+    <?php if (isset($_SESSION['success'])): ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Order Submitted Successfully!',
+                html: '<?php echo addslashes($_SESSION['success']); ?>' + 
+                      <?php if (isset($_SESSION['order_id'])): ?>
+                      '<br><br>' +
+                      '<div><strong>Order ID:</strong> <span class="fw-bold" style="font-size: 18px; letter-spacing: 1px; color: #0d47a1;">' +
+                      '<?php echo $_SESSION['order_id']; ?>' +
+                      '</span></div>' +
+                      '<br>' +
+                      '<div class="alert alert-primary py-3 mb-0" style="background: linear-gradient(145deg, #e3f2fd, #bbdefb);">' +
+                      '<div class="d-flex align-items-center justify-content-center">' +
+                      '<strong style="font-size: 16px;">Order ID:</strong>&nbsp;' +
+                      '<span class="fw-bold" style="font-size: 18px; letter-spacing: 1px; color: #0d47a1;"><?php echo $_SESSION['order_id']; ?></span>&nbsp;' +
+                      '<button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="copyOrderId()" title="Copy Order ID" style="box-shadow: 0 2px 5px rgba(0,0,0,0.1);">' +
+                      '<i class="fas fa-copy"></i></button></div>' +
+                      '</div>' +
+                      '<script>' +
+                      'function copyOrderId() {' +
+                      '  const orderIdText = "<?php echo $_SESSION['order_id']; ?>";' +
+                      '  navigator.clipboard.writeText(orderIdText);' +
+                      '  const copyBtn = document.querySelector(".btn-outline-primary");' +
+                      '  copyBtn.innerHTML = "<i class=\\"fas fa-check\\"></i>";' +
+                      '  copyBtn.classList.add("btn-success");' +
+                      '  copyBtn.classList.remove("btn-outline-primary");' +
+                      '  setTimeout(() => {' +
+                      '    copyBtn.innerHTML = "<i class=\\"fas fa-copy\\"></i>";' +
+                      '    copyBtn.classList.remove("btn-success");' +
+                      '    copyBtn.classList.add("btn-outline-primary");' +
+                      '  }, 2000);' +
+                      '}' +
+                      '</script>'
+                      <?php else: ?>
+                      ''
+                      <?php endif; ?>,
+                confirmButtonColor: '#3085d6'
+            });
+        });
+    </script>
+<?php 
+unset($_SESSION['success']); 
+if (isset($_SESSION['order_id'])) unset($_SESSION['order_id']);
+endif; ?>
+
+<?php if (isset($_SESSION['error'])): ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '<?php echo addslashes($_SESSION['error']); ?>',
+                confirmButtonColor: '#d33'
+            });
+        });
+    </script>
+<?php unset($_SESSION['error']); endif; ?>
 </body>
 </html>

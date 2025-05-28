@@ -146,7 +146,6 @@ if (!$result) {
                                             <td><?php echo htmlspecialchars($row['role']); ?></td>
                                             <td>
                                                 <a href="edit_sublimator.php?id=<?php echo $row['user_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete(<?php echo $row['user_id']; ?>)">Delete</button>
                                             </td>
                                         </tr>
                                 <?php }

@@ -56,7 +56,14 @@ $stmt->execute();
           <i class="fas fa-tshirt fa-3x text-success mb-3"></i>
           <h4>Thank you for your order!</h4>
           <p class="mb-0">Your sublimation jerseys order has been submitted.</p>
-          <p class="mb-3">Order ID: <strong><?php echo htmlspecialchars($order_id); ?></strong></p>
+          <div class="alert alert-primary mb-3 py-2">
+            <div class="d-flex align-items-center justify-content-center">
+              <div>Order ID: <strong class="fs-5"><?php echo htmlspecialchars($order_id); ?></strong></div>
+              <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="copyOrderId()" title="Copy Order ID">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
           <div class="alert alert-light border">
             <p class="mb-1"><strong>Next steps:</strong></p>
             <ul class="text-start mb-0">
@@ -93,6 +100,26 @@ $stmt->execute();
             history.pushState(null, null, document.URL);
         });
     });
+    
+    // Function to copy order ID to clipboard
+    function copyOrderId() {
+        const orderId = '<?php echo htmlspecialchars($order_id); ?>';
+        navigator.clipboard.writeText(orderId).then(function() {
+            // Show success tooltip
+            const copyBtn = document.querySelector('.btn-outline-primary');
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.classList.add('btn-success');
+            copyBtn.classList.remove('btn-outline-primary');
+            
+            // Reset button after 2 seconds
+            setTimeout(function() {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.classList.remove('btn-success');
+                copyBtn.classList.add('btn-outline-primary');
+            }, 2000);
+        });
+    }
 </script>
 </body>
 </html>

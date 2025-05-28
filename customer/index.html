@@ -1,0 +1,35 @@
+<?php
+// ...existing code...
+        // 1. Insert into sublimation_orders (no player_details)
+        $sub_query = "INSERT INTO sublimation_orders (
+            order_id, template_id, custom_design, quantity, instructions, completion_date
+        ) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sub_query);
+        $stmt->bind_param("ssisss", 
+            $order_id, $template_id, $customization, $quantity, $notes, $completion_date
+        );
+        $stmt->execute();
+        // 2. Get the new sublimation_id
+        $sublimation_id = $conn->insert_id;
+        $stmt->close();
+
+        // 3. Insert each player into sublimation_players
+        $player_query = "INSERT INTO sublimation_players (
+            sublimation_id, player_name, jersey_number, size, include_lower, order_id
+        ) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($player_query);
+        foreach ($players as $player) {
+            $include_lower = $player['has_shorts'] ? 1 : 0;
+            $stmt->bind_param(
+                "isssis",
+                $sublimation_id,
+                $player['name'],
+                $player['number'],
+                $player['size'],
+                $include_lower,
+                $order_id
+            );
+            $stmt->execute();
+        }
+        $stmt->close();
+// ...existing code...

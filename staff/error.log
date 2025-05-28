@@ -1,0 +1,428 @@
+[27-May-2025 07:24:26 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 07:30:19 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:36:45 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:39:26 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:39:27 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:40:00 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:40:05 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:40:11 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:40:12 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 't.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 499
+[27-May-2025 07:47:54 Europe/Berlin] PHP Warning:  Undefined array key "sublimator_id" in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 519
+[27-May-2025 07:52:43 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:74
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(74): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 74
+[27-May-2025 07:53:55 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:74
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(74): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 74
+[27-May-2025 08:05:33 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:05:38 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:08:31 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:08:32 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:09:28 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:13:21 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:13:22 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:13:39 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.sublimator_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:76
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(76): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 76
+[27-May-2025 08:21:52 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:16 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:17 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:18 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:18 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:19 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:19 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:22:19 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:25:31 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'p.method' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:95
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(95): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 95
+[27-May-2025 08:26:22 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'p.method' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[27-May-2025 08:26:23 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'p.method' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[27-May-2025 08:26:30 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:26:50 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:27:02 Europe/Berlin] PHP Warning:  Undefined array key "all" in C:\xampp\htdocs\capstone_jxt\staff\tailoring_orders.php on line 508
+[27-May-2025 08:27:34 Europe/Berlin] PHP Warning:  Undefined array key "all" in C:\xampp\htdocs\capstone_jxt\staff\tailoring_orders.php on line 493
+[27-May-2025 08:30:19 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 08:30:42 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 's.user_id' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php:72
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php(72): mysqli_prepare(Object(mysqli), 'SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\sublimation_orders.php on line 72
+[27-May-2025 09:10:19 Europe/Berlin] Current user role: Staff
+[27-May-2025 09:55:39 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 828b4bc152a9a7bd4dec1c94e1a61ea76eb43eb5a284d2080789374d15be86bf
+)
+
+[27-May-2025 09:55:39 Europe/Berlin] User role: staff
+[27-May-2025 09:56:13 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 828b4bc152a9a7bd4dec1c94e1a61ea76eb43eb5a284d2080789374d15be86bf
+)
+
+[27-May-2025 09:56:13 Europe/Berlin] User role: staff
+[27-May-2025 09:56:13 Europe/Berlin] CSRF token validation failed
+[27-May-2025 10:33:43 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 828b4bc152a9a7bd4dec1c94e1a61ea76eb43eb5a284d2080789374d15be86bf
+)
+
+[27-May-2025 10:33:43 Europe/Berlin] User role: staff
+[27-May-2025 10:33:43 Europe/Berlin] CSRF token validation failed
+[27-May-2025 12:51:14 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 828b4bc152a9a7bd4dec1c94e1a61ea76eb43eb5a284d2080789374d15be86bf
+)
+
+[27-May-2025 12:51:14 Europe/Berlin] User role: staff
+[27-May-2025 12:52:14 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 828b4bc152a9a7bd4dec1c94e1a61ea76eb43eb5a284d2080789374d15be86bf
+)
+
+[27-May-2025 12:52:14 Europe/Berlin] User role: staff
+[27-May-2025 13:48:18 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'id' in 'order clause' in C:\xampp\htdocs\capstone_jxt\staff\view_order.php:60
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\view_order.php(60): mysqli_prepare(Object(mysqli), 'SELECT * FROM s...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\view_order.php on line 60
+[27-May-2025 15:07:38 Europe/Berlin] PHP Warning:  Undefined array key "user_type" in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 6
+[27-May-2025 15:09:04 Europe/Berlin] PHP Warning:  Undefined array key "user_type" in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 6
+[27-May-2025 15:12:32 Europe/Berlin] PHP Warning:  Undefined array key "user_type" in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 6
+[27-May-2025 15:13:51 Europe/Berlin] PHP Warning:  include(notifications.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 98
+[27-May-2025 15:13:51 Europe/Berlin] PHP Warning:  include(): Failed opening 'notifications.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 98
+[27-May-2025 15:19:56 Europe/Berlin] PHP Warning:  include(notifications.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 121
+[27-May-2025 15:19:56 Europe/Berlin] PHP Warning:  include(): Failed opening 'notifications.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 121
+[27-May-2025 15:19:56 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 162
+[27-May-2025 15:47:37 Europe/Berlin] PHP Warning:  include(notifications.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 89
+[27-May-2025 15:47:37 Europe/Berlin] PHP Warning:  include(): Failed opening 'notifications.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 89
+[28-May-2025 06:03:27 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94d072d6d738a9ac2ef6c917f4f9bb2753163b72ffc990e336042e0724ea4534
+)
+
+[28-May-2025 06:03:27 Europe/Berlin] User role: staff
+[28-May-2025 06:05:06 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94d072d6d738a9ac2ef6c917f4f9bb2753163b72ffc990e336042e0724ea4534
+)
+
+[28-May-2025 06:05:06 Europe/Berlin] User role: staff
+[28-May-2025 06:10:28 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94d072d6d738a9ac2ef6c917f4f9bb2753163b72ffc990e336042e0724ea4534
+)
+
+[28-May-2025 06:10:28 Europe/Berlin] User role: staff
+[28-May-2025 07:04:55 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94d072d6d738a9ac2ef6c917f4f9bb2753163b72ffc990e336042e0724ea4534
+)
+
+[28-May-2025 07:04:55 Europe/Berlin] User role: staff
+[28-May-2025 07:23:54 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94d072d6d738a9ac2ef6c917f4f9bb2753163b72ffc990e336042e0724ea4534
+)
+
+[28-May-2025 07:23:54 Europe/Berlin] User role: staff
+[28-May-2025 07:35:43 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 2acbe8aad153e83f26e7aaa186a76d0acd8e201801be2f8b9ad5cec15d19ffd6
+)
+
+[28-May-2025 07:35:43 Europe/Berlin] User role: staff
+[28-May-2025 10:17:31 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 2acbe8aad153e83f26e7aaa186a76d0acd8e201801be2f8b9ad5cec15d19ffd6
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+)
+
+[28-May-2025 10:17:31 Europe/Berlin] User role: staff
+[28-May-2025 11:19:54 Europe/Berlin] PHP Warning:  Undefined array key "first_name" in C:\xampp\htdocs\capstone_jxt\staff\orders.php on line 206
+[28-May-2025 11:19:54 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\staff\orders.php on line 206
+[28-May-2025 11:19:56 Europe/Berlin] PHP Warning:  Undefined array key "first_name" in C:\xampp\htdocs\capstone_jxt\staff\orders.php on line 206
+[28-May-2025 11:19:56 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\staff\orders.php on line 206
+[28-May-2025 11:21:21 Europe/Berlin] PHP Warning:  Undefined array key "first_name" in C:\xampp\htdocs\capstone_jxt\staff\orders.php on line 206
+[28-May-2025 11:21:21 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\staff\orders.php on line 206
+[28-May-2025 14:09:04 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'p.method' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[28-May-2025 14:28:06 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 14:28:06 Europe/Berlin] User role: staff
+[28-May-2025 15:25:35 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:25:35 Europe/Berlin] User role: staff
+[28-May-2025 15:26:20 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:26:20 Europe/Berlin] User role: staff
+[29-May-2025 00:14:04 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'where clause' in C:\xampp\htdocs\capstone_jxt\staff\notification.php:21
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\notification.php(21): mysqli_query(Object(mysqli), 'SELECT COUNT(*)...')
+#1 C:\xampp\htdocs\capstone_jxt\staff\orders.php(201): include('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\notification.php on line 21
+[29-May-2025 00:14:06 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'where clause' in C:\xampp\htdocs\capstone_jxt\staff\notification.php:21
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\notification.php(21): mysqli_query(Object(mysqli), 'SELECT COUNT(*)...')
+#1 C:\xampp\htdocs\capstone_jxt\staff\orders.php(201): include('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\notification.php on line 21
+[29-May-2025 00:14:08 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'where clause' in C:\xampp\htdocs\capstone_jxt\staff\notification.php:21
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\notification.php(21): mysqli_query(Object(mysqli), 'SELECT COUNT(*)...')
+#1 C:\xampp\htdocs\capstone_jxt\staff\orders.php(201): include('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\notification.php on line 21
+[29-May-2025 00:25:15 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'p.method' in 'field list' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[29-May-2025 00:26:25 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.payment_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[29-May-2025 00:26:26 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.payment_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[29-May-2025 00:26:42 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.payment_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[29-May-2025 00:26:43 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.payment_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[29-May-2025 00:26:44 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'o.payment_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php:98
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\order_reports.php(98): mysqli->prepare('SELECT o.*, c.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 98
+[29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(includes/header_scripts.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 121
+[29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(): Failed opening 'includes/header_scripts.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 121
+[29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(includes/footer.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 244
+[29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(): Failed opening 'includes/footer.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 244
+[29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(includes/scripts.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 248
+[29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(): Failed opening 'includes/scripts.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 248

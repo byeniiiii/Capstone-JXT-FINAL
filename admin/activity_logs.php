@@ -1,6 +1,13 @@
 <?php
 // Include database connection
 include '../db.php';
+session_start();
+
+// If the user is not logged in or not an admin, redirect
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
+    header("Location: ../index.php");
+    exit();
+}
 
 // Updated query that only tracks staff, manager, and sublimator activities
 $query = "SELECT l.*, CONCAT(u.first_name, ' ', u.last_name) AS user_name 

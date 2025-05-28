@@ -12,3 +12,21 @@
 2025-05-09 03:08:37 - Error: Missing required parameters
 2025-05-09 03:16:36 - Request: []
 2025-05-09 03:16:36 - Error: Missing required parameters
+2025-05-22 03:30:17 - Request: {"payment_id":"40","action":"approve"}
+2025-05-22 03:30:17 - Error: Missing required parameters
+2025-05-22 03:30:30 - Request: {"payment_id":"40","action":"approve"}
+2025-05-22 03:30:30 - Error: Missing required parameters
+2025-05-22 03:32:12 - Request: {"payment_id":"40","action":"approve"}
+2025-05-22 03:32:12 - Error: Missing required parameters
+2025-05-22 03:37:43 - Request: {"payment_id":"40","action":"approve"}
+2025-05-22 03:37:43 - Error: Missing required parameters
+2025-05-22 03:46:32 - Request: {"payment_id":"40","order_id":"JXT2505OA7","order_total":"400.00","action":"approve"}
+2025-05-22 03:46:32 - Success: Payment approved
+2025-05-22 06:29:04 - Request: {"payment_id":"38","order_id":"JXT2505OA7","order_total":"400.00","action":"approve"}
+2025-05-22 06:29:04 - Success: Payment approved
+2025-05-22 06:29:10 - Request: {"payment_id":"41","order_id":"JXT2505HNK","order_total":"400.00","action":"approve"}
+2025-05-22 06:29:10 - Success: Payment approved
+2025-05-22 10:16:57 - Request: {"payment_id":"40","action":"approve"}
+2025-05-22 10:16:57 - Error: Missing required parameters
+2025-05-28 08:28:33 - Request: {"payment_id":"45","order_id":"152HPBKSMO","order_total":"900.00","action":"approve"}
+2025-05-28 08:28:33 - Success: Payment approved

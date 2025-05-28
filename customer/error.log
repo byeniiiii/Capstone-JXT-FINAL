@@ -1,0 +1,20 @@
+[27-May-2025 08:59:17 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+[27-May-2025 10:47:12 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+[28-May-2025 08:23:46 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+[28-May-2025 08:25:13 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 08:25:41 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 08:26:41 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 08:35:54 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 08:36:09 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 08:36:45 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 08:37:27 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 10:14:13 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 10:15:36 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 10:18:33 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 11:14:25 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+[28-May-2025 11:15:49 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 11:16:31 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 11:16:43 Europe/Berlin] PHP Deprecated:  strtotime(): Passing null to parameter #1 ($datetime) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\customer\track_order.php on line 849
+[28-May-2025 23:51:21 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+[29-May-2025 00:01:30 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+[29-May-2025 00:02:21 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37

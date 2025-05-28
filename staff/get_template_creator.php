@@ -1,43 +1,51 @@
 <?php
 header('Content-Type: application/json');
-require_once '../db.php';
+include '../db.php';
 
-$template_id = isset($_GET['template_id']) ? $_GET['template_id'] : null;
+try {
+    $template_id = isset($_GET['template_id']) ? $_GET['template_id'] : null;
 
-if (!$template_id) {
-    echo json_encode(['success' => false, 'message' => 'Template ID is required']);
-    exit();
-}
+    if (!$template_id) {
+        throw new Exception('Template ID is required');
+    }
 
-$query = "SELECT t.added_by as user_id, CONCAT(u.first_name, ' ', u.last_name) as name 
-          FROM templates t 
-          JOIN users u ON t.added_by = u.user_id 
-          WHERE t.template_id = ?";
+    // Fixed query to use added_by instead of created_by
+    $query = "SELECT u.user_id, u.first_name, u.last_name 
+              FROM templates t 
+              JOIN users u ON t.added_by = u.user_id 
+              WHERE t.template_id = ?";
+              
+    $stmt = mysqli_prepare($conn, $query);
+    if (!$stmt) {
+        throw new Exception('Failed to prepare statement: ' . mysqli_error($conn));
+    }
 
-$stmt = mysqli_prepare($conn, $query);
-if (!$stmt) {
-    echo json_encode(['success' => false, 'message' => 'Failed to prepare query']);
-    exit();
-}
-
-mysqli_stmt_bind_param($stmt, "s", $template_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-if ($result) {
-    $row = mysqli_fetch_assoc($result);
-    if ($row) {
+    mysqli_stmt_bind_param($stmt, "s", $template_id);
+    
+    if (!mysqli_stmt_execute($stmt)) {
+        throw new Exception('Failed to execute query: ' . mysqli_stmt_error($stmt));
+    }
+    
+    $result = mysqli_stmt_get_result($stmt);    
+    
+    if ($row = mysqli_fetch_assoc($result)) {
         echo json_encode([
             'success' => true, 
             'user_id' => $row['user_id'],
-            'name' => $row['name']
+            'creator_name' => $row['first_name'] . ' ' . $row['last_name']
         ]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Template creator not found']);
+        throw new Exception('Template creator not found');
     }
-} else {
-    echo json_encode(['success' => false, 'message' => 'Failed to fetch template creator']);
-}
 
-mysqli_stmt_close($stmt);
-mysqli_close($conn);
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false, 
+        'message' => $e->getMessage()
+    ]);
+} finally {
+    if (isset($stmt)) mysqli_stmt_close($stmt);
+    mysqli_close($conn);
+}
+?>

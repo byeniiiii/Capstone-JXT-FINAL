@@ -417,6 +417,66 @@ switch(strtolower($order['order_status'])) {
                         </a>
                     </div>
 
+                    <!-- Order Progress Tracker -->
+                    <div class="detail-card mb-4">
+                        <div class="card-header">
+                            <h5><i class="fas fa-tasks mr-2"></i> Order Progress</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="progress-tracker">
+                                <div class="row status-steps">
+                                    <?php
+                                    // Define all possible statuses in order
+                                    $all_statuses = [
+                                        'pending_approval' => ['icon' => 'clock', 'label' => 'Pending Approval'],
+                                        'approved' => ['icon' => 'check-circle', 'label' => 'Approved'],
+                                        'in_process' => ['icon' => 'cog fa-spin', 'label' => 'In Process'],
+                                        'ready_for_pickup' => ['icon' => 'box', 'label' => 'Ready for Pickup'],
+                                        'completed' => ['icon' => 'flag-checkered', 'label' => 'Completed'],
+                                        'declined' => ['icon' => 'times-circle', 'label' => 'Declined']
+                                    ];
+                                    
+                                    // Skip declined status for normal flow
+                                    $display_statuses = array_filter($all_statuses, function($key) {
+                                        return $key !== 'declined';
+                                    }, ARRAY_FILTER_USE_KEY);
+                                    
+                                    // If order is declined, show only that status
+                                    $current_status = strtolower($order['order_status']);
+                                    if ($current_status === 'declined') {
+                                        $display_statuses = ['declined' => $all_statuses['declined']];
+                                    }
+                                    
+                                    $col_class = count($display_statuses) <= 4 ? 12 / count($display_statuses) : 3;
+                                    
+                                    foreach ($display_statuses as $status_key => $status_info) {
+                                        $is_active = ($current_status === $status_key);
+                                        $is_completed = false;
+                                        
+                                        // Determine if this step is completed (any step before current)
+                                        if ($current_status !== 'declined') {
+                                            $status_order = array_keys($all_statuses);
+                                            $current_index = array_search($current_status, $status_order);
+                                            $status_index = array_search($status_key, $status_order);
+                                            $is_completed = ($status_index < $current_index);
+                                        }
+                                        
+                                        $step_class = $is_active ? 'active' : ($is_completed ? 'completed' : '');
+                                    ?>
+                                    <div class="col-md-<?= $col_class ?> mb-4">
+                                        <div class="step text-center <?= $step_class ?>">
+                                            <div class="step-icon">
+                                                <i class="fas fa-<?= $status_info['icon'] ?>"></i>
+                                            </div>
+                                            <div class="step-label"><?= $status_info['label'] ?></div>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <!-- Order Summary Column -->
                         <div class="col-lg-4 order-summary">
@@ -619,46 +679,6 @@ switch(strtolower($order['order_status'])) {
                                         <p class="mb-0"><?= nl2br(htmlspecialchars($order['decline_reason'])) ?></p>
                                     </div>
                                     <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Add this above the timeline section -->
-                            <div class="detail-card">
-                                <div class="card-header">
-                                    <h5><i class="fas fa-tasks mr-2"></i> Order Progress</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="progress-tracker">
-                                        <?php
-                                        $statuses = ['pending_approval', 'approved', 'in_process', 'ready_for_pickup', 'completed'];
-                                        $status_labels = ['Pending Approval', 'Approved', 'In Process', 'Ready for Pickup', 'Completed'];
-                                        $current_status_index = array_search($order['order_status'], $statuses);
-                                        
-                                        // Handle case when order is declined
-                                        if ($order['order_status'] == 'declined') {
-                                            echo '<div class="alert alert-danger">This order was declined.</div>';
-                                        } else {
-                                            echo '<div class="progress" style="height: 8px; margin-bottom: 20px;">';
-                                            // Calculate progress percentage
-                                            $progress = ($current_status_index !== false) ? 
-                                                        (($current_status_index + 1) / count($statuses)) * 100 : 0;
-                                            echo '<div class="progress-bar bg-success" role="progressbar" style="width: ' . $progress . '%" 
-                                                   aria-valuenow="' . $progress . '" aria-valuemin="0" aria-valuemax="100"></div>';
-                                            echo '</div>';
-                                            
-                                            // Status steps
-                                            echo '<div class="row status-steps">';
-                                            foreach ($statuses as $index => $status) {
-                                                $active = ($current_status_index !== false && $index <= $current_status_index) ? 'active' : '';
-                                                echo '<div class="col text-center step ' . $active . '">';
-                                                echo '<div class="step-icon"><i class="fas ' . ($active ? 'fa-check-circle' : 'fa-circle') . '"></i></div>';
-                                                echo '<div class="step-label">' . $status_labels[$index] . '</div>';
-                                                echo '</div>';
-                                            }
-                                            echo '</div>';
-                                        }
-                                        ?>
-                                    </div>
                                 </div>
                             </div>
 

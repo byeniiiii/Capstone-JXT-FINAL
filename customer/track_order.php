@@ -30,6 +30,11 @@ if (!empty($_GET['search'])) {
     $where_clause .= " AND o.order_id LIKE '%$search_query%'";
 }
 
+// Pagination setup
+$records_per_page = 8;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $records_per_page;
+
 // Update the main query to properly handle both order types
 $query = "SELECT o.order_id, o.order_type, o.total_amount, o.downpayment_amount, 
                  o.payment_method, o.payment_status, o.order_status, o.created_at, o.updated_at,
@@ -50,12 +55,68 @@ $query = "SELECT o.order_id, o.order_type, o.total_amount, o.downpayment_amount,
           LEFT JOIN sublimation_players sp ON s.sublimation_id = sp.sublimation_id
           WHERE $where_clause
           GROUP BY o.order_id
-          ORDER BY o.created_at DESC";
+          ORDER BY o.created_at DESC LIMIT ? OFFSET ?";
 
 $stmt = mysqli_prepare($conn, $query);
-mysqli_stmt_bind_param($stmt, "i", $customer_id);
+mysqli_stmt_bind_param($stmt, "iii", $customer_id, $records_per_page, $offset);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
+
+// Get total records for pagination
+$count_query = "SELECT COUNT(*) as total FROM orders o WHERE $where_clause";
+$count_stmt = mysqli_prepare($conn, $count_query);
+mysqli_stmt_bind_param($count_stmt, "i", $customer_id);
+mysqli_stmt_execute($count_stmt);
+$count_result = mysqli_stmt_get_result($count_stmt);
+$total_records = mysqli_fetch_assoc($count_result)['total'];
+$total_pages = ceil($total_records / $records_per_page);
+
+// First, add this function at the top of your PHP code after database connection
+function getPaginatedOrders($orders, $page = 1, $per_page = 8) {
+    $total_records = count($orders);
+    $total_pages = ceil($total_records / $per_page);
+    $page = max(1, min($page, $total_pages));
+    $offset = ($page - 1) * $per_page;
+    
+    return [
+        'data' => array_slice($orders, $offset, $per_page),
+        'total_pages' => $total_pages,
+        'current_page' => $page
+    ];
+}
+
+// Then add this function to generate pagination HTML
+function generatePagination($current_page, $total_pages, $tab_id) {
+    if ($total_pages <= 1) return '';
+    
+    $html = '<nav aria-label="Page navigation" class="custom-pagination mt-4">';
+    $html .= '<ul class="pagination justify-content-center">';
+    
+    // First page
+    $html .= '<li class="page-item ' . ($current_page == 1 ? 'disabled' : '') . '">';
+    $html .= '<a class="page-link" href="#" data-tab="' . $tab_id . '" data-page="1">First</a></li>';
+    
+    // Previous page
+    $html .= '<li class="page-item ' . ($current_page == 1 ? 'disabled' : '') . '">';
+    $html .= '<a class="page-link" href="#" data-tab="' . $tab_id . '" data-page="' . ($current_page - 1) . '">Previous</a></li>';
+    
+    // Page numbers
+    for ($i = 1; $i <= $total_pages; $i++) {
+        $html .= '<li class="page-item ' . ($i == $current_page ? 'active' : '') . '">';
+        $html .= '<a class="page-link" href="#" data-tab="' . $tab_id . '" data-page="' . $i . '">' . $i . '</a></li>';
+    }
+    
+    // Next page
+    $html .= '<li class="page-item ' . ($current_page == $total_pages ? 'disabled' : '') . '">';
+    $html .= '<a class="page-link" href="#" data-tab="' . $tab_id . '" data-page="' . ($current_page + 1) . '">Next</a></li>';
+    
+    // Last page
+    $html .= '<li class="page-item ' . ($current_page == $total_pages ? 'disabled' : '') . '">';
+    $html .= '<a class="page-link" href="#" data-tab="' . $tab_id . '" data-page="' . $total_pages . '">Last</a></li>';
+    
+    $html .= '</ul></nav>';
+    return $html;
+}
 ?>
 
 <!DOCTYPE html>
@@ -73,846 +134,384 @@ $result = mysqli_stmt_get_result($stmt);
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --primary-orange: #D98324;
+            --secondary-orange: #FF9F45;
+            --dark: #2D2D2D;
+            --light: #FFFFFF;
+            --gray: #F5F5F5;
+            --border-color: #E5E5E5;
+        }
+
         body {
-            background-color: #f8f9fa;
-            color: #212529;
+            background-color: var(--light);
+            color: var(--dark);
             font-family: 'Poppins', sans-serif;
-            padding-top: 56px; /* Space for fixed navbar */
+            padding-top: 70px;
         }
         
-        /* Navbar styling */
+        /* Navbar Styling */
         .navbar {
-            background-color: #343a40;
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            background: var(--light);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-bottom: 2px solid var(--primary-orange);
         }
-        
+
         .navbar-brand {
-            font-weight: 600;
-            color: white;
+            color: var(--primary-orange) !important;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        .nav-link {
+            color: var(--dark) !important;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-orange) !important;
         }
         
-        .navbar-toggler {
-            border: none;
-            color: white;
-        }
-        
-        .navbar-nav .nav-link {
-            color: rgba(255,255,255,0.85);
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        
-        .navbar-nav .nav-link:hover,
-        .navbar-nav .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
-        
-        .navbar-nav .nav-link i {
-            width: 20px;
-            text-align: center;
-            margin-right: 8px;
-        }
-        
-        /* Main content area */
-        .orders-container {
-            max-width: 1000px;
-            margin: 30px auto;
-        }
-        
+        /* Enhanced Card Design */
         .card {
             border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-            border-radius: 0.5rem;
-        }
-        
-        .card-header {
-            background-color: #343a40;
-            color: white;
-            font-weight: 600;
-            border-top-left-radius: 0.5rem !important;
-            border-top-right-radius: 0.5rem !important;
-        }
-        
-        /* Search bar */
-        .search-form {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .search-form .form-control {
-            padding-left: 2.5rem;
-            padding-right: 6.5rem;
-            height: 3rem;
-            font-size: 1rem;
-            border-radius: 25px;
-            border: 1px solid #ced4da;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .search-form .form-control:focus {
-            border-color: #ff7d00;
-            box-shadow: 0 0 0 0.25rem rgb(255 125 0 / 25%);
-        }
-        
-        .search-form .icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-        
-        .search-form .btn {
-            position: absolute;
-            right: 5px;
-            top: 5px;
             border-radius: 20px;
-            background-color: #ff7d00;
-            border-color: #ff7d00;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--secondary-orange) 100%);
             color: white;
-            height: calc(100% - 10px);
-            transition: all 0.2s;
+            padding: 1.5rem;
+            border: none;
         }
         
-        .search-form .btn:hover {
-            background-color: #e06c00;
-            border-color: #e06c00;
-        }
-        
-        /* Tables */
+        /* Enhanced Table Design */
         .table {
-            margin-bottom: 0;
+            border-spacing: 0 12px;
+            margin-top: -12px;
         }
-        
+
+        .table tr {
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .table tr:hover {
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .table td:first-child {
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+        }
+
+        .table td:last-child {
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
         .table th {
-            font-weight: 600;
-            background-color: #f8f9fa;
-            color: #343a40;
-            border-bottom: 2px solid #dee2e6;
+            background: var(--gray);
+            color: var(--dark);
         }
-        
+
         .table td {
+            background: white;
+            border: none;
+            padding: 1rem;
             vertical-align: middle;
         }
         
-        .table .status {
+        /* Enhanced Status Pills */
+        .status-pill {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: #ff7d00;
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        .status-pending {
+            background: var(--gray);
+            color: var(--dark);
+        }
+
+        .status-approved {
+            background: var(--primary-orange);
+            color: var(--light);
+        }
+
+        .status-processing {
+            background: var(--secondary-orange);
+            color: var(--light);
         }
         
-        .table .view-btn {
-            background-color: #343a40;
-            color: white;
-            border: none;
-            border-radius: 0.25rem;
-            padding: 0.5rem 1rem;
-            transition: all 0.2s;
-        }
-        
-        .table .view-btn:hover {
-            background-color: #ff7d00;
-            color: white;
-        }
-        
-        /* Modal */
-        .modal-content {
-            border-radius: 0.5rem;
-        }
-        
-        .modal-header {
-            background-color: #343a40;
-            color: white;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-        }
-        
-        .modal-body p {
-            margin-bottom: 0.5rem;
-        }
-        
-        .modal-body p strong {
-            color: #343a40;
-        }
-        
-        .modal-footer .btn {
-            background-color: #ff7d00;
-            border-color: #ff7d00;
-            color: white;
-            transition: all 0.2s;
-        }
-        
-        .modal-footer .btn:hover {
-            background-color: #e06c00;
-            border-color: #e06c00;
-        }
-
-        /* Updated styles for tabs navigation */
-        .status-tabs {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            border-bottom: 2px solid #343a40;
-            margin-bottom: 20px;
-            padding-bottom: 1px;
-            background: #fff;
-            width: 100%;
-            -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
-            scrollbar-width: none; /* Hide scrollbar Firefox */
-            position: relative;
-        }
-
-        /* Hide scrollbar for Chrome/Safari */
-        .status-tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .status-tabs .nav-item {
-            flex: 0 0 auto;
-            margin-bottom: -2px;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .status-tabs .nav-link {
-            color: #343a40;
-            background-color: transparent;
-            font-weight: 500;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 0;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .status-tabs .nav-link:hover {
-            color: #ff7d00;
-            background-color: rgba(255, 125, 0, 0.03);
-        }
-
-        .status-tabs .nav-link.active {
-            color: #ff7d00;
-            font-weight: 700;
-            border-bottom: 2px solid #ff7d00;
-        }
-
-        .status-badge {
-            background-color: #ff7d00;
-            color: white;
-            font-size: 0.7rem;
-            border-radius: 10px;
-            padding: 1px 6px;
-            margin-left: 4px;
-            display: inline-block;
-            position: relative;
-            top: -2px;
-        }
-
-        /* Improved mobile view */
-        @media (max-width: 576px) {
-            .status-tabs {
-                justify-content: space-between;
-                padding: 0 5px;
-            }
-            
-            .status-tabs .nav-link {
-                padding: 12px 15px;
-                border-radius: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                border: none;
-            }
-            
-            .status-tabs .nav-link.active {
-                border-bottom: 2px solid #ff7d00;
-            }
-            
-            .status-tabs .nav-link i {
-                font-size: 18px;
-                margin-bottom: 4px;
-                margin-right: 0;
-            }
-            
-            .status-tabs .nav-link .tab-text {
-                font-size: 11px;
-                display: block;
-            }
-            
-            .status-badge {
-                position: absolute;
-                top: 6px;
-                right: 5px;
-                margin: 0;
-            }
-            
-            /* Update the active and inactive colors */
-            .status-tabs .nav-link.active i,
-            .status-tabs .nav-link.active .tab-text {
-                color: #ff7d00;
-                font-weight: 700;
-            }
-        }
-
-        /* Make tabs more bottom-nav like on very small devices */
-        @media (max-width: 400px) {
-            .status-tabs {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: white;
-                border-top: 1px solid #e9ecef;
-                border-bottom: none;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-                z-index: 1000;
-                padding: 8px 0 5px;
-            }
-            
-            .status-tabs .nav-item {
-                flex: 1;
-                max-width: 20%; /* Show at most 5 tabs, rest with horizontal scroll */
-            }
-            
-            .status-tabs .nav-link {
-                padding: 8px 5px;
-            }
-            
-            .card-body {
-                padding-bottom: 80px;
-            }
-        }
-
-        /* Add this to your CSS for improved tab scrolling */
-        .status-tabs {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            border-bottom: 2px solid #343a40;
-            margin-bottom: 20px;
-            padding-bottom: 1px;
-            background: #fff;
-            width: 100%;
-            position: relative;
-            scrollbar-width: thin;  /* Firefox */
-            scroll-behavior: smooth; /* Smooth scrolling */
-            -webkit-overflow-scrolling: touch; /* Better scroll on iOS */
-        }
-
-        /* Show a subtle scrollbar instead of hiding it completely */
-        .status-tabs::-webkit-scrollbar {
-            height: 3px;
-            display: block;
-        }
-
-        .status-tabs::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        .status-tabs::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 3px;
-        }
-
-        .status-tabs::-webkit-scrollbar-thumb:hover {
-            background: #ccc;
-        }
-
-        /* Add scroll arrows to indicate there's more content */
-        .tab-scroll-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .tab-scroll-arrow {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 32px;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.3));
-            border: none;
-            color: #343a40;
-            font-size: 1.2rem;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .tab-scroll-arrow.left {
-            left: 0;
-            background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
-        }
-
-        .tab-scroll-arrow.right {
-            right: 0;
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 100%);
-        }
-
-        .tab-scroll-container:hover .tab-scroll-arrow {
-            opacity: 1;
-        }
-
-        /* Make sure tabs have enough space */
-        .status-tabs .nav-item {
-            flex: 0 0 auto;
-            margin-bottom: -2px;
-            text-align: center;
-            white-space: nowrap;
-            padding: 0 2px; /* Small padding between tabs */
-        }
-
-        /* Modal styling */
-        .modal-xl {
-            max-width: 95%;
-        }
-        
-        .modal-content {
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-        
-        .modal-header {
-            background-color: #343a40;
-            color: white;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-        }
-        
-        /* Detail card styling */
-        .detail-card {
-            background-color: white;
+        /* Enhanced Buttons */
+        .btn {
             border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background-color: #343a40;
-            color: white;
-            padding: 15px 20px;
+            padding: 10px 20px;
             font-weight: 600;
-        }
-        
-        .card-header h5 {
-            margin: 0;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .card-body {
-            padding: 20px;
-        }
-        
-        .info-group {
-            margin-bottom: 15px;
-        }
-        
-        .info-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        .info-label {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-bottom: 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-        
-        .info-value {
-            font-size: 1rem;
-            color: #343a40;
-            font-weight: 500;
-        }
-        
-        /* Status badges */
-        .modal-status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        
-        .status-pending-approval {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-declined {
-            background-color: #f8d7da;
-            color: #842029;
-        }
-        
-        .status-approved {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-in-process {
-            background-color: #d1e7dd;
-            color: #0f5132;
-        }
-        
-        .status-ready-for-pickup {
-            background-color: #e0f7fa;
-            color: #0288d1;
-        }
-        
-        .status-completed {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-        
-        /* Progress tracker */
-        .progress-tracker {
-            margin: 15px 0 30px;
+            transition: all 0.3s ease;
         }
 
-        .status-steps {
-            position: relative;
-            z-index: 1;
+        .view-btn {
+            background: var(--dark);
+            color: white;
         }
 
-        .step {
-            position: relative;
+        .view-btn:hover {
+            background: var(--primary-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(217, 131, 36, 0.3);
         }
 
-        .step-icon {
-            font-size:
-        }
-
-        /* Payment status pills */
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-downpayment-paid {
-            background-color: #e1bee7;
-            color: #6a1b9a;
-        }
-
-        .status-fully-paid {
-            background-color: #c8e6c9;
-            color: #2e7d32;
-        }
-
-        /* Add this to handle both variations */
-        .status-fully-paid, .status-fully-paid {
-            background-color: #c8e6c9;
-            color: #2e7d32;
-        }
-
-        /* Generic status pill style if not already defined */
-        .status-pill {
-            padding: 0.3rem 0.6rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-
-        /* Add these styles to your CSS */
-        :root {
-            --shopee-orange: #ee4d2d;
-            --shopee-light-orange: #fef6f5;
-            --shopee-green: #26aa99;
-            --border-color: #efefef;
-        }
-
-        /* Summary section styles */
-        .summary-section {
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 15px;
-        }
-
-        .summary-section:last-child {
-            border-bottom: none;
-        }
-
-        .summary-header {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .summary-label {
-            color: #757575;
-            font-size: 14px;
-        }
-
-        .summary-value {
-            font-weight: 500;
-            text-align: right;
-        }
-
-        .total-row .summary-label,
-        .total-row .summary-value {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        /* Shopee style badges */
-        .shopee-badge {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
+        .payment-btn {
+            background: var(--primary-orange);
+            color: var(--light);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
             font-weight: 500;
         }
 
-        .pending-badge {
-            background-color: #fff3cd;
-            color: #856404;
+        .payment-btn:hover {
+            background: var(--secondary-orange);
+            color: var(--light);
         }
+        
+        /* Enhanced Search Box Styling */
+.search-form {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
 
-        .downpayment-paid-badge, .partially-paid-badge {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
+.search-wrapper {
+    position: relative;
+    width: 100%;
+}
 
-        .fully-paid-badge {
-            background-color: #d4edda;
-            color: #155724;
-        }
+.search-form .form-control {
+    height: 50px;
+    border-radius: 25px;
+    padding-left: 45px;
+    padding-right: 100px;
+    border: 2px solid #e9ecef;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    width: 100%;
+}
 
-        /* Shopee progress tracker */
-        .shopee-tracking {
-            margin: 30px 0;
-            position: relative;
-        }
+.search-form .form-control:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 0.2rem rgba(217, 131, 36, 0.15);
+}
 
-        .progress-bar-wrapper {
-            position: relative;
-            height: 100px;
-            margin-bottom: 20px;
-        }
+.search-form .search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-orange);
+    font-size: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+}
 
-        .progress-bar {
-            position: absolute;
-            top: 36px;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background-color: #e0e0e0;
-            z-index: 1;
-        }
+.search-form .btn-search {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-orange);
+    color: white;
+    border: none;
+    height: 40px;
+    padding: 0 25px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
 
-        .progress-inner {
-            height: 100%;
-            background-color: var(--shopee-orange);
-            transition: width 0.5s ease;
-        }
+.search-form .btn-search:hover {
+    background: var(--secondary-orange);
+    transform: translateY(-50%) scale(1.02);
+    box-shadow: 0 4px 15px rgba(217, 131, 36, 0.2);
+}
 
-        .progress-steps {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .progress-step {
-            position: absolute;
-            transform: translateX(-50%);
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .search-form .form-control {
+        height: 45px;
+        font-size: 0.9rem;
+        padding-right: 90px;
+    }
+    
+    .search-form .btn-search {
+        height: 35px;
+        padding: 0 15px;
+        font-size: 0.9rem;
+    }
+}
+        
+        /* Empty State Improvements */
+        .empty-state {
             text-align: center;
-            width: 80px;
+            padding: 3rem 1rem;
         }
 
-        .step-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: #fff;
-            border: 2px solid #e0e0e0;
-            margin: 0 auto 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #bdbdbd;
-            position: relative;
-            z-index: 2;
+        .empty-state img {
+            max-width: 200px;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
         }
 
-        .step-label {
-            font-size: 12px;
-            color: #9e9e9e;
-            white-space: nowrap;
+        .empty-state h3 {
+            color: var(--dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Modal Improvements */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            background: var(--light);
+            border-bottom: 2px solid var(--primary-orange);
+        }
+
+        .modal-title {
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Progress Tracker */
+        .progress-inner {
+            background: var(--primary-orange);
         }
 
         .progress-step.active .step-icon {
-            border-color: var(--shopee-orange);
-            background-color: var(--shopee-light-orange);
-            color: var(--shopee-orange);
+            background: var(--primary-orange);
+            color: var(--light);
         }
 
-        .progress-step.active .step-label {
-            color: var(--shopee-orange);
-            font-weight: 500;
+        .progress-step .step-icon {
+            background: var(--gray);
+            color: var(--dark);
         }
 
-        .progress-step.current .step-icon {
-            border-color: var(--shopee-orange);
-            background-color: var(--shopee-orange);
-            color: #fff;
-            transform: scale(1.1);
-            box-shadow: 0 0 0 4px rgba(238, 77, 45, 0.2);
-        }
-
-        /* Current status card */
-        .current-status-card {
-            display: flex;
-            align-items: center;
-            background-color: var(--shopee-light-orange);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .status-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background-color: var(--shopee-orange);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 18px;
-        }
-
-        .status-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .status-timestamp {
-            color: #757575;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        /* Product details */
-        .details-header {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-
-        .product-card {
-            display: flex;
-            justify-content: space-between;
-            border: 1px solid #efefef;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #fff;
-        }
-
-        .product-title {
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .product-specs {
-            font-size: 13px;
-            color: #757575;
-        }
-
-        .product-price {
-            font-weight: 600;
-            color: var(--shopee-orange);
-            font-size: 18px;
-        }
-
-        /* Timeline styles */
-        .shopee-timeline {
-            margin-top: 30px;
-        }
-
-        .timeline-list {
-            list-style-type: none;
-            padding-left: 8px;
-            margin: 0;
-            position: relative;
-        }
-
-        .timeline-list::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 8px;
-            height: 100%;
-            width: 2px;
-            background-color: #e0e0e0;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding: 0 0 20px 30px;
-        }
-
-        .timeline-item:last-child {
-            padding-bottom: 0;
-        }
-
-        .timeline-point {
-            position: absolute;
-            left: 0;
-            top: 8px;
-            width: 18px;
-            height: 18px;
-            background-color: #fff;
-            border: 2px solid #e0e0e0;
-            border-radius: 50%;
-            transform: translateX(-8px);
-            z-index: 1;
-        }
-
+        /* Timeline */
         .timeline-point.active {
-            background-color: var(--shopee-orange);
-            border-color: var(--shopee-orange);
+            background: var(--primary-orange);
         }
 
-        .timeline-content {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 12px 15px;
+        /* Custom Pagination */
+        .custom-pagination {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .event-time {
-            font-size: 12px;
-            color: #757575;
-        }
-
-        .event-title {
+        .page-link {
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            color: var(--dark);
             font-weight: 600;
-            margin: 5px 0;
+            transition: all 0.3s ease;
         }
 
-        .event-message {
-            font-size: 13px;
-            color: #555;
+        .page-link:hover {
+            background: var(--primary-orange);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(217, 131, 36, 0.2);
         }
+
+        .page-item.active .page-link {
+            background: var(--primary-orange);
+            color: white;
+            box-shadow: 0 5px 15px rgba(217, 131, 36, 0.3);
+        }
+
+        /* Responsive Design Improvements */
+        @media (max-width: 768px) {
+            .card-header {
+                padding: 1.2rem;
+            }
+            
+            .table td {
+                padding: 1rem 0.5rem;
+            }
+            
+            .status-pill {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.875rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.8rem;
+                font-size: 0.875rem;
+            }
+            
+            .tab-text {
+                display: none;
+            }
+            
+            .nav-tabs .nav-link i {
+                margin: 0;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Animation Effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table tr {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .table tr:nth-child(1) { animation-delay: 0.1s; }
+        .table tr:nth-child(2) { animation-delay: 0.2s; }
+        .table tr:nth-child(3) { animation-delay: 0.3s; }
+        .table tr:nth-child(4) { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
@@ -946,11 +545,20 @@ $result = mysqli_stmt_get_result($stmt);
         </div>
         <!-- Replace the current card body with this tabbed interface -->
         <div class="card-body">
-            <form method="GET" class="search-form">
-                <i class="fas fa-search icon"></i>
-                <input type="text" class="form-control" name="search" placeholder="Enter Order ID..." value="<?= htmlspecialchars($search_query) ?>">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </form>
+            <!-- Replace the existing search form with this -->
+<form method="GET" class="search-form">
+    <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" 
+               class="form-control" 
+               name="search" 
+               placeholder="Enter Order ID to search..." 
+               value="<?= htmlspecialchars($search_query) ?>">
+        <button type="submit" class="btn btn-search">
+            Search
+        </button>
+    </div>
+</form>
 
             <!-- Update the status tabs navigation with icons -->
             <ul class="nav nav-tabs status-tabs mb-3" id="orderTabs" role="tablist">
@@ -1055,13 +663,17 @@ $result = mysqli_stmt_get_result($stmt);
                 <!-- Pending Tab -->
                 <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
                     <?php
-                    mysqli_data_seek($result, 0); // Reset result pointer
+                    mysqli_data_seek($result, 0);
                     $pending_orders = [];
                     while ($row = mysqli_fetch_assoc($result)) {
                         if ($row['order_status'] == 'pending_approval') {
                             $pending_orders[] = $row;
                         }
                     }
+                    
+                    $current_page = isset($_GET['pending_page']) ? (int)$_GET['pending_page'] : 1;
+                    $paginated_orders = getPaginatedOrders($pending_orders, $current_page);
+                    
                     if (!empty($pending_orders)): ?>
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -1074,7 +686,7 @@ $result = mysqli_stmt_get_result($stmt);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($pending_orders as $row): ?>
+                                    <?php foreach ($paginated_orders['data'] as $row): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($row['order_id']) ?></td>
                                             <td><?= htmlspecialchars(ucfirst($row['order_type'])) ?></td>
@@ -1084,7 +696,9 @@ $result = mysqli_stmt_get_result($stmt);
                                                     <a class="btn view-btn" href="view_order.php?id=<?= htmlspecialchars($row['order_id']) ?>">
                                                         View Details
                                                     </a>
-                                                    <button class="btn btn-danger cancel-order-btn" data-order-id="<?= htmlspecialchars($row['order_id']) ?>">
+                                                    <button class="btn btn-danger cancel-order-btn" 
+                                                            onclick="cancelOrder('<?= htmlspecialchars($row['order_id']) ?>')"
+                                                            title="Cancel Order">
                                                         <i class="fas fa-times-circle me-1"></i> Cancel Order
                                                     </button>
                                                 </div>
@@ -1094,6 +708,7 @@ $result = mysqli_stmt_get_result($stmt);
                                 </tbody>
                             </table>
                         </div>
+                        <?= generatePagination($paginated_orders['current_page'], $paginated_orders['total_pages'], 'pending') ?>
                     <?php else: ?>
                         <div class="empty-state">
                             <img src="../image/pending.svg" alt="No pending orders" class="empty-state-img">
@@ -1109,7 +724,10 @@ $result = mysqli_stmt_get_result($stmt);
                     mysqli_data_seek($result, 0); // Reset result pointer
                     $approved_orders = [];
                     while ($row = mysqli_fetch_assoc($result)) {
-                        if ($row['order_status'] == 'approved') {
+                        // Only include orders that are approved AND haven't been paid yet
+                        if ($row['order_status'] == 'approved' && 
+                            $row['payment_status'] != 'downpayment_paid' && 
+                            $row['payment_status'] != 'fully_paid') {
                             $approved_orders[] = $row;
                         }
                     }
@@ -1139,15 +757,13 @@ $result = mysqli_stmt_get_result($stmt);
                                             </td>
                                             <td><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
                                             <td>
-                                                <div class="d-flex flex-wrap gap-1">
+                                                <div class="d-flex flex-row gap-2">
                                                     <a class="btn view-btn" href="view_order.php?id=<?= htmlspecialchars($row['order_id']) ?>">
                                                         View Details
                                                     </a>
-                                                    <?php if ($row['payment_status'] == 'pending'): ?>
-                                                    <a href="payment_downpayment.php?order_id=<?= $row['order_id'] ?>" class="btn btn-success">
+                                                    <a href="payment_downpayment.php?order_id=<?= $row['order_id'] ?>" class="btn btn-success payment-btn">
                                                         <i class="fas fa-credit-card me-1"></i> Pay Downpayment
                                                     </a>
-                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1289,7 +905,9 @@ $result = mysqli_stmt_get_result($stmt);
                                                         <i class="fas fa-eye me-1"></i> View Details
                                                     </a>
                                                     <?php if ($row['payment_status'] != 'fully_paid'): ?>
-                                                    <a href="payment_full.php?order_id=<?= $row['order_id'] ?>" class="btn btn-success ms-1">Pay Balance</a>
+                                                    <a href="payment_full.php?order_id=<?= $row['order_id'] ?>" class="btn btn-success payment-btn ms-1">
+                                                        <i class="fas fa-credit-card me-1"></i> Pay Balance
+                                                    </a>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
@@ -1399,6 +1017,31 @@ $result = mysqli_stmt_get_result($stmt);
                     <?php endif; ?>
                 </div>
             </div>
+
+            <!-- Pagination controls -->
+            <div class="mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?= $page == 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=1&search=<?= urlencode($search_query) ?>" tabindex="-1">First</a>
+                        </li>
+                        <li class="page-item <?= $page == 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search_query) ?>" tabindex="-1">Previous</a>
+                        </li>
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search_query) ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?= $page == $total_pages ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search_query) ?>">Next</a>
+                        </li>
+                        <li class="page-item <?= $page == $total_pages ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $total_pages ?>&search=<?= urlencode($search_query) ?>">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
@@ -1478,11 +1121,40 @@ function openModal(orderId, totalAmount, downpayment, paymentMethod, paymentStat
     
     // Show loading state
     document.getElementById("order-summary-content").innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Loading order details...</p></div>';
+    document.getElementById("order-progress-content").innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+    document.getElementById("order-timeline-content").innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+    
+    // Reset footer buttons
+    const modalFooter = document.querySelector('#orderModal .modal-footer');
+    modalFooter.innerHTML = `
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a id="view-full-details" href="view_order.php?id=${orderId}" class="btn btn-primary">View Full Details</a>
+    `;
     
     // Parse order status from server
     fetch(`get_order_tracking.php?id=${orderId}`)
         .then(response => response.json())
         .then(data => {
+            const orderStatus = data.status || 'pending_approval';
+            
+            // Add payment buttons based on order status
+            if (orderStatus === 'approved' && paymentStatus === 'pending') {
+                // Add Pay Downpayment button
+                const payButton = document.createElement('a');
+                payButton.href = `payment_downpayment.php?order_id=${orderId}`;
+                payButton.className = 'btn btn-success ms-2 payment-btn';
+                payButton.innerHTML = '<i class="fas fa-credit-card me-2"></i> Pay Downpayment';
+                modalFooter.prepend(payButton);
+            } else if (orderStatus === 'ready_for_pickup' && 
+                     (paymentStatus !== 'fully_paid' && paymentStatus !== 'paid')) {
+                // Add Pay Balance button
+                const payButton = document.createElement('a');
+                payButton.href = `payment_full.php?order_id=${orderId}`;
+                payButton.className = 'btn btn-success ms-2 payment-btn';
+                payButton.innerHTML = '<i class="fas fa-credit-card me-2"></i> Pay Balance';
+                modalFooter.prepend(payButton);
+            }
+            
             // Order summary section
             let orderSummaryContent = `
                 <div class="summary-section">
@@ -1514,8 +1186,40 @@ function openModal(orderId, totalAmount, downpayment, paymentMethod, paymentStat
                             </span>
                         </div>
                     </div>
-                </div>
+                </div>`;
                 
+            // Add payment action button to summary section if needed
+            if ((orderStatus === 'approved' && paymentStatus === 'pending') || 
+                (orderStatus === 'ready_for_pickup' && paymentStatus !== 'fully_paid' && paymentStatus !== 'paid')) {
+                
+                let btnText = '';
+                let redirectUrl = '';
+                
+                if (orderStatus === 'approved') {
+                    btnText = 'Pay Downpayment';
+                    redirectUrl = `payment_downpayment.php?order_id=${orderId}`;
+                } else {
+                    btnText = 'Pay Remaining Balance';
+                    redirectUrl = `payment_full.php?order_id=${orderId}`;
+                }
+                
+                // Add call-to-action payment button below the payment details
+                orderSummaryContent += `
+                <div class="summary-section payment-cta text-center">
+                    <a href="${redirectUrl}" class="btn btn-success btn-lg payment-btn payment-btn-lg w-100">
+                        <i class="fas fa-credit-card me-2"></i> ${btnText}
+                    </a>
+                    <p class="text-muted mt-2 small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        ${orderStatus === 'approved' ? 
+                          'Payment is required to start production of your order.' : 
+                          'Complete your payment to pick up your order.'}
+                    </p>
+                </div>`;
+            }
+            
+            // Add price section
+            orderSummaryContent += `
                 <div class="summary-section price-section">
                     <div class="summary-row">
                         <div class="summary-label">Total Amount</div>
@@ -1571,4 +1275,164 @@ function openModal(orderId, totalAmount, downpayment, paymentMethod, paymentStat
                         <div class="step-icon">
                             <i class="fas fa-${step.icon}"></i>
                         </div>
-                        <div class="step-label
+                        <div class="step-label">${step.label}</div>
+                    </div>`;
+            });
+            
+            progressHtml += `</div></div></div>`;
+            
+            document.getElementById("order-progress-content").innerHTML = progressHtml;
+            
+            // Check if timeline data exists before rendering
+            if (data.timeline && Array.isArray(data.timeline) && data.timeline.length > 0) {
+                let timelineHtml = `
+                    <div class="shopee-timeline">
+                        <div class="timeline-list">`;
+                        
+                data.timeline.forEach((event, index) => {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-point ${event.status === 'completed' ? 'active' : ''}"></div>
+                            <div class="timeline-content">
+                                <div class="event-time">${event.time}</div>
+                                <div class="event-title">${event.title}</div>
+                                <div class="event-message">${event.message}</div>
+                            </div>
+                        </div>`;
+                });
+                
+                timelineHtml += `</div></div>`;
+                document.getElementById("order-timeline-content").innerHTML = timelineHtml;
+            } else {
+                document.getElementById("order-timeline-content").innerHTML = '<p class="text-center text-muted">No timeline information available</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching order details:', error);
+            document.getElementById("order-summary-content").innerHTML = '<div class="alert alert-danger">Error loading order details. Please try again.</div>';
+            document.getElementById("order-progress-content").innerHTML = '<div class="alert alert-danger">Error loading order progress.</div>';
+            document.getElementById("order-timeline-content").innerHTML = '<div class="alert alert-danger">Error loading order timeline.</div>';
+        });
+}
+
+// Add this to your existing JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle pagination clicks
+    document.querySelectorAll('.pagination .page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tab = this.dataset.tab;
+            const page = this.dataset.page;
+            
+            // Store the current page in session storage
+            sessionStorage.setItem(`${tab}_page`, page);
+            
+            // Reload the tab content
+            loadTabContent(tab, page);
+        });
+    });
+});
+
+function loadTabContent(tab, page) {
+    const tabContent = document.querySelector(`#${tab}`);
+    
+    // Show loading spinner
+    tabContent.innerHTML = `
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>`;
+    
+    // Fetch new content
+    fetch(`get_tab_content.php?tab=${tab}&page=${page}`)
+        .then(response => response.text())
+        .then(html => {
+            tabContent.innerHTML = html;
+            
+            // Reinitialize pagination event listeners
+            initPagination();
+        })
+        .catch(error => {
+            console.error('Error loading tab content:', error);
+            tabContent.innerHTML = `
+                <div class="alert alert-danger">
+                    Error loading content. Please try again.
+                </div>`;
+        });
+}
+
+function initPagination() {
+    document.querySelectorAll('.pagination .page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tab = this.dataset.tab;
+            const page = this.dataset.page;
+            loadTabContent(tab, page);
+        });
+    });
+}
+
+// Cancel order function
+function cancelOrder(orderId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This will permanently cancel your order. This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, cancel order',
+        cancelButtonText: 'No, keep order'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Cancelling order...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Send delete request
+            fetch('cancel_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: orderId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Cancelled!',
+                        text: 'Your order has been cancelled.',
+                        icon: 'success',
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to cancel order');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to cancel order',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+</script>
+
+</body>
+</html>
