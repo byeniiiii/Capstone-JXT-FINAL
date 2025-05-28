@@ -1,0 +1,33 @@
+[22-May-2025 11:56:38 Europe/Berlin] Main query error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:20:14 Europe/Berlin] Main query error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:10 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:11 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:11 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:12 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:12 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:18 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:18 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:18 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:19 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:23:19 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:25:47 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[22-May-2025 12:26:42 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[25-May-2025 12:23:43 Europe/Berlin] Generated template ID: 69812
+[25-May-2025 13:02:18 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 07:27:25 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 16:46:50 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 16:59:11 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 17:09:46 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 17:09:47 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 17:09:48 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 17:09:49 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 17:14:11 Europe/Berlin] Database error: Unknown column 's.design_type' in 'field list'
+[28-May-2025 18:34:49 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\sublimator\Activity_logs.php on line 197
+[28-May-2025 18:34:49 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\sublimator\Activity_logs.php on line 197
+[28-May-2025 18:34:49 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\sublimator\Activity_logs.php on line 197
+[28-May-2025 18:34:49 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\sublimator\Activity_logs.php on line 197
+[28-May-2025 19:10:06 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'tailor_db.sublimation_order_status' doesn't exist in C:\xampp\htdocs\capstone_jxt\sublimator\view_order.php:46
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\view_order.php(46): mysqli_prepare(Object(mysqli), 'SELECT so.*, so...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\view_order.php on line 46

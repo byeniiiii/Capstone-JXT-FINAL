@@ -8,11 +8,29 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Fetch activity logs with user information
+// Get the current user's role
+$user_id = $_SESSION['user_id'];
+$user_role = $_SESSION['role'];
+
+// Fetch activity logs with user information based on role
 $query = "SELECT l.*, CONCAT(u.first_name, ' ', u.last_name) as user_name 
           FROM activity_logs l 
-          LEFT JOIN users u ON l.user_id = u.user_id 
-          ORDER BY l.created_at DESC";
+          LEFT JOIN users u ON l.user_id = u.user_id";
+
+// Filter logs based on user role
+if ($user_role == 'Manager') {
+    // Managers can see logs from staff and their own logs
+    $query .= " WHERE l.user_type IN ('manager', 'staff')";
+} elseif ($user_role == 'Staff') {
+    // Staff can only see their own logs
+    $query .= " WHERE l.user_id = $user_id";
+} elseif ($user_role == 'Sublimator') {
+    // Sublimators can only see their own logs
+    $query .= " WHERE l.user_type = 'sublimator' AND l.user_id = $user_id";
+}
+// Admin can see all logs (no filter)
+
+$query .= " ORDER BY l.created_at DESC";
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -253,7 +271,6 @@ $result = mysqli_query($conn, $query);
                                             <th>Type</th>
                                             <th>Action</th>
                                             <th>Description</th>
-                                            <th>IP Address</th>
                                             <th>Timestamp</th>
                                         </tr>
                                     </thead>
@@ -280,12 +297,11 @@ $result = mysqli_query($conn, $query);
                                                         </span>
                                                     </td>
                                                     <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                                    <td><small><?php echo htmlspecialchars($row['ip_address']); ?></small></td>
                                                     <td><?php echo date('M d, Y h:i A', strtotime($row['created_at'])); ?></td>
                                                 </tr>
                                             <?php }
                                         } else { ?>
-                                            <tr><td colspan="7" class="text-center">No activity logs found</td></tr>
+                                            <tr><td colspan="6" class="text-center">No activity logs found</td></tr>
                                         <?php } ?>
                                     </tbody>
                                 </table>
@@ -313,7 +329,7 @@ $result = mysqli_query($conn, $query);
     <script>
         $(document).ready(function() {
             $('#activityTable').DataTable({
-                order: [[6, 'desc']],
+                order: [[5, 'desc']],
                 pageLength: 7,
                 responsive: true,
                 dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',

@@ -78,7 +78,7 @@ if (!$result) {
     <div id="wrapper">
         <?php include 'sidebar.php'; ?>
 
-        <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
             <div id="content">
                 <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow">
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -120,7 +120,7 @@ if (!$result) {
                                             <td><?php echo htmlspecialchars($row['role']); ?></td>
                                             <td>
                                                 <a href="edit_user.php?id=<?php echo $row['user_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete(<?php echo $row['user_id']; ?>)">Delete</button>
+                                        
                                             </td>
                                         </tr>
                                 <?php }
@@ -185,8 +185,12 @@ if (!$result) {
 
 
                 <!-- Footer -->
-                <footer class="footer text-center py-3">
-                    <span>Copyright &copy; JXT Tailoring and Printing Services</span>
+                <footer class="footer py-3 bg-white mt-auto">
+                    <div class="container-fluid">
+                        <div class="text-center">
+                            <span>Copyright &copy; JXT Tailoring and Printing Services</span>
+                        </div>
+                    </div>
                 </footer>
             </div>
         </div>

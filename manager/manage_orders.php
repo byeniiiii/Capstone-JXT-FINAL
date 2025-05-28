@@ -452,13 +452,13 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                                                             <small class="payment-date"><?= $payment['formatted_date'] ?></small>
                                                         </div>
                                                         <div>
-                                                            <?php if (!empty($payment['screenshot_path']) && file_exists($payment['screenshot_path'])): ?>
-                                                                <img src="<?= htmlspecialchars($payment['screenshot_path']) ?>" 
+                                                            <?php if (!empty($payment['screenshot_path'])): ?>
+                                                                <img src="../uploads/payment_screenshots/<?= basename($payment['screenshot_path']) ?>" 
                                                                      class="thumbnail-img" 
                                                                      alt="Payment screenshot"
                                                                      data-bs-toggle="modal" 
                                                                      data-bs-target="#imageModal"
-                                                                     data-src="<?= htmlspecialchars($payment['screenshot_path']) ?>">
+                                                                     data-src="../uploads/payment_screenshots/<?= basename($payment['screenshot_path']) ?>">
                                                             <?php else: ?>
                                                                 <div class="placeholder-img">
                                                                     <i class="fas fa-image"></i>

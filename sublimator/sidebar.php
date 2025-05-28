@@ -48,11 +48,19 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
             </div>
             
             <!-- Manage Orders -->
-            <a href="orders.php" class="menu-item <?= ($current_page == 'orders.php') ? 'active' : ''; ?>">
+            <a href="manage_orders.php" class="menu-item <?= ($current_page == 'manage_orders.php') ? 'active' : ''; ?>">
                 <div class="menu-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <span class="menu-text">Manage Orders</span>
+            </a>
+            
+            <!-- My Assignments -->
+            <a href="my_assignments.php" class="menu-item <?= ($current_page == 'my_assignments.php') ? 'active' : ''; ?>">
+                <div class="menu-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <span class="menu-text">My Assignments</span>
             </a>
             
             <!-- Manage Templates -->

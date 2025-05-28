@@ -628,8 +628,14 @@ if ($payment_id > 0) {
             }
         }
     </style>
+    <!-- Bootstrap CSS (assumed to be included, add if needed) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 </head>
-<body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-light">
@@ -784,14 +790,13 @@ if ($payment_id > 0) {
                 </div>
                 
                 <div class="receipt-action">
-    <button class="btn btn-primary" onclick="printReceipt()">
-        <i class="fas fa-print me-2"></i> Print Receipt
-    </button>
-    <a href="track_order.php" class="btn btn-outline-secondary ms-2">
-        <i class="fas fa-box me-2"></i> View Orders
-    </a>
-</div>
-                
+                    <button class="btn btn-primary" onclick="printReceipt()">
+                        <i class="fas fa-print me-2"></i> Print Receipt
+                    </button>
+                    <a href="track_order.php" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-box me-2"></i> View Orders
+                    </a>
+                </div>
             <?php else: ?>
                 <div class="payment-card">
                     <div class="payment-card-header">
@@ -930,360 +935,287 @@ if ($payment_id > 0) {
 
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Select2 -->
+<!-- Select2 (Note: Select2 typically requires jQuery, but we'll use a vanilla JS fallback) -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    // Initialize select2
-    $('.staff-select').select2({
-        theme: 'bootstrap-5',
-        placeholder: "Select a staff member",
-        allowClear: true
-    });
-    
-    const minimumPayment = parseFloat($('#minimum_payment').val());
-    const totalAmount = parseFloat($('#total_amount').val());
-    
+// Variables
+const minimumPayment = parseFloat(document.getElementById('minimum_payment')?.value) || 0;
+const totalAmount = parseFloat(document.getElementById('total_amount')?.value) || 0;
+
+// Initialize Select2 (Fallback for vanilla JS)
+document.addEventListener('DOMContentLoaded', () => {
+    const staffSelect = document.querySelector('.staff-select');
+    if (staffSelect) {
+        // Since Select2 typically requires jQuery, we'll use a basic vanilla JS select for compatibility
+        // If Select2 is strictly needed, consider including jQuery or a vanilla JS alternative like Choices.js
+        staffSelect.addEventListener('change', () => {
+            staffSelect.classList.remove('is-invalid');
+            const select2Container = document.querySelector('.select2-selection');
+            if (select2Container) {
+                select2Container.style.borderColor = '#ced4da';
+            }
+        });
+        // Minimal Select2 initialization (may require jQuery for full functionality)
+        if (typeof Select2 !== 'undefined') {
+            new Select2(staffSelect, {
+                theme: 'bootstrap-5',
+                placeholder: 'Select a staff member',
+                allowClear: true
+            });
+        }
+    }
+
     // Handle payment method selection
-    $('.payment-method-option').click(function() {
-        $('.payment-method-option').removeClass('selected');
-        $(this).addClass('selected');
-        
-        const method = $(this).data('method');
-        $('#payment_method').val(method);
-        
-        if (method === 'gcash') {
-            $('#gcashFields').show();
-            $('#cashFields').hide();
-            $('#transaction_reference').attr('required', true);
-            $('#gcash_screenshot').attr('required', true);
-        } else {
-            $('#gcashFields').hide();
-            $('#cashFields').show();
-            $('#transaction_reference').attr('required', false);
-            $('#gcash_screenshot').attr('required', false);
-        }
-    });
-    
-    // Handle amount paid validation
-    $('#amount_paid').on('input', function() {
-        const amountPaid = parseFloat($(this).val());
-        
-        if (amountPaid < minimumPayment) {
-            $(this).addClass('is-invalid');
-            $('#amount_error').text(`Amount must be at least ₱${minimumPayment.toFixed(2)} (required downpayment).`);
-        } else if (amountPaid > totalAmount) {
-            $(this).addClass('is-invalid');
-            $('#amount_error').text(`Amount cannot exceed the total order amount (₱${totalAmount.toFixed(2)}).`);
-        } else {
-            $(this).removeClass('is-invalid');
-        }
-        
-        // Update payment type text based on amount
-        if (amountPaid >= totalAmount) {
-            $('.payment-type-text').text('Full Payment');
-        } else {
-            $('.payment-type-text').text('Downpayment');
-        }
-    });
-    
-    // File upload preview handling
-    $('#gcash_screenshot').change(function(e) {
-        if (this.files && this.files[0]) {
-            const file = this.files[0];
-            const fileReader = new FileReader();
-            
-            fileReader.onload = function(e) {
-                $('#screenshotPreview').attr('src', e.target.result);
-                $('#screenshotPreview').css('display', 'block');
-                $('.file-upload-message').css('display', 'none');
-                $('#removeScreenshot').css('display', 'flex');
-            }
-            
-            fileReader.readAsDataURL(file);
-        }
-    });
-    
-    // Remove screenshot
-    $('#removeScreenshot').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        $('#gcash_screenshot').val('');
-        $('#screenshotPreview').attr('src', '');
-        $('#screenshotPreview').css('display', 'none');
-        $('.file-upload-message').css('display', 'block');
-        $(this).css('display', 'none');
-    });
-    
-    // Form validation
-    $('#paymentForm').submit(function(e) {
-        let isValid = true;
-        
-        // Validate amount
-        const amountPaid = parseFloat($('#amount_paid').val());
-        if (isNaN(amountPaid) || amountPaid < minimumPayment) {
-            $('#amount_paid').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#amount_paid').removeClass('is-invalid');
-        }
-        
-        // Validate GCash fields if selected
-        const method = $('#payment_method').val();
-        if (method === 'gcash') {
-            const reference = $('#transaction_reference').val().trim();
-            if (reference === '') {
-                $('#transaction_reference').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#transaction_reference').removeClass('is-invalid');
-            }
-            
-            const hasFile = $('#gcash_screenshot')[0].files.length > 0;
-            if (!hasFile) {
-                $('.file-upload-wrapper').css('border-color', '#dc3545');
-                isValid = false;
-            } else {
-                $('.file-upload-wrapper').css('border-color', '#ced4da');
-            }
-        }
-        
-        // Validate staff selection
-        const staffId = $('#received_by').val();
-        if (!staffId) {
-            $('#received_by').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#received_by').removeClass('is-invalid');
-        }
-        
-        if (!isValid) {
+    document.querySelectorAll('.payment-method-option').forEach(option => {
+        option.addEventListener('click', (e) => {
             e.preventDefault();
-        }
+            e.stopPropagation();
+            const method = option.dataset.method;
+            console.log('Clicked payment method:', method);
+
+            // Update selected class
+            document.querySelectorAll('.payment-method-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+
+            // Update hidden input
+            const paymentMethodInput = document.getElementById('payment_method');
+            paymentMethodInput.value = method;
+            console.log('Payment method set to:', paymentMethodInput.value);
+
+            // Toggle fields
+            const gcashFields = document.getElementById('gcashFields');
+            const cashFields = document.getElementById('cashFields');
+            const transactionReference = document.getElementById('transaction_reference');
+            const gcashScreenshot = document.getElementById('gcash_screenshot');
+            const fileUploadWrapper = document.querySelector('.file-upload-wrapper');
+
+            if (method === 'gcash') {
+                gcashFields.style.display = 'block';
+                gcashFields.style.transition = 'opacity 0.3s ease';
+                gcashFields.style.opacity = '1';
+                cashFields.style.display = 'none';
+
+                if (transactionReference) transactionReference.required = true;
+                if (gcashScreenshot) gcashScreenshot.required = true;
+
+                if (transactionReference) transactionReference.classList.remove('is-invalid');
+                if (fileUploadWrapper) fileUploadWrapper.style.borderColor = '#ced4da';
+            } else if (method === 'cash') {
+                gcashFields.style.display = 'none';
+                cashFields.style.display = 'block';
+
+                if (transactionReference) {
+                    transactionReference.required = false;
+                    transactionReference.value = '';
+                    transactionReference.classList.remove('is-invalid');
+                }
+                if (gcashScreenshot) {
+                    gcashScreenshot.required = false;
+                    gcashScreenshot.value = '';
+                }
+                resetFileUpload();
+            }
+        });
     });
+
+    // Handle amount paid validation
+    const amountPaidInput = document.getElementById('amount_paid');
+    if (amountPaidInput) {
+        amountPaidInput.addEventListener('input', () => {
+            const amountPaid = parseFloat(amountPaidInput.value) || 0;
+            const amountError = document.getElementById('amount_error');
+
+            if (amountPaid < minimumPayment) {
+                amountPaidInput.classList.add('is-invalid');
+                amountError.textContent = `Amount must be at least ₱${minimumPayment.toFixed(2)} (required downpayment).`;
+            } else if (amountPaid > totalAmount) {
+                amountPaidInput.classList.add('is-invalid');
+                amountError.textContent = `Amount cannot exceed the total order amount (₱${totalAmount.toFixed(2)}).`;
+            } else {
+                amountPaidInput.classList.remove('is-invalid');
+            }
+
+            document.querySelectorAll('.payment-type-text').forEach(text => {
+                text.textContent = amountPaid >= totalAmount ? 'Full Payment' : 'Downpayment';
+            });
+        });
+    }
+
+    // File upload preview handling
+    const gcashScreenshot = document.getElementById('gcash_screenshot');
+    if (gcashScreenshot) {
+        gcashScreenshot.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload a valid image file (JPG, PNG, GIF)');
+                    gcashScreenshot.value = '';
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    gcashScreenshot.value = '';
+                    return;
+                }
+
+                const fileReader = new FileReader();
+                fileReader.onload = (e) => {
+                    const screenshotPreview = document.getElementById('screenshotPreview');
+                    screenshotPreview.src = e.target.result;
+                    screenshotPreview.style.display = 'block';
+                    document.querySelector('.file-upload-message').style.display = 'none';
+                    document.getElementById('removeScreenshot').style.display = 'block';
+                    document.querySelector('.file-upload-wrapper').style.borderColor = '#28a745';
+                };
+                fileReader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Remove screenshot
+    const removeScreenshot = document.getElementById('removeScreenshot');
+    if (removeScreenshot) {
+        removeScreenshot.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetFileUpload();
+        });
+    }
+
+    // File upload wrapper click handling
+    const fileUploadWrapper = document.querySelector('.file-upload-wrapper');
+    if (fileUploadWrapper) {
+        fileUploadWrapper.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget || e.target.classList.contains('file-upload-message') || 
+                e.target.parentElement.classList.contains('file-upload-message')) {
+                gcashScreenshot.click();
+            }
+        });
+    }
+
+    // Form validation
+    const paymentForm = document.getElementById('paymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', (e) => {
+            let isValid = true;
+
+            console.log('Form submitted with payment method:', document.getElementById('payment_method')?.value);
+
+            // Validate amount
+            const amountPaid = parseFloat(amountPaidInput?.value) || 0;
+            const amountError = document.getElementById('amount_error');
+            if (amountPaid < minimumPayment) {
+                amountPaidInput.classList.add('is-invalid');
+                amountError.textContent = `Amount must be at least ₱${minimumPayment.toFixed(2)} (required downpayment).`;
+                isValid = false;
+            } else if (amountPaid > totalAmount) {
+                amountPaidInput.classList.add('is-invalid');
+                amountError.textContent = `Amount cannot exceed the total order amount (₱${totalAmount.toFixed(2)}).`;
+                isValid = false;
+            } else {
+                amountPaidInput.classList.remove('is-invalid');
+            }
+
+            // Validate GCash fields
+            const method = document.getElementById('payment_method')?.value;
+            console.log('Validating method:', method);
+
+            if (method === 'gcash') {
+                const transactionReference = document.getElementById('transaction_reference');
+                const reference = transactionReference?.value.trim();
+                if (reference === '') {
+                    transactionReference.classList.add('is-invalid');
+                    console.log('Reference number is empty');
+                    isValid = false;
+                } else {
+                    transactionReference.classList.remove('is-invalid');
+                }
+
+                const hasFile = gcashScreenshot?.files.length > 0;
+                if (!hasFile) {
+                    fileUploadWrapper.style.borderColor = '#dc3545';
+                    console.log('No file uploaded');
+                    alert('Please upload a screenshot of your GCash transaction.');
+                    isValid = false;
+                } else {
+                    fileUploadWrapper.style.borderColor = '#28a745';
+                }
+            }
+
+            // Validate staff selection
+            const receivedBy = document.getElementById('received_by');
+            const staffId = receivedBy?.value;
+            if (!staffId) {
+                receivedBy.classList.add('is-invalid');
+                const select2Container = document.querySelector('.select2-selection');
+                if (select2Container) {
+                    select2Container.style.borderColor = '#dc3545';
+                }
+                isValid = false;
+            } else {
+                receivedBy.classList.remove('is-invalid');
+                const select2Container = document.querySelector('.select2-selection');
+                if (select2Container) {
+                    select2Container.style.borderColor = '#ced4da';
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                console.log('Form validation failed');
+
+                const firstError = document.querySelector('.is-invalid, .file-upload-wrapper[style*="border-color: rgb(220, 53, 69)"]');
+                if (firstError) {
+                    window.scrollTo({
+                        top: firstError.getBoundingClientRect().top + window.pageYOffset - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            } else {
+                console.log('Form validation passed');
+            }
+        });
+    }
+
+    // Real-time validation for GCash fields
+    const transactionReference = document.getElementById('transaction_reference');
+    if (transactionReference) {
+        ['input', 'blur'].forEach(event => {
+            transactionReference.addEventListener(event, () => {
+                const value = transactionReference.value.trim();
+                if (document.getElementById('payment_method')?.value === 'gcash') {
+                    transactionReference.classList.toggle('is-invalid', value === '');
+                }
+            });
+        });
+    }
 });
 
-// Print receipt function
-function printReceipt() {
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    
-    // Get the receipt content
-    const receiptContent = document.getElementById('printableReceipt').outerHTML;
-    
-    // Create the print document
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>JX Tailoring - Payment Receipt</title>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {
-                    font-family: 'Arial', sans-serif;
-                    line-height: 1.5;
-                    margin: 0;
-                    padding: 20px;
-                }
-                
-                .receipt {
-                    background-color: white;
-                    padding: 20px;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    box-shadow: none;
-                }
-                
-                .receipt-header {
-                    text-align: center;
-                    margin-bottom: 20px;
-                }
-                
-                .receipt-logo {
-                    max-width: 120px;
-                    margin-bottom: 8px;
-                }
-                
-                .receipt-title {
-                    font-size: 24px;
-                    font-weight: bold;
-                    margin-bottom: 5px;
-                    text-transform: uppercase;
-                }
-                
-                .receipt-subtitle {
-                    font-size: 18px;
-                    font-weight: bold;
-                    margin: 10px 0;
-                    text-transform: uppercase;
-                }
-                
-                .receipt-address {
-                    font-size: 14px;
-                    margin-bottom: 8px;
-                    line-height: 1.4;
-                }
-                
-                .receipt-separator {
-                    border-bottom: 2px solid #000;
-                    width: 100%;
-                    margin: 15px 0;
-                }
-                
-                .receipt-id, .receipt-date {
-                    font-size: 14px;
-                    font-weight: 500;
-                    margin-bottom: 5px;
-                }
-                
-                .receipt-customer-info {
-                    margin: 20px 0;
-                    border: 1px solid #ccc;
-                    padding: 15px;
-                    border-radius: 5px;
-                }
-                
-                .receipt-customer-info p {
-                    margin: 5px 0;
-                    font-size: 14px;
-                }
-                
-                .receipt-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 20px;
-                }
-                
-                .receipt-table th, .receipt-table td {
-                    border: 1px solid #ccc;
-                    padding: 8px;
-                    text-align: center;
-                }
-                
-                .receipt-table th {
-                    background-color: #f2f2f2;
-                    font-weight: 600;
-                }
-                
-                .receipt-table td:nth-child(2) {
-                    text-align: left;
-                }
-                
-                .receipt-table td:nth-child(3),
-                .receipt-table td:nth-child(4) {
-                    text-align: right;
-                }
-                
-                .receipt-computation {
-                    border: 1px solid #ccc;
-                    padding: 15px;
-                    border-radius: 5px;
-                    margin: 15px 0;
-                }
-                
-                .receipt-row {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 8px;
-                    padding-bottom: 8px;
-                    border-bottom: 1px dashed #ccc;
-                }
-                
-                .payment-details {
-                    margin-top: 20px;
-                    padding-top: 20px;
-                    border-top: 1px solid #000;
-                }
-                
-                .receipt-total-row {
-                    border-top: 2px solid #000;
-                    border-bottom: 2px solid #000;
-                    padding-top: 8px;
-                    margin-top: 8px;
-                }
-                
-                .receipt-signatures {
-                    display: flex;
-                    justify-content: space-between;
-                    margin: 30px 0;
-                }
-                
-                .receipt-signature-box {
-                    width: 45%;
-                    text-align: center;
-                }
-                
-                .signature-line {
-                    border-bottom: 1px solid #000;
-                    margin-bottom: 8px;
-                    height: 40px;
-                }
-                
-                .receipt-footer {
-                    margin-top: 30px;
-                    border-top: 1px solid #ccc;
-                    padding-top: 15px;
-                }
-                
-                .receipt-disclaimer {
-                    text-align: center;
-                    margin-top: 20px;
-                    font-size: 12px;
-                }
-                
-                .receipt-disclaimer p:nth-child(2) {
-                    font-weight: bold;
-                    font-style: italic;
-                }
-                
-                .receipt-action {
-                    display: none;
-                }
-                
-                .receipt-screenshot {
-                    max-width: 100%;
-                    max-height: 300px;
-                    margin: 15px auto;
-                    display: block;
-                    border: 1px solid #ccc;
-                    border-radius: 8px;
-                }
-                
-                @media print {
-                    .receipt-action {
-                        display: none;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            ${receiptContent}
-            <script>
-                window.onload = function() {
-                    window.print();
-                    setTimeout(function() {
-                        window.close();
-                    }, 500);
-                };
-            </script>
-        </body>
-        </html>
-    `);
-    
-    printWindow.document.close();
-}
-</script>
+// Helper function to reset file upload
+function resetFileUpload() {
+    const gcashScreenshot = document.getElementById('gcash_screenshot');
+    const screenshotPreview = document.getElementById('screenshotPreview');
+    const fileUploadMessage = document.querySelector('.file-upload-message');
+    const removeScreenshot = document.getElementById('removeScreenshot');
+    const fileUploadWrapper = document.querySelector('.file-upload-wrapper');
 
+    if (gcashScreenshot) gcashScreenshot.value = '';
+    if (screenshotPreview) {
+        screenshotPreview.src = '';
+        screenshotPreview.style.display = 'none';
+    }
+    if (fileUploadMessage) fileUploadMessage.style.display = 'block';
+    if (removeScreenshot) removeScreenshot.style.display = 'none';
+    if (fileUploadWrapper) fileUploadWrapper.style.borderColor = '#ced4da';
+}
+
+
+</script>
 </body>
 </html>
 
-<script>
-    function printReceipt() {
-        var printContents = document.getElementById('receipt-content').innerHTML;
-        var originalContents = document.body.innerHTML;
+
 

@@ -53,7 +53,7 @@ try {
         throw new Exception("Order must be in 'Ready for Pickup' status to mark as completed");
     }
     
-    if ($order_data['payment_status'] !== 'fully_paid') {
+    if ($order_data['payment_status'] !== 'fully_paid' && $order_data['payment_status'] !== 'paid') {
         throw new Exception("Order must be fully paid before marking as completed");
     }
     

@@ -416,29 +416,21 @@ function calculateTotal(forcedPrice = null) {
 // }
 
 function validateForm() {
-    // Remove the total amount validation
-    // if (!validateTotalAmount()) {
-    //     return false;
-    // }
-    
     // Check for duplicate jersey numbers
     const jerseyNumbers = [];
     const jerseyInputs = document.querySelectorAll('input[name="jersey_number[]"]');
-    
     let hasDuplicates = false;
     let duplicateNumber = '';
-    
+
     jerseyInputs.forEach(input => {
-        // Reset any previous error styling
+        // Remove previous error styling
         input.classList.remove('is-invalid');
-        
         const num = input.value.trim();
         if (num && jerseyNumbers.includes(num)) {
             input.classList.add('is-invalid');
             hasDuplicates = true;
             duplicateNumber = num;
-            
-            // Create error message if it doesn't exist
+            // Show error message
             let errorDiv = input.parentNode.querySelector('.invalid-feedback');
             if (!errorDiv) {
                 errorDiv = document.createElement('div');
@@ -450,16 +442,16 @@ function validateForm() {
             jerseyNumbers.push(num);
         }
     });
-    
+
     if (hasDuplicates) {
         alert(`⚠️ Error: Duplicate jersey number found (${duplicateNumber}). Each jersey number must be unique.`);
         return false;
     }
-    
+
     // Set the final calculated amount to the hidden field
     const calculatedTotal = calculateTotal();
     document.getElementById('total_amount_field').value = calculatedTotal;
-    
+
     return true;
 }
 

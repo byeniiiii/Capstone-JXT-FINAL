@@ -1,0 +1,279 @@
+[28-May-2025 15:46:10 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:46:10 Europe/Berlin] POST data: Array
+(
+    [order_id] => VGA1D
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:46:10 Europe/Berlin] Error in assign_sublimator.php: Missing required parameters
+[28-May-2025 15:47:44 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:47:44 Europe/Berlin] POST data: Array
+(
+    [order_id] => VGA1D
+    [sublimator_id] => 15
+    [notes] => test
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:47:44 Europe/Berlin] Order status: approved
+[28-May-2025 15:47:44 Europe/Berlin] Error in assign_sublimator.php: Unknown column 'sublimator_id' in 'field list'
+[28-May-2025 15:58:39 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:58:39 Europe/Berlin] POST data: Array
+(
+    [order_id] => VGA1D
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 15:58:39 Europe/Berlin] Order status: approved
+[28-May-2025 15:58:39 Europe/Berlin] Error in assign_sublimator.php: Unknown column 'sublimator_id' in 'field list'
+[28-May-2025 16:30:40 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 16:30:40 Europe/Berlin] POST data: Array
+(
+    [order_id] => VGA1D
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 16:30:40 Europe/Berlin] Order status: approved
+[28-May-2025 16:30:40 Europe/Berlin] Checking if order exists: VGA1D - Found: 0
+[28-May-2025 16:30:40 Europe/Berlin] Inserting new sublimation order: VGA1D
+[28-May-2025 16:34:36 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 16:34:36 Europe/Berlin] POST data: Array
+(
+    [order_id] => 6X4YHVTEJ6
+    [sublimator_id] => 14
+    [notes] => 
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 16:34:36 Europe/Berlin] Order status: approved, Payment status: pending
+[28-May-2025 16:34:36 Europe/Berlin] Error in assign_sublimator.php: Order must have at least a downpayment before assigning a sublimator
+[28-May-2025 16:45:58 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 16:45:58 Europe/Berlin] POST data: Array
+(
+    [order_id] => W7DK9
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 7d885f3b68a0b96d93549280175946cd2e07469d9e54902158c1dd91f5b4d66a
+)
+
+[28-May-2025 16:45:58 Europe/Berlin] Order status: approved, Payment status: pending
+[28-May-2025 16:45:58 Europe/Berlin] Error in assign_sublimator.php: Order must have at least a downpayment before assigning a sublimator
+[28-May-2025 23:54:08 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [csrf_token] => 8442892188c927c9f2548e83cc9989d1188f32aeee0e71654b21bedebccebd5d
+)
+
+[28-May-2025 23:54:08 Europe/Berlin] POST data: Array
+(
+    [order_id] => 2EH7XGV3UA
+    [sublimator_id] => 17
+    [notes] => Auto-assigned to template creator: Mark Dizzemar Bais
+    [csrf_token] => 8442892188c927c9f2548e83cc9989d1188f32aeee0e71654b21bedebccebd5d
+)
+
+[28-May-2025 23:54:08 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[28-May-2025 23:54:08 Europe/Berlin] Checking if order exists: 2EH7XGV3UA - Found: 1
+[28-May-2025 23:54:08 Europe/Berlin] Updating existing sublimation order: 2EH7XGV3UA
+[28-May-2025 23:54:08 Europe/Berlin] Error in assign_sublimator.php: Unknown column 'user_id' in 'field list'
+[28-May-2025 23:55:11 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [csrf_token] => 8442892188c927c9f2548e83cc9989d1188f32aeee0e71654b21bedebccebd5d
+)
+
+[28-May-2025 23:55:11 Europe/Berlin] POST data: Array
+(
+    [order_id] => 6X4YHVTEJ6
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 8442892188c927c9f2548e83cc9989d1188f32aeee0e71654b21bedebccebd5d
+)
+
+[28-May-2025 23:55:11 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[28-May-2025 23:55:11 Europe/Berlin] Checking if order exists: 6X4YHVTEJ6 - Found: 1
+[28-May-2025 23:55:11 Europe/Berlin] Updating existing sublimation order: 6X4YHVTEJ6
+[28-May-2025 23:55:11 Europe/Berlin] Error in assign_sublimator.php: Unknown column 'user_id' in 'field list'
+[28-May-2025 23:55:27 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [csrf_token] => 8442892188c927c9f2548e83cc9989d1188f32aeee0e71654b21bedebccebd5d
+)
+
+[28-May-2025 23:55:27 Europe/Berlin] POST data: Array
+(
+    [order_id] => 2EH7XGV3UA
+    [sublimator_id] => 17
+    [notes] => Auto-assigned to template creator: Mark Dizzemar Bais
+    [csrf_token] => 8442892188c927c9f2548e83cc9989d1188f32aeee0e71654b21bedebccebd5d
+)
+
+[28-May-2025 23:55:27 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[28-May-2025 23:55:27 Europe/Berlin] Checking if order exists: 2EH7XGV3UA - Found: 1
+[28-May-2025 23:55:27 Europe/Berlin] Updating existing sublimation order: 2EH7XGV3UA
+[28-May-2025 23:55:27 Europe/Berlin] Error in assign_sublimator.php: Unknown column 'user_id' in 'field list'
+[29-May-2025 00:18:39 Europe/Berlin] Session data: Array
+(
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:18:39 Europe/Berlin] POST data: Array
+(
+    [order_id] => 2EH7XGV3UA
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:18:39 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[29-May-2025 00:18:39 Europe/Berlin] Checking if order exists: 2EH7XGV3UA - Found: 1
+[29-May-2025 00:18:39 Europe/Berlin] Updating existing sublimation order: 2EH7XGV3UA
+[29-May-2025 00:18:39 Europe/Berlin] Error in assign_sublimator.php: Unknown column 'notification_type' in 'field list'
+[29-May-2025 00:23:22 Europe/Berlin] Session data: Array
+(
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:23:22 Europe/Berlin] POST data: Array
+(
+    [order_id] => 6X4YHVTEJ6
+    [sublimator_id] => 15
+    [notes] => Auto-assigned to template creator: Jane Doe
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:23:22 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[29-May-2025 00:23:22 Europe/Berlin] Checking if order exists: 6X4YHVTEJ6 - Found: 1
+[29-May-2025 00:23:22 Europe/Berlin] Updating existing sublimation order: 6X4YHVTEJ6
+[29-May-2025 00:23:50 Europe/Berlin] Session data: Array
+(
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:23:50 Europe/Berlin] POST data: Array
+(
+    [order_id] => B44ZK
+    [sublimator_id] => 15
+    [notes] => 
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:23:50 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[29-May-2025 00:23:50 Europe/Berlin] Checking if order exists: B44ZK - Found: 0
+[29-May-2025 00:23:50 Europe/Berlin] Inserting new sublimation order: B44ZK
+[29-May-2025 00:24:01 Europe/Berlin] Session data: Array
+(
+    [customer_id] => 2093
+    [customer_name] => 
+    [customer_username] => lando
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:24:01 Europe/Berlin] POST data: Array
+(
+    [order_id] => 2EH7XGV3UA
+    [sublimator_id] => 17
+    [notes] => Auto-assigned to template creator: Mark Dizzemar Bais
+    [csrf_token] => 94e278c5f01085ab5e0efdc0b55f6eaf360bd71811473c5b2b56d5139c59a1ab
+)
+
+[29-May-2025 00:24:01 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[29-May-2025 00:24:01 Europe/Berlin] Checking if order exists: 2EH7XGV3UA - Found: 1
+[29-May-2025 00:24:01 Europe/Berlin] Updating existing sublimation order: 2EH7XGV3UA

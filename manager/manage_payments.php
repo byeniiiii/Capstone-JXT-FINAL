@@ -541,295 +541,345 @@ $recent_payments = $conn->query($recent_payments_query);
                     </ul>
                 </nav>
                 <!-- End of Topbar -->
- <!-- Begin Page Content -->
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Manage Payments</h1>
-    </div>
 
-    <?php if ($payment_id > 0 && $payment_details && $order_info): ?>
-    <!-- Payment Receipt -->
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Payment Receipt</h6>
-                    <div class="dropdown">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" 
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="printReceipt()">
-                                <i class="fas fa-print fa-sm fa-fw me-2 text-gray-400"></i> Print Receipt
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" onclick="emailReceipt()">
-                                <i class="fas fa-envelope fa-sm fa-fw me-2 text-gray-400"></i> Email Receipt
-                            </a></li>
-                        </ul>
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Manage Payments</h1>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="receipt" id="printableReceipt">
-                        <div class="receipt-header">
-                            <h2 class="receipt-title">JX Tailoring</h2>
-                            <p class="receipt-subtitle">Official Payment Receipt</p>
-                            <p class="receipt-date"><?php echo $payment_details['formatted_date']; ?></p>
-                            <p class="receipt-id">Receipt #<?php echo str_pad($payment_details['payment_id'], 6, '0', STR_PAD_LEFT); ?></p>
-                        </div>
-                        <div class="receipt-body">
-                            <div class="receipt-row">
-                                <span class="receipt-label">Customer:</span>
-                                <span class="receipt-value"><?php echo htmlspecialchars($order_info['first_name'] . ' ' . $order_info['last_name']); ?></span>
-                            </div>
-                            <div class="receipt-row">
-                                <span class="receipt-label">Order ID:</span>
-                                <span class="receipt-value"><?php echo htmlspecialchars($order_info['order_id']); ?></span>
-                            </div>
-                            <div class="receipt-row">
-                                <span class="receipt-label">Order Type:</span>
-                                <span class="receipt-value"><?php echo ucfirst(htmlspecialchars($order_info['order_type'])); ?></span>
-                            </div>
-                            <div class="receipt-row">
-                                <span class="receipt-label">Payment Method:</span>
-                                <span class="receipt-value"><?php echo ucfirst(htmlspecialchars($payment_details['payment_method'])); ?></span>
-                            </div>
-                            <?php if (!empty($payment_details['transaction_reference'])): ?>
-                            <div class="receipt-row">
-                                <span class="receipt-label">Reference #:</span>
-                                <span class="receipt-value"><?php echo htmlspecialchars($payment_details['transaction_reference']); ?></span>
-                            </div>
-                            <?php endif; ?>
-                            <div class="receipt-row">
-                                <span class="receipt-label">Payment Type:</span>
-                                <span class="receipt-value">
-                                    <?php echo ($payment_details['payment_type'] == 'full_payment') ? 'Full Payment' : 'Downpayment'; ?>
-                                </span>
-                            </div>
-                            <div class="receipt-row">
-                                <span class="receipt-label">Received By:</span>
-                                <span class="receipt-value"><?php echo htmlspecialchars($payment_details['staff_name']); ?></span>
-                            </div>
-                            <div class="receipt-row receipt-total">
-                                <span class="receipt-label">Amount Paid:</span>
-                                <span class="receipt-value">₱<?php echo number_format($payment_details['amount'], 2); ?></span>
-                            </div>
-                        </div>
-                        <div class="receipt-footer">
-                            <p>Thank you for your business!</p>
-                            <p>JX Tailoring • Phone: (123) 456-7890 • Email: info@jxtailoring.com</p>
-                        </div>
-                    </div>
-                    <div class="receipt-actions">
-                        <button type="button" class="btn btn-primary" onclick="printReceipt()">
-                            <i class="fas fa-print mr-1"></i> Print Receipt
-                        </button>
-                        <button type="button" class="btn btn-success" onclick="newPayment()">
-                            <i class="fas fa-plus mr-1"></i> New Payment
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php else: ?>
-        <!-- Recent Payments Table -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Recent Payments</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-custom">
-                        <thead>
-                            <tr>
-                                <th>Payment ID</th>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if ($recent_payments->num_rows > 0): ?>
-                                <?php while ($payment = $recent_payments->fetch_assoc()): ?>
-                                    <tr>
-                                        <td><?php echo str_pad($payment['payment_id'], 6, '0', STR_PAD_LEFT); ?></td>
-                                        <td><?php echo $payment['order_id']; ?></td>
-                                        <td><?php echo $payment['customer_name']; ?></td>
-                                        <td>₱<?php echo number_format($payment['amount'], 2); ?></td>
-                                        <td><?php echo ucfirst($payment['payment_method']); ?></td>
-                                        <td><?php echo date('M d, Y', strtotime($payment['payment_date'])); ?></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-info view-payment" data-id="<?php echo $payment['payment_id']; ?>">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="7" class="text-center">No recent payments found</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
 
-        <!-- Process Payment Form -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Process Payment</h6>
-            </div>
-            <div class="card-body">
-                <?php if (!empty($error_message)): ?>
-                    <div class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-circle mr-2"></i> <?php echo $error_message; ?>
-                    </div>
-                <?php endif; ?>
-                <form method="POST" enctype="multipart/form-data" id="paymentForm">
-                    <div class="mb-3">
-                        <label for="order_id" class="form-label">Select Order</label>
-                        <select class="form-select" id="order_id" name="order_id" required>
-                            <option value="">-- Select Order --</option>
-                            <?php while ($order = $pending_orders->fetch_assoc()): ?>
-                                <option value="<?php echo $order['order_id']; ?>" 
-                                        data-total="<?php echo $order['total_amount']; ?>"
-                                        data-paid="<?php echo $order['amount_paid'] ?? 0; ?>">
-                                    #<?php echo $order['order_id']; ?> - <?php echo $order['customer_name']; ?> 
-                                    (₱<?php echo number_format($order['total_amount'], 2); ?>)
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
-                    <div class="row order-info-row" style="display: none;">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Total Amount</label>
-                            <div class="form-control" id="total_display">₱0.00</div>
+                    <?php if ($payment_id > 0 && $payment_details && $order_info): ?>
+                    <!-- Payment Receipt -->
+                    <div class="row">
+                        <div class="col-lg-8 mx-auto">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Payment Receipt</h6>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" 
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuLink">
+                                            <li><a class="dropdown-item" href="#" onclick="printReceipt()">
+                                                <i class="fas fa-print fa-sm fa-fw me-2 text-gray-400"></i> Print Receipt
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="emailReceipt()">
+                                                <i class="fas fa-envelope fa-sm fa-fw me-2 text-gray-400"></i> Email Receipt
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="receipt" id="printableReceipt">
+                                        <div class="receipt-header">
+                                            <h2 class="receipt-title">JX Tailoring</h2>
+                                            <p class="receipt-subtitle">Official Payment Receipt</p>
+                                            <p class="receipt-date"><?php echo $payment_details['formatted_date']; ?></p>
+                                            <p class="receipt-id">Receipt #<?php echo str_pad($payment_details['payment_id'], 6, '0', STR_PAD_LEFT); ?></p>
+                                        </div>
+                                        <div class="receipt-body">
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Customer:</span>
+                                                <span class="receipt-value"><?php echo htmlspecialchars($order_info['first_name'] . ' ' . $order_info['last_name']); ?></span>
+                                            </div>
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Order ID:</span>
+                                                <span class="receipt-value"><?php echo htmlspecialchars($order_info['order_id']); ?></span>
+                                            </div>
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Order Type:</span>
+                                                <span class="receipt-value"><?php echo ucfirst(htmlspecialchars($order_info['order_type'])); ?></span>
+                                            </div>
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Payment Method:</span>
+                                                <span class="receipt-value"><?php echo ucfirst(htmlspecialchars($payment_details['payment_method'])); ?></span>
+                                            </div>
+                                            <?php if (!empty($payment_details['transaction_reference'])): ?>
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Reference #:</span>
+                                                <span class="receipt-value"><?php echo htmlspecialchars($payment_details['transaction_reference']); ?></span>
+                                            </div>
+                                            <?php endif; ?>
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Payment Type:</span>
+                                                <span class="receipt-value">
+                                                    <?php echo ($payment_details['payment_type'] == 'full_payment') ? 'Full Payment' : 'Downpayment'; ?>
+                                                </span>
+                                            </div>
+                                            <div class="receipt-row">
+                                                <span class="receipt-label">Received By:</span>
+                                                <span class="receipt-value"><?php echo htmlspecialchars($payment_details['staff_name']); ?></span>
+                                            </div>
+                                            <div class="receipt-row receipt-total">
+                                                <span class="receipt-label">Amount Paid:</span>
+                                                <span class="receipt-value">₱<?php echo number_format($payment_details['amount'], 2); ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="receipt-footer">
+                                            <p>Thank you for your business!</p>
+                                            <p>JX Tailoring • Phone: (123) 456-7890 • Email: info@jxtailoring.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="receipt-actions">
+                                        <button type="button" class="btn btn-primary" onclick="printReceipt()">
+                                            <i class="fas fa-print mr-1"></i> Print Receipt
+                                        </button>
+                                        <button type="button" class="btn btn-success" onclick="newPayment()">
+                                            <i class="fas fa-plus mr-1"></i> New Payment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Amount Paid</label>
-                            <div class="form-control" id="paid_display">₱0.00</div>
-                        </div>
-                        <div class="col-12 mb-3">
-                            <label class="form-label">Remaining Balance</label>
-                            <div class="form-control" id="remaining_display">₱0.00</div>
-                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="payment_method" class="form-label">Payment Method</label>
-                        <select class="form-select" id="payment_method" name="payment_method" required>
-                            <option value="">-- Select Payment Method --</option>
-                            <option value="cash">Cash</option>
-                            <option value="gcash">GCash</option>
-                        </select>
-                    </div>
-                    <div class="mb-3" id="transaction_reference_group" style="display: none;">
-                        <label for="transaction_reference" class="form-label">Transaction Reference</label>
-                        <input type="text" class="form-control" id="transaction_reference" name="transaction_reference" placeholder="Enter transaction reference">
-                    </div>
-                    <div class="mb-3" id="gcash_screenshot_group" style="display: none;">
-                        <label for="gcash_screenshot" class="form-label">GCash Screenshot</label>
-                        <input type="file" class="form-control" id="gcash_screenshot" name="gcash_screenshot" accept="image/*">
-                        <small class="form-text text-muted">Upload screenshot of GCash payment confirmation.</small>
-                    </div>
-                    <div class="mb-3">
-                        <label for="amount_paid" class="form-label">Amount Paid</label>
-                        <div class="input-group">
-                            <span class="input-group-text">₱</span>
-                            <input type="number" class="form-control" id="amount_paid" name="amount_paid" step="0.01" min="0" required placeholder="0.00">
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Process Payment</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Orders Pending Payment Table -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Orders Pending Payment</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-custom">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Total</th>
-                                <th>Paid</th>
-                                <th>Remaining</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            mysqli_data_seek($pending_orders, 0);
-                            if ($pending_orders->num_rows > 0): 
-                            ?>
-                                <?php while ($order = $pending_orders->fetch_assoc()): 
-                                    $amount_paid = $order['amount_paid'] ?? 0;
-                                    $remaining = $order['total_amount'] - $amount_paid;
-                                ?>
-                                    <tr>
-                                        <td><?php echo $order['order_id']; ?></td>
-                                        <td><?php echo $order['customer_name']; ?></td>
-                                        <td>₱<?php echo number_format($order['total_amount'], 2); ?></td>
-                                        <td>₱<?php echo number_format($amount_paid, 2); ?></td>
-                                        <td>₱<?php echo number_format($remaining, 2); ?></td>
-                                        <td>
+                    <?php else: ?>
+                        <!-- Process Payment Form -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Process Payment</h6>
+                            </div>
+                            <div class="card-body">
+                                <?php if (!empty($error_message)): ?>
+                                    <div class="alert alert-danger" role="alert">
+                                        <i class="fas fa-exclamation-circle mr-2"></i> <?php echo $error_message; ?>
+                                    </div>
+                                <?php endif; ?>
+                                <form method="POST" enctype="multipart/form-data" id="paymentForm">
+                                    <div class="mb-3">
+                                        <label for="order_id" class="form-label">Select Order</label>
+                                        <select class="form-select" id="order_id" name="order_id" required>
+                                            <option value="">-- Select Order --</option>
                                             <?php 
-                                            $status_class = '';
-                                            $status_text = '';
-                                            switch ($order['payment_status']) {
-                                                case 'pending':
-                                                    $status_class = 'payment-pending';
-                                                    $status_text = 'Pending';
-                                                    break;
-                                                case 'downpayment_paid':
-                                                    $status_class = 'payment-partial';
-                                                    $status_text = 'Partial';
-                                                    break;
-                                                case 'fully_paid':
-                                                    $status_class = 'payment-paid';
-                                                    $status_text = 'Paid';
-                                                    break;
-                                            }
+                                            mysqli_data_seek($pending_orders, 0);
+                                            while ($order = $pending_orders->fetch_assoc()): ?>
+                                                <option value="<?php echo $order['order_id']; ?>" 
+                                                        data-total="<?php echo $order['total_amount']; ?>"
+                                                        data-paid="<?php echo $order['amount_paid'] ?? 0; ?>">
+                                                    #<?php echo $order['order_id']; ?> - <?php echo $order['customer_name']; ?> 
+                                                    (₱<?php echo number_format($order['total_amount'], 2); ?>)
+                                                </option>
+                                            <?php endwhile; ?>
+                                        </select>
+                                    </div>
+                                    <div class="row order-info-row" style="display: none;">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Total Amount</label>
+                                            <div class="form-control" id="total_display">₱0.00</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Amount Paid</label>
+                                            <div class="form-control" id="paid_display">₱0.00</div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Remaining Balance</label>
+                                            <div class="form-control" id="remaining_display">₱0.00</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="payment_method" class="form-label">Payment Method</label>
+                                        <select class="form-select" id="payment_method" name="payment_method" required>
+                                            <option value="">-- Select Payment Method --</option>
+                                            <option value="cash">Cash</option>
+                                            <option value="gcash">GCash</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3" id="transaction_reference_group" style="display: none;">
+                                        <label for="transaction_reference" class="form-label">Transaction Reference</label>
+                                        <input type="text" class="form-control" id="transaction_reference" name="transaction_reference" placeholder="Enter transaction reference">
+                                    </div>
+                                    <div class="mb-3" id="gcash_screenshot_group" style="display: none;">
+                                        <label for="gcash_screenshot" class="form-label">GCash Screenshot</label>
+                                        <input type="file" class="form-control" id="gcash_screenshot" name="gcash_screenshot" accept="image/*">
+                                        <small class="form-text text-muted">Upload screenshot of GCash payment confirmation.</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="amount_paid" class="form-label">Amount Paid</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">₱</span>
+                                            <input type="number" class="form-control" id="amount_paid" name="amount_paid" step="0.01" min="0" required placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Process Payment</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Payments Table -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Recent Payments</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-custom" id="recentPaymentsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Payment ID</th>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Amount</th>
+                                                <th>Method</th>
+                                                <th>Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php if ($recent_payments->num_rows > 0): ?>
+                                                <?php while ($payment = $recent_payments->fetch_assoc()): ?>
+                                                    <tr>
+                                                        <td><?php echo str_pad($payment['payment_id'], 6, '0', STR_PAD_LEFT); ?></td>
+                                                        <td><?php echo $payment['order_id']; ?></td>
+                                                        <td><?php echo htmlspecialchars($payment['customer_name']); ?></td>
+                                                        <td>₱<?php echo number_format($payment['amount'], 2); ?></td>
+                                                        <td><?php echo ucfirst($payment['payment_method']); ?></td>
+                                                        <td><?php echo date('M d, Y', strtotime($payment['payment_date'])); ?></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info view-payment" 
+                                                                    data-id="<?php echo $payment['payment_id']; ?>">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-primary view-receipt" 
+                                                                    data-id="<?php echo $payment['payment_id']; ?>">
+                                                                <i class="fas fa-receipt"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <?php endwhile; ?>
+                                            <?php else: ?>
+                                                <tr>
+                                                    <td colspan="7" class="text-center">No recent payments found</td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Orders Pending Payment Table -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Orders Pending Payment</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-custom" id="pendingPaymentsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Total</th>
+                                                <th>Paid</th>
+                                                <th>Remaining</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            mysqli_data_seek($pending_orders, 0);
+                                            if ($pending_orders->num_rows > 0): 
+                                                while ($order = $pending_orders->fetch_assoc()): 
+                                                    $amount_paid = $order['amount_paid'] ?? 0;
+                                                    $remaining = $order['total_amount'] - $amount_paid;
+
+                                                    // Check for pending payment
+                                                    $payment_query = $conn->prepare("SELECT payment_id, payment_method, payment_status 
+                                                                            FROM payments 
+                                                                            WHERE order_id = ? AND payment_status = 'pending_verification'");
+                                                    $payment_query->bind_param("s", $order['order_id']);
+                                                    $payment_query->execute();
+                                                    $payment_result = $payment_query->get_result();
+                                                    $pending_payment = $payment_result->num_rows > 0 ? $payment_result->fetch_assoc() : null;
                                             ?>
-                                            <span class="payment-badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary process-payment" data-id="<?php echo $order['order_id']; ?>">
-                                                <i class="fas fa-cash-register"></i>
-                                            </button>
-                                            <a href="view_order.php?id=<?php echo $order['order_id']; ?>" class="btn btn-sm btn-info">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="7" class="text-center">No orders pending payment</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                                                <tr>
+                                                    <td><?php echo $order['order_id']; ?></td>
+                                                    <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
+                                                    <td>₱<?php echo number_format($order['total_amount'], 2); ?></td>
+                                                    <td>₱<?php echo number_format($amount_paid, 2); ?></td>
+                                                    <td>₱<?php echo number_format($remaining, 2); ?></td>
+                                                    <td>
+                                                        <?php 
+                                                        $status_class = '';
+                                                        $status_text = '';
+                                                        switch ($order['payment_status']) {
+                                                            case 'pending':
+                                                                $status_class = 'payment-pending';
+                                                                $status_text = 'Pending';
+                                                                break;
+                                                            case 'downpayment_paid':
+                                                                $status_class = 'payment-partial';
+                                                                $status_text = 'Partial';
+                                                                break;
+                                                            case 'fully_paid':
+                                                                $status_class = 'payment-paid';
+                                                                $status_text = 'Paid';
+                                                                break;
+                                                        }
+                                                        ?>
+                                                        <span class="payment-badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
+                                                    </td>
+                                                    <td>
+                                                        <?php if ($pending_payment): ?>
+                                                            <button class="btn btn-sm btn-success approve-payment" data-id="<?php echo $pending_payment['payment_id']; ?>" title="Approve Payment">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <button class="btn btn-sm btn-primary process-payment" data-id="<?php echo $order['order_id']; ?>">
+                                                            <i class="fas fa-cash-register"></i>
+                                                        </button>
+                                                        <a href="view_order.php?id=<?php echo $order['order_id']; ?>" class="btn btn-sm btn-info">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                            <?php else: ?>
+                                                <tr>
+                                                    <td colspan="7" class="text-center">No orders pending payment</td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <!-- /.container-fluid -->
+
+                <!-- Modal for Viewing Receipt -->
+                <div class="modal fade" id="viewReceiptModal" tabindex="-1" aria-labelledby="viewReceiptModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewReceiptModalLabel">Payment Receipt</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="receiptContent">
+                                    <!-- Receipt will be dynamically loaded here -->
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="printModalReceipt()">
+                                    <i class="fas fa-print mr-1"></i> Print Receipt
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    <?php endif; ?>
-</div>
-<!-- /.container-fluid -->
             <!-- End of Main Content -->
 
         </div>
@@ -877,7 +927,7 @@ $recent_payments = $conn->query($recent_payments_query);
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="js/sb-admin-2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
+
     <!-- Custom scripts -->
     <script>
     $(document).ready(function() {
@@ -899,7 +949,6 @@ $recent_payments = $conn->query($recent_payments_query);
                 $('#paid_display').text(formatCurrency(paid));
                 $('#remaining_display').text(formatCurrency(remaining));
                 
-                // Set the amount_paid field to the remaining balance by default
                 $('#amount_paid').val(remaining.toFixed(2));
                 
                 $('.order-info-row').show();
@@ -917,11 +966,6 @@ $recent_payments = $conn->query($recent_payments_query);
                 $('#gcash_screenshot_group').show();
                 $('#transaction_reference').attr('required', true);
                 $('#gcash_screenshot').attr('required', true);
-            } else if (method === 'bank_transfer') {
-                $('#transaction_reference_group').show();
-                $('#gcash_screenshot_group').hide();
-                $('#transaction_reference').attr('required', true);
-                $('#gcash_screenshot').attr('required', false);
             } else {
                 $('#transaction_reference_group').hide();
                 $('#gcash_screenshot_group').hide();
@@ -948,21 +992,36 @@ $recent_payments = $conn->query($recent_payments_query);
             
             if (!orderId) {
                 e.preventDefault();
-                alert('Please select an order');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select an order',
+                    confirmButtonColor: '#d33'
+                });
                 $('#order_id').focus();
                 return false;
             }
             
             if (!paymentMethod) {
                 e.preventDefault();
-                alert('Please select a payment method');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select a payment method',
+                    confirmButtonColor: '#d33'
+                });
                 $('#payment_method').focus();
                 return false;
             }
             
             if (amountPaid <= 0) {
                 e.preventDefault();
-                alert('Please enter a valid amount');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please enter a valid amount',
+                    confirmButtonColor: '#d33'
+                });
                 $('#amount_paid').focus();
                 return false;
             }
@@ -973,14 +1032,24 @@ $recent_payments = $conn->query($recent_payments_query);
                 
                 if (!reference) {
                     e.preventDefault();
-                    alert('Please enter a transaction reference for GCash payment');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please enter a transaction reference for GCash payment',
+                        confirmButtonColor: '#d33'
+                    });
                     $('#transaction_reference').focus();
                     return false;
                 }
                 
                 if (!screenshot) {
                     e.preventDefault();
-                    alert('Please upload a screenshot of the GCash transaction');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please upload a screenshot of the GCash transaction',
+                        confirmButtonColor: '#d33'
+                    });
                     $('#gcash_screenshot').focus();
                     return false;
                 }
@@ -1000,7 +1069,6 @@ $recent_payments = $conn->query($recent_payments_query);
                 </div>
             `);
 
-            // Fetch payment details via AJAX
             $.ajax({
                 url: 'fetch_payment_details.php',
                 method: 'POST',
@@ -1009,16 +1077,109 @@ $recent_payments = $conn->query($recent_payments_query);
                     $('#paymentDetailsContent').html(response);
                 },
                 error: function() {
-                    $('#paymentDetailsContent').html('<div class="alert alert-danger">Failed to load payment details. Please try again.</div>');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load payment details. Please try again.',
+                        confirmButtonColor: '#d33'
+                    });
                 }
             });
 
-            // Show the modal
             $('#viewPaymentModal').modal('show');
         });
+
+        // Handle Approve Payment button click
+        $('.approve-payment').click(function() {
+            const paymentId = $(this).data('id');
+            const orderId = $(this).data('order-id');
+            const orderTotal = $(this).data('order-total');
+            
+            Swal.fire({
+                title: 'Approve Payment?',
+                text: 'Are you sure you want to approve this payment?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, approve it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: 'process_payment_approval.php',
+                        type: 'POST',
+                        data: { 
+                            payment_id: paymentId,
+                            order_id: orderId,
+                            order_total: orderTotal,
+                            action: 'approve'
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Approved!',
+                                    text: response.message,
+                                    confirmButtonColor: '#28a745'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.message,
+                                    confirmButtonColor: '#d33'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'There was an error approving the payment.',
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Handle "View Receipt" button click
+        $('.view-receipt').click(function() {
+            const paymentId = $(this).data('id');
+            $('#receiptContent').html(`
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `);
+
+            $.ajax({
+                url: 'fetch_payment_receipt.php',
+                method: 'POST',
+                data: { payment_id: paymentId },
+                success: function(response) {
+                    $('#receiptContent').html(response);
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load payment receipt. Please try again.',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
+
+            $('#viewReceiptModal').modal('show');
+        });
     });
-    
-    // Print receipt function
+
+    // Print receipt function - Global function
     function printReceipt() {
         const printContents = document.getElementById('printableReceipt').innerHTML;
         const originalContents = document.body.innerHTML;
@@ -1082,29 +1243,94 @@ $recent_payments = $conn->query($recent_payments_query);
         window.print();
         document.body.innerHTML = originalContents;
     }
-    
-    // New payment function
+
+    // New payment function - Global function
     function newPayment() {
         window.location.href = 'manage_payments.php';
     }
-    
-    // Email receipt function (placeholder)
+
+    // Email receipt function - Global function
     function emailReceipt() {
         alert('Email functionality will be implemented soon.');
     }
+
+    // Handle "Print Receipt" button click in modal - Global function
+    function printModalReceipt() {
+        const printContents = document.getElementById('modalPrintableReceipt').innerHTML;
+        const originalContents = document.body.innerHTML;
+        
+        document.body.innerHTML = `
+            <html>
+                <head>
+                    <title>Payment Receipt</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .receipt-header {
+                            text-align: center;
+                            margin-bottom: 25px;
+                            padding-bottom: 15px;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        .receipt-title {
+                            font-size: 24px;
+                            font-weight: 700;
+                            margin-bottom: 5px;
+                        }
+                        .receipt-subtitle {
+                            font-size: 14px;
+                        }
+                        .receipt-row {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 12px;
+                        }
+                        .receipt-label {
+                            font-weight: 600;
+                        }
+                        .receipt-value {
+                            text-align: right;
+                        }
+                        .receipt-total {
+                            margin-top: 20px;
+                            padding-top: 15px;
+                            border-top: 1px solid #ddd;
+                            font-weight: 700;
+                            font-size: 18px;
+                        }
+                        .receipt-footer {
+                            text-align: center;
+                            margin-top: 30px;
+                            font-size: 14px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContents}
+                </body>
+            </html>
+        `;
+        
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
     </script>
 
-                <!-- Begin Page Content -->
-                </div>
-            
-                <footer class="footer text-center py-3">
-                    <span>Copyright &copy; JXT Tailoring and Printing Services</span>
-                </footer>
-                <!-- End of Footer -->
-            </div>
-            <!-- End of Content Wrapper -->
-        </div>
+    <!-- Begin Page Content -->
     </div>
-    <!-- End of Page Wrapper -->
+    
+    <footer class="footer text-center py-3">
+        <span>Copyright &copy; JXT Tailoring and Printing Services</span>
+    </footer>
+    <!-- End of Footer -->
+</div>
+<!-- End of Content Wrapper -->
+</div>
+</div>
+<!-- End of Page Wrapper -->
 </body>
 </html>

@@ -1,8 +1,8 @@
 <?php
 // Error reporting settings
-error_reporting(0); // Turn off all error reporting
-ini_set('display_errors', 0); // Don't display errors
-ini_set('log_errors', 1); // Log errors instead
+error_reporting(E_ALL); // Show all errors
+ini_set('display_errors', 1); // Display errors
+ini_set('log_errors', 1); // Also log errors
 ini_set('error_log', 'error.log'); // Set error log file
 
 $host = "localhost"; 

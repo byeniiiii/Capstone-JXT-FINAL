@@ -205,6 +205,67 @@ $pending_count = $pending_result->fetch_assoc()['count'];
             margin-right: 5px;
         }
         
+        /* New Styles for Action Buttons */
+        .btn-approve {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-approve:hover {
+            background-color: #218838;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-reject {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-reject:hover {
+            background-color: #c82333;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-view {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-view:hover {
+            background-color: #0069d9;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
         .filter-form {
             background-color: #f8f9fc;
             padding: 15px;
@@ -300,9 +361,7 @@ $pending_count = $pending_result->fetch_assoc()['count'];
             border-color: #443627;
         }
         
-        .page-link {
-            color: #443627;
-        }
+                .page-link {            color: #443627;        }                /* Payment highlight animation */        @keyframes highlight-pulse {            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.8); }            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }        }                .highlight-payment {            border: 2px solid #ffc107 !important;            animation: highlight-pulse 1s infinite;        }
     </style>
 </head>
 
@@ -338,12 +397,12 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                     <div class="card mb-4">
                         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-primary">Filter Payments</h6>
-                            <a class="btn btn-sm btn-outline-primary" href="manage_payments.php">
+                            <a class="btn btn-sm btn-outline-primary" href="approve_payments.php">
                                 <i class="fas fa-sync-alt fa-sm"></i> Reset Filters
                             </a>
                         </div>
                         <div class="card-body filter-form">
-                            <form action="manage_payments.php" method="GET" class="row g-3">
+                            <form action="approve_payments.php" method="GET" class="row g-3">
                                 <div class="col-md-4">
                                     <label for="status" class="form-label">Status</label>
                                     <select class="form-select" name="status" id="status">
@@ -388,32 +447,57 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                     <ul class="nav nav-tabs nav-tab-custom mb-0" id="paymentTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <a class="nav-link <?= $filter_status == 'pending' ? 'active' : '' ?>" 
-                               href="manage_payments.php?status=pending">
+                               href="approve_payments.php?status=pending">
                                 <i class="fas fa-clock fa-sm me-1"></i> Pending 
                                 <?php if ($pending_count > 0): ?>
-                                <span class="badge bg-danger text-white"><?= $pending_count ?></span>
+                                <span class="badge bg-danger text-white rounded-pill ms-1"><?= $pending_count ?></span>
                                 <?php endif; ?>
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
                             <a class="nav-link <?= $filter_status == 'confirmed' ? 'active' : '' ?>" 
-                               href="manage_payments.php?status=confirmed">
+                               href="approve_payments.php?status=confirmed">
                                 <i class="fas fa-check fa-sm me-1"></i> Confirmed
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
                             <a class="nav-link <?= $filter_status == 'rejected' ? 'active' : '' ?>" 
-                               href="manage_payments.php?status=rejected">
+                               href="approve_payments.php?status=rejected">
                                 <i class="fas fa-times fa-sm me-1"></i> Rejected
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
                             <a class="nav-link <?= $filter_status == 'all' ? 'active' : '' ?>" 
-                               href="manage_payments.php?status=all">
+                               href="approve_payments.php?status=all">
                                 <i class="fas fa-list fa-sm me-1"></i> All Payments
                             </a>
                         </li>
                     </ul>
+
+                    <!-- Notification Area -->
+                    <?php if(isset($_SESSION['payment_success'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> <?= $_SESSION['payment_success'] ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['payment_success']); ?>
+                    <?php endif; ?>
+
+                    <?php if(isset($_SESSION['payment_error'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> <?= $_SESSION['payment_error'] ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['payment_error']); ?>
+                    <?php endif; ?>
+
+                    <!-- Highlight recently processed payment if any -->
+                    <?php if(isset($_GET['action_completed']) && isset($_GET['payment_id'])): ?>
+                    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                        <i class="fas fa-info-circle me-2"></i> Payment status updated successfully.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Payments List -->
                     <div class="card shadow mb-4">
@@ -431,7 +515,8 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                                             if ($payment['payment_type'] == 'balance') $paymentTypeClass = 'type-balance';
                                         ?>
                                         <div class="col">
-                                            <div class="card payment-card h-100">
+                                            <div class="card payment-card h-100 <?= (isset($_GET['action_completed']) && isset($_GET['payment_id']) && $_GET['payment_id'] == $payment['payment_id']) ? 'border border-3 border-warning' : '' ?>"
+                                                 <?= (isset($_GET['action_completed']) && isset($_GET['payment_id']) && $_GET['payment_id'] == $payment['payment_id']) ? 'style="box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);"' : '' ?>>
                                                 <div class="card-header-custom d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <span class="fw-bold">Order #<?= htmlspecialchars($payment['order_id']) ?></span>
@@ -493,29 +578,40 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                                                     <div class="payment-meta">
                                                         <?php if ($payment['payment_status'] == 'pending'): ?>
                                                             <div class="d-flex justify-content-between">
-                                                                <button class="btn btn-sm btn-success approve-payment" 
-                                                                        data-id="<?= $payment['payment_id'] ?>"
-                                                                        data-order-id="<?= $payment['order_id'] ?>"
-                                                                        data-amount="<?= $payment['amount'] ?>"
-                                                                        data-type="<?= $payment['payment_type'] ?>"
-                                                                        data-order-total="<?= $payment['total_amount'] ?>">
-                                                                    <i class="fas fa-check"></i> Approve
-                                                                </button>
-                                                                <button class="btn btn-sm btn-danger reject-payment"
-                                                                        data-id="<?= $payment['payment_id'] ?>"
-                                                                        data-order-id="<?= $payment['order_id'] ?>">
-                                                                    <i class="fas fa-times"></i> Reject
-                                                                </button>
-                                                                <a href="view_order.php?id=<?= $payment['order_id'] ?>" 
-                                                                   class="btn btn-sm btn-primary">
-                                                                    <i class="fas fa-eye"></i> View Order
+                                                                <!-- Direct form submission for approval -->
+                                                                <form action="process_payment.php" method="post" class="d-inline">
+                                                                    <input type="hidden" name="action" value="approve">
+                                                                    <input type="hidden" name="payment_id" value="<?= $payment['payment_id'] ?>">
+                                                                    <input type="hidden" name="order_id" value="<?= $payment['order_id'] ?>">
+                                                                    <input type="hidden" name="payment_type" value="<?= $payment['payment_type'] ?>">
+                                                                    <input type="hidden" name="amount" value="<?= $payment['amount'] ?>">
+                                                                    <input type="hidden" name="order_total" value="<?= $payment['total_amount'] ?>">
+                                                                    <button type="submit" class="btn-approve" onclick="return confirm('Are you sure you want to approve this payment?');">
+                                                                        <i class="fas fa-check me-2"></i> Approve
+                                                                    </button>
+                                                                </form>
+                                                                
+                                                                <!-- Direct form for rejection -->
+                                                                <form action="process_payment.php" method="post" class="d-inline" id="rejectForm<?= $payment['payment_id'] ?>">
+                                                                    <input type="hidden" name="action" value="reject">
+                                                                    <input type="hidden" name="payment_id" value="<?= $payment['payment_id'] ?>">
+                                                                    <input type="hidden" name="order_id" value="<?= $payment['order_id'] ?>">
+                                                                    <input type="hidden" name="reason" id="reason<?= $payment['payment_id'] ?>" value="">
+                                                                    <button type="button" class="btn-reject" onclick="openRejectModal(<?= $payment['payment_id'] ?>, '<?= $payment['order_id'] ?>')">
+                                                                        <i class="fas fa-times me-2"></i> Reject
+                                                                    </button>
+                                                                </form>
+                                                                
+                                                                <a href="view_orders.php?id=<?= $payment['order_id'] ?>" 
+                                                                   class="btn-view">
+                                                                    <i class="fas fa-eye me-2"></i> View Order
                                                                 </a>
                                                             </div>
                                                         <?php else: ?>
                                                             <div class="text-end">
-                                                                <a href="view_order.php?id=<?= $payment['order_id'] ?>" 
-                                                                   class="btn btn-sm btn-primary">
-                                                                    <i class="fas fa-eye"></i> View Order
+                                                                <a href="view_orders.php?id=<?= $payment['order_id'] ?>" 
+                                                                   class="btn-view">
+                                                                    <i class="fas fa-eye me-2"></i> View Order
                                                                 </a>
                                                             </div>
                                                         <?php endif; ?>
@@ -532,21 +628,21 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                                     <nav aria-label="Page navigation">
                                         <ul class="pagination">
                                             <li class="page-item <?= ($current_page <= 1) ? 'disabled' : '' ?>">
-                                                <a class="page-link" href="?page=<?= $current_page-1 ?>&status=<?= $filter_status ?>&type=<?= $filter_type ?>&search=<?= urlencode($search_query) ?>&date_from=<?= $date_from ?>&date_to=<?= $date_to ?>" aria-label="Previous">
+                                                <a class="page-link" href="approve_payments.php?page=<?= $current_page-1 ?>&status=<?= $filter_status ?>&type=<?= $filter_type ?>&search=<?= urlencode($search_query) ?>&date_from=<?= $date_from ?>&date_to=<?= $date_to ?>" aria-label="Previous">
                                                     <span aria-hidden="true">&laquo;</span>
                                                 </a>
                                             </li>
                                             
                                             <?php for($i = 1; $i <= $total_pages; $i++): ?>
                                                 <li class="page-item <?= ($i == $current_page) ? 'active' : '' ?>">
-                                                    <a class="page-link" href="?page=<?= $i ?>&status=<?= $filter_status ?>&type=<?= $filter_type ?>&search=<?= urlencode($search_query) ?>&date_from=<?= $date_from ?>&date_to=<?= $date_to ?>">
+                                                    <a class="page-link" href="approve_payments.php?page=<?= $i ?>&status=<?= $filter_status ?>&type=<?= $filter_type ?>&search=<?= urlencode($search_query) ?>&date_from=<?= $date_from ?>&date_to=<?= $date_to ?>">
                                                         <?= $i ?>
                                                     </a>
                                                 </li>
                                             <?php endfor; ?>
                                             
                                             <li class="page-item <?= ($current_page >= $total_pages) ? 'disabled' : '' ?>">
-                                                <a class="page-link" href="?page=<?= $current_page+1 ?>&status=<?= $filter_status ?>&type=<?= $filter_type ?>&search=<?= urlencode($search_query) ?>&date_from=<?= $date_from ?>&date_to=<?= $date_to ?>" aria-label="Next">
+                                                <a class="page-link" href="approve_payments.php?page=<?= $current_page+1 ?>&status=<?= $filter_status ?>&type=<?= $filter_type ?>&search=<?= urlencode($search_query) ?>&date_from=<?= $date_from ?>&date_to=<?= $date_to ?>" aria-label="Next">
                                                     <span aria-hidden="true">&raquo;</span>
                                                 </a>
                                             </li>
@@ -559,7 +655,7 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                                     <i class="fas fa-search"></i>
                                     <h4>No payments found</h4>
                                     <p>No payments match your search criteria.</p>
-                                    <a href="manage_payments.php" class="btn btn-outline-primary">
+                                    <a href="approve_payments.php" class="btn btn-outline-primary">
                                         <i class="fas fa-sync-alt"></i> Clear Filters
                                     </a>
                                 </div>
@@ -628,9 +724,14 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                 <div class="modal-body">
                     <p>Are you sure you want to reject this payment?</p>
                     <div class="mb-3">
-                        <label for="rejectionReason" class="form-label">Reason for rejection <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="rejectionReason" rows="3" required></textarea>
+                        <label for="reason" class="form-label">Reason for rejection <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="reason" rows="3" required></textarea>
+                        <div class="invalid-feedback">
+                            Please provide a reason for rejection.
+                        </div>
                     </div>
+                    <input type="hidden" id="reject_payment_id">
+                    <input type="hidden" id="reject_order_id">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -665,169 +766,65 @@ $pending_count = $pending_result->fetch_assoc()['count'];
                 $('#fullImage').attr('src', imgSrc);
             });
             
-            // Variables to store current payment being processed
-            let currentPaymentId = null;
-            let currentOrderId = null;
-            let currentPaymentType = null;
-            let currentAmount = 0;
-            let currentOrderTotal = 0;
-            
-            // Handle approve button click
-            $('.approve-payment').click(function() {
-                currentPaymentId = $(this).data('id');
-                currentOrderId = $(this).data('order-id');
-                currentPaymentType = $(this).data('type');
-                currentAmount = $(this).data('amount');
-                currentOrderTotal = $(this).data('order-total');
-                
-                $('#approvalModal').modal('show');
-            });
-            
-            // Handle reject button click
-            $('.reject-payment').click(function() {
-                currentPaymentId = $(this).data('id');
-                currentOrderId = $(this).data('order-id');
-                
+            // Function to open the rejection modal
+            window.openRejectModal = function(paymentId, orderId) {
+                $('#reject_payment_id').val(paymentId);
+                $('#reject_order_id').val(orderId);
                 $('#rejectionModal').modal('show');
-            });
-            
-            // Confirm approval
-            $('#confirmApproval').click(function() {
-                const note = $('#approvalNote').val();
                 
-                // Show loading
-                Swal.fire({
-                    title: 'Processing...',
-                    html: 'Approving payment, please wait.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
+                // Clear previous values
+                $('#reason').val('');
+                $('#reason').removeClass('is-invalid');
+                
+                // Set up the confirm button handler
+                $('#confirmRejection').off('click').on('click', function() {
+                    const reason = $('#reason').val().trim();
+                    if (!reason) {
+                        $('#reason').addClass('is-invalid');
+                        return false;
                     }
+                    
+                    // Set the reason in the hidden form and submit it
+                    $('#reason' + paymentId).val(reason);
+                    $('#rejectForm' + paymentId).submit();
                 });
-                
-                // Call AJAX to approve payment
-                $.ajax({
-                    url: 'handle_order_ajax.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        action: 'approve',
-                        payment_id: currentPaymentId,
-                        order_id: currentOrderId,
-                        payment_type: currentPaymentType,
-                        amount: currentAmount,
-                        order_total: currentOrderTotal,
-                        note: note
-                    },
-                    success: function(response) {
-                        $('#approvalModal').modal('hide');
-                        
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Payment Approved!',
-                                text: response.message,
-                                confirmButtonColor: '#443627'
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message || 'An error occurred during approval.',
-                                confirmButtonColor: '#443627'
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('#approvalModal').modal('hide');
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Server error. Please try again later.',
-                            confirmButtonColor: '#443627'
-                        });
-                    }
-                });
-            });
+            };
             
-            // Confirm rejection
-            $('#confirmRejection').click(function() {
-                const reason = $('#rejectionReason').val();
-                
-                // Validate reason is provided
-                if (!reason) {
-                    $('#rejectionReason').addClass('is-invalid');
-                    return;
+            // Validate rejection form before submission
+            $('#rejectForm').on('submit', function(e) {
+                const reasonField = $('#reason');
+                if (!reasonField.val().trim()) {
+                    e.preventDefault();
+                    reasonField.addClass('is-invalid');
+                    return false;
                 }
-                
-                // Show loading
-                Swal.fire({
-                    title: 'Processing...',
-                    html: 'Rejecting payment, please wait.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-                
-                // Call AJAX to reject payment
-                $.ajax({
-                    url: 'handle_order_ajax.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        action: 'reject',
-                        payment_id: currentPaymentId,
-                        order_id: currentOrderId,
-                        reason: reason
-                    },
-                    success: function(response) {
-                        $('#rejectionModal').modal('hide');
-                        
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Payment Rejected',
-                                text: response.message,
-                                confirmButtonColor: '#443627'
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message || 'An error occurred during rejection.',
-                                confirmButtonColor: '#443627'
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('#rejectionModal').modal('hide');
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Server error. Please try again later.',
-                            confirmButtonColor: '#443627'
-                        });
-                    }
-                });
             });
             
             // Clear invalid state on input
-            $('#rejectionReason').on('input', function() {
+            $('#reason').on('input', function() {
                 $(this).removeClass('is-invalid');
             });
             
-            // Reset modals when hidden
-            $('#approvalModal, #rejectionModal').on('hidden.bs.modal', function() {
-                $('#approvalNote').val('');
-                $('#rejectionReason').val('').removeClass('is-invalid');
-                currentPaymentId = null;
-                currentOrderId = null;
-            });
+            // Highlight the recently processed payment
+            <?php if(isset($_GET['action_completed']) && isset($_GET['payment_id'])): ?>
+            setTimeout(function() {
+                const paymentId = <?= $_GET['payment_id'] ?>;
+                const highlightedCard = $(".payment-card").filter(function() {
+                    return $(this).find('input[name="payment_id"]').val() == paymentId;
+                });
+                
+                if (highlightedCard.length) {
+                    $('html, body').animate({
+                        scrollTop: highlightedCard.offset().top - 100
+                    }, 500);
+                    
+                    highlightedCard.addClass('highlight-payment');
+                    setTimeout(function() {
+                        highlightedCard.removeClass('highlight-payment');
+                    }, 3000);
+                }
+            }, 300);
+            <?php endif; ?>
         });
     </script>
 </body>

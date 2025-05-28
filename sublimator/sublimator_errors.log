@@ -1,0 +1,16 @@
+[28-May-2025 17:22:11 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'where clause' in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:75
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(75): mysqli_prepare(Object(mysqli), 'SELECT COUNT(*)...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 75
+[28-May-2025 17:22:27 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'where clause' in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:75
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(75): mysqli_prepare(Object(mysqli), 'SELECT COUNT(*)...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 75
+[28-May-2025 17:47:07 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'where clause' in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:75
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(75): mysqli_prepare(Object(mysqli), 'SELECT COUNT(*)...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 75
+[28-May-2025 17:50:46 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\capstone_jxt\sublimator\sidebar.php:4) in C:\xampp\htdocs\capstone_jxt\sublimator\topbar.php on line 6

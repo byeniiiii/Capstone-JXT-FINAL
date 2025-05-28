@@ -46,10 +46,10 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
                 <span>Management</span>
             </div>
 
-            <!-- New Orders -->
+            <!-- Place Order -->
             <a href="new_orders.php" class="menu-item <?= ($current_page == 'new_orders.php') ? 'active' : ''; ?>">
                 <div class="menu-icon">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-plus-circle"></i>
                 </div>
                 <span class="menu-text">Place Order</span>
                 <span class="menu-highlight"></span>
@@ -58,41 +58,39 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
             <!-- Approve Orders -->
             <a href="orders.php" class="menu-item <?= ($current_page == 'orders.php') ? 'active' : ''; ?>">
                 <div class="menu-icon">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-check-circle"></i>
                 </div>
                 <span class="menu-text">Approve Orders</span>
                 <span class="menu-highlight"></span>
             </a>
 
-            <!-- New Orders -->
-            <a href="manage_orders.php" class="menu-item <?= ($current_page == 'manage_orders.php') ? 'active' : ''; ?>">
+            <!-- Made-to-Order -->
+            <a href="custom_orders.php" class="menu-item <?= ($current_page == 'custom_orders.php') ? 'active' : ''; ?>">
                 <div class="menu-icon">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-tshirt"></i>
                 </div>
-                <span class="menu-text">Manage Order</span>
+                <span class="menu-text">Add Made-To-Order</span>
                 <span class="menu-highlight"></span>
             </a>
 
-             <!-- Sublimation Orders 
-            <a href="sublimation_orders.php" class="menu-item <?= ($current_page == 'orders.php') ? 'active' : ''; ?>">
+             <!-- Sublimation Orders -->
+            <a href="sublimation_orders.php" class="menu-item <?= ($current_page == 'sublimation_orders.php') ? 'active' : ''; ?>">
                 <div class="menu-icon">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-print"></i>
                 </div>
                 <span class="menu-text">Sublimation Orders</span>
                 <span class="menu-highlight"></span>
             </a>
--->
 
-             <!-- Tailoring Orders 
-            <a href="tailoring_orders.php" class="menu-item <?= ($current_page == 'orders.php') ? 'active' : ''; ?>">
+
+             <!-- Tailoring Orders -->
+            <a href="tailoring_orders.php" class="menu-item <?= ($current_page == 'tailoring_orders.php') ? 'active' : ''; ?>">
                 <div class="menu-icon">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-cut"></i>
                 </div>
                 <span class="menu-text">Tailoring Orders</span>
                 <span class="menu-highlight"></span>
             </a>
-
--->
             
             
             <!-- Section: Transaction -->

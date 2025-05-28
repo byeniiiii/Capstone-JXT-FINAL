@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 29, 2025 at 03:06 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: May 27, 2025 at 07:53 AM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -63,7 +63,41 @@ CREATE TABLE `activity_logs` (
 
 INSERT INTO `activity_logs` (`log_id`, `user_id`, `user_type`, `action_type`, `description`, `ip_address`, `created_at`) VALUES
 (1, 18, 'customer', 'order_decline', 'Order #AFRPA declined: way klaro', NULL, '2025-04-22 15:58:38'),
-(2, 18, 'customer', 'order_decline', 'Order #TOHUXNP declined: way klaro', NULL, '2025-04-22 16:12:07');
+(2, 18, 'customer', 'order_decline', 'Order #TOHUXNP declined: way klaro', NULL, '2025-04-22 16:12:07'),
+(3, 18, 'customer', 'order_decline', 'Order #3U739 declined: No amount given', NULL, '2025-05-02 01:21:38'),
+(4, 18, 'customer', 'order_decline', 'Order #LSCD8 declined: walay klaro', NULL, '2025-05-05 08:42:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `alterations`
+--
+
+CREATE TABLE `alterations` (
+  `alteration_id` int(11) NOT NULL,
+  `order_id` varchar(10) NOT NULL,
+  `alteration_type` varchar(100) NOT NULL,
+  `measurement_method` enum('upload','manual') NOT NULL,
+  `measurements` text DEFAULT NULL,
+  `measurement_file` varchar(255) DEFAULT NULL,
+  `instructions` text DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `alterations`
+--
+
+INSERT INTO `alterations` (`alteration_id`, `order_id`, `alteration_type`, `measurement_method`, `measurements`, `measurement_file`, `instructions`, `quantity`) VALUES
+(1, 'OP0M0', 'alterations', 'manual', '{\"notes\":\"Trial\\n\"}', NULL, NULL, 1),
+(2, 'B2V53', 'repairs', 'manual', '{\"notes\":\"Trial 2\\n\"}', NULL, NULL, 1),
+(3, '15B5T', 'alterations', 'manual', '{\"notes\":\"Test 3\"}', NULL, NULL, 1),
+(4, 'EOPR0', 'alterations', 'manual', '{\"notes\":\"Test 6\"}', NULL, NULL, 1),
+(5, 'LI5GM', 'custom', 'manual', '{\"chest\":\"55\",\"waist\":\"55\",\"hips\":\"55\",\"shoulders\":\"55\",\"sleeves\":\"55\",\"length\":\"55\"}', NULL, NULL, 1),
+(6, 'G9YIL', 'custom', 'manual', '{\"chest\":\"11\",\"waist\":\"11\",\"hips\":\"11\",\"shoulders\":\"11\",\"sleeves\":\"11\",\"length\":\"11\",\"notes\":\"W\\n\"}', NULL, NULL, 1),
+(7, '05R84', 'custom made', 'manual', '{\"chest\":\"11\",\"waist\":\"11\",\"hips\":\"1111\",\"shoulders\":\"11\",\"sleeves\":\"11\",\"length\":\"11\"}', NULL, NULL, 1),
+(8, '9Q8UW', 'alterations', 'upload', '\"{\\\"chest\\\":\\\"0\\\",\\\"waist\\\":\\\"0\\\",\\\"hips\\\":\\\"0\\\",\\\"shoulders\\\":\\\"0\\\",\\\"sleeves\\\":\\\"0\\\",\\\"length\\\":\\\"0\\\",\\\"notes\\\":\\\"Tedhgs\\\"}\"', 'uploads/measurements/measurement_9Q8UW_1747739631.jpg', NULL, 1),
+(9, '3D5LC', 'repairs', 'upload', '\"{\\\"chest\\\":\\\"0\\\",\\\"waist\\\":\\\"0\\\",\\\"hips\\\":\\\"0\\\",\\\"shoulders\\\":\\\"0\\\",\\\"sleeves\\\":\\\"0\\\",\\\"length\\\":\\\"0\\\",\\\"notes\\\":\\\"Buslot ang short\\\"}\"', 'uploads/measurements/measurement_3D5LC_1747741759.jpg', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -90,7 +124,36 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`customer_id`, `username`, `password`, `email`, `first_name`, `last_name`, `phone_number`, `address`, `created_at`, `updated_at`) VALUES
 (2093, 'lando', '$2y$10$ASexsx2gpxPbiUg3CWwNHeF9C4iDllxCYemcv6diIbRCMX7KBKk7C', 'landz@gmail.com', 'Rolando', 'Teopes', '09563674567', 'Palinpinon, Valencia, Negros Oriental', '2025-03-24 14:22:45', '2025-03-24 14:22:45'),
-(8739, 'biyah', '$2y$10$by4vg6mmHatpuVWbRcOCoexzJgYPBQiqr/y5Bo1L5YWA0FhceEclO', 'biyah@gmail.com', 'Vieyah', 'Vicente', '09365743627', 'Purok 4, Balugo, Valencia, Negros Oriental', '2025-04-19 06:52:25', '2025-04-19 06:52:25');
+(2452, 'kyle', '$2y$10$N9ZyF6.yW4Jb6oOuwXr2SeM5Lk6HgWsMkWnq.5JFKawDJ3mPOSSvG', 'k@k', 'kyle', 'cadimas', '9999', 'basay', '2025-05-10 16:41:26', '2025-05-10 16:41:26'),
+(2621, 'janjan', '$2y$10$lovcGzmMO96L8EztOa3N5uzex7m1JbNwwrUq7JlWaGGg7GWBYQ.AW', 'jan@gmail.com', 'Janjan', 'Micheal', '09668765432', 'Purok 4, Balugo, Valencia, Negros Oriental', '2025-05-19 11:58:04', '2025-05-19 11:58:04'),
+(8739, 'biyah', '$2y$10$by4vg6mmHatpuVWbRcOCoexzJgYPBQiqr/y5Bo1L5YWA0FhceEclO', 'biyah@gmail.com', 'Vieyah', 'Vicente', '09365743627', 'Purok 4, Balugo, Valencia, Negros Oriental', '2025-04-19 06:52:25', '2025-04-19 06:52:25'),
+(8740, '', '$2y$10$BGn8TQqtQxrfckKm9qtwg.eV.dU5KioIbcxEyjDsOriMKX5O6kElW', 'lalay@gmail.com', 'Lalay', 'Crocodile', '09674553432', 'Purok 4, Balugo, Valencia, Negros Oriental', '2025-05-05 06:13:37', '2025-05-05 06:13:37'),
+(8742, 'gojosatoruc69407', '$2y$10$nfCptmTk3VZ9k3kTDNZ.PutjV5qF1GTOq7RhX5tW3tnk1p6PVP/3e', 'gojo@gmail.com', 'Gojo', 'Satoru', '09664557876', 'Purok 4, Balugo, Valencia, Negros Oriental', '2025-05-05 06:45:00', '2025-05-05 06:45:00'),
+(8743, 'mjam', '$2y$10$cdMePXLtFAMALPCOzhNluetuKD00HrmZrXViNjaefBO5lhUjlKGNS', 'brent@gmail.com', 'Brentt', 'Cait', '09631716867', 'Dumaguete city', '2025-05-20 10:53:21', '2025-05-20 10:53:21');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `custom_made`
+--
+
+CREATE TABLE `custom_made` (
+  `custom_id` int(11) NOT NULL,
+  `order_id` varchar(10) NOT NULL,
+  `design_details` text NOT NULL,
+  `body_measurement_file` varchar(255) DEFAULT NULL,
+  `fabric_type` varchar(100) DEFAULT NULL,
+  `quantity` int(11) DEFAULT 1,
+  `reference_image` varchar(255) DEFAULT NULL,
+  `special_instructions` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `custom_made`
+--
+
+INSERT INTO `custom_made` (`custom_id`, `order_id`, `design_details`, `body_measurement_file`, `fabric_type`, `quantity`, `reference_image`, `special_instructions`) VALUES
+(1, '05R84', '', NULL, 'customer', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -105,6 +168,138 @@ CREATE TABLE `declined_orders` (
   `declined_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `login_attempts`
+--
+
+CREATE TABLE `login_attempts` (
+  `attempt_id` int(11) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `identifier` varchar(255) NOT NULL,
+  `success` tinyint(1) DEFAULT 0,
+  `attempt_time` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `login_attempts`
+--
+
+INSERT INTO `login_attempts` (`attempt_id`, `ip_address`, `identifier`, `success`, `attempt_time`) VALUES
+(1, '192.168.1.45', 'kyle', 1, '2025-05-13 11:32:16'),
+(2, '192.168.1.46', 'lando', 1, '2025-05-13 11:32:35'),
+(3, '192.168.1.45', 'lando', 1, '2025-05-13 11:32:48'),
+(4, '192.168.1.45', 'lando', 1, '2025-05-13 11:35:40'),
+(5, '192.168.1.45', 'lando', 1, '2025-05-13 11:35:47'),
+(6, '192.168.1.45', 'lando', 1, '2025-05-13 11:40:20'),
+(7, '192.168.1.45', 'k@k', 0, '2025-05-13 14:34:00'),
+(8, '192.168.1.45', 'k@k', 0, '2025-05-13 14:34:09'),
+(9, '192.168.1.45', 'biyah', 1, '2025-05-13 14:34:22'),
+(10, '192.168.1.45', 'lando', 0, '2025-05-13 14:35:56'),
+(11, '192.168.1.45', 'lando', 1, '2025-05-13 14:36:06'),
+(12, '192.168.1.45', 'lando', 0, '2025-05-13 14:44:42'),
+(13, '192.168.1.45', 'lando', 0, '2025-05-13 14:44:50'),
+(14, '192.168.1.45', 'lando', 1, '2025-05-13 14:44:59'),
+(15, '192.168.1.45', 'lando', 1, '2025-05-13 14:47:22'),
+(16, '192.168.1.45', 'lando', 1, '2025-05-13 14:48:59'),
+(17, '192.168.1.45', 'lando', 1, '2025-05-13 14:49:35'),
+(18, '192.168.1.45', 'lando', 1, '2025-05-13 14:51:50'),
+(19, '192.168.1.45', 'biyah', 1, '2025-05-13 14:52:44'),
+(20, '192.168.1.45', 'biyah', 0, '2025-05-13 14:52:50'),
+(21, '192.168.1.45', 'biyah', 1, '2025-05-13 14:53:59'),
+(22, '192.168.1.45', 'biyah', 1, '2025-05-13 14:54:06'),
+(23, '192.168.1.45', 'biyah', 1, '2025-05-13 14:54:09'),
+(24, '192.168.1.45', 'lando', 0, '2025-05-13 14:54:49'),
+(25, '192.168.1.45', 'lando', 1, '2025-05-13 14:54:58'),
+(26, '192.168.1.45', 'lando', 1, '2025-05-13 14:56:44'),
+(27, '192.168.1.45', 'lando', 0, '2025-05-13 14:58:18'),
+(28, '192.168.1.45', 'lando', 1, '2025-05-13 14:58:23'),
+(29, '192.168.1.45', 'lando', 1, '2025-05-13 14:58:40'),
+(30, '192.168.1.45', 'lando', 1, '2025-05-13 14:58:43'),
+(31, '192.168.1.45', 'lando', 1, '2025-05-13 14:59:35'),
+(32, '192.168.1.45', 'lando', 1, '2025-05-13 14:59:38'),
+(33, '192.168.1.45', 'lando', 1, '2025-05-13 15:00:05'),
+(34, '192.168.1.45', 'lando', 1, '2025-05-13 15:00:38'),
+(35, '192.168.1.45', 'lando', 1, '2025-05-13 15:00:48'),
+(36, '192.168.1.45', 'lando', 1, '2025-05-13 15:00:51'),
+(37, '192.168.1.51', 'testuser', 0, '2025-05-13 16:11:49'),
+(38, '192.168.1.45', 'lando', 1, '2025-05-13 16:19:58'),
+(39, '192.168.1.45', 'kyle', 1, '2025-05-13 16:59:37'),
+(40, '192.168.196.243', 'kyle', 1, '2025-05-14 08:57:23'),
+(41, '192.168.196.243', 'kyle', 1, '2025-05-14 09:49:46'),
+(42, '192.168.196.243', 'kyle ', 1, '2025-05-14 09:50:17'),
+(43, '192.168.196.243', 'kyle', 0, '2025-05-14 10:24:14'),
+(44, '192.168.196.243', 'kyle', 0, '2025-05-14 10:24:18'),
+(45, '192.168.196.243', 'kyle', 0, '2025-05-14 10:24:28'),
+(46, '192.168.196.243', 'kyle', 0, '2025-05-14 10:25:17'),
+(47, '192.168.196.243', 'kyle', 1, '2025-05-14 10:27:53'),
+(48, '192.168.196.243', 'kyle', 1, '2025-05-14 10:33:09'),
+(49, '192.168.196.243', 'kyle', 1, '2025-05-14 10:46:02'),
+(50, '192.168.196.243', 'k@k', 0, '2025-05-15 05:23:01'),
+(51, '192.168.196.243', 'k@k', 0, '2025-05-15 05:23:05'),
+(52, '192.168.43.143', 'kyle ', 1, '2025-05-15 05:29:45'),
+(53, '192.168.1.25', 'kyle', 1, '2025-05-19 04:00:31'),
+(54, '192.168.43.143', 'kyle', 0, '2025-05-19 11:49:16'),
+(55, '192.168.43.143', 'kyle', 0, '2025-05-19 11:49:25'),
+(56, '192.168.43.143', 'kyle', 1, '2025-05-19 11:50:15'),
+(57, '192.168.43.143', 'janjan', 0, '2025-05-19 11:59:04'),
+(58, '192.168.43.143', 'janjan', 0, '2025-05-19 11:59:26'),
+(59, '192.168.43.143', 'janjan', 1, '2025-05-19 12:00:24'),
+(60, '192.168.251.75', 'kyle', 1, '2025-05-20 08:41:02'),
+(61, '192.168.251.124', 'kyle', 1, '2025-05-20 09:02:59'),
+(62, '192.168.251.124', 'janjan', 1, '2025-05-20 09:08:26'),
+(63, '192.168.251.124', 'janjan', 1, '2025-05-20 10:02:52'),
+(64, '192.168.251.124', 'janjan', 1, '2025-05-20 10:05:47'),
+(65, '192.168.251.124', 'janjan', 1, '2025-05-20 10:13:16'),
+(66, '192.168.251.124', 'jajan', 0, '2025-05-20 10:14:15'),
+(67, '192.168.251.124', 'jajan', 0, '2025-05-20 10:14:42'),
+(68, '192.168.251.124', 'jajan', 0, '2025-05-20 10:15:06'),
+(69, '192.168.251.124', 'jajan', 0, '2025-05-20 10:15:34'),
+(70, '192.168.251.124', 'janjan', 0, '2025-05-20 10:20:00'),
+(71, '192.168.251.124', 'janjan', 0, '2025-05-20 10:20:22'),
+(72, '192.168.251.124', 'janjan', 0, '2025-05-20 10:20:38'),
+(73, '192.168.251.160', 'test', 0, '2025-05-20 10:22:00'),
+(74, '192.168.251.124', 'janjan', 0, '2025-05-20 10:22:13'),
+(75, '192.168.251.124', 'janjan', 0, '2025-05-20 10:22:23'),
+(76, '192.168.251.124', 'kyle', 1, '2025-05-20 10:22:41'),
+(77, '192.168.251.124', 'kyle', 1, '2025-05-20 10:24:54'),
+(78, '192.168.251.124', 'mjam', 1, '2025-05-20 10:54:05'),
+(79, '192.168.251.124', 'mjam', 1, '2025-05-20 10:54:31'),
+(80, '192.168.251.124', 'kyle', 1, '2025-05-20 11:11:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notes`
+--
+
+CREATE TABLE `notes` (
+  `note_id` int(11) NOT NULL,
+  `order_id` varchar(20) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `note` text NOT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notes`
+--
+
+INSERT INTO `notes` (`note_id`, `order_id`, `user_id`, `note`, `created_at`) VALUES
+(1, 'AOQWW', 18, 'Order marked as ready for pickup', '2025-05-09 07:56:03'),
+(2, 'AOQWW', 19, 'ok nani', '2025-05-09 09:08:36'),
+(3, 'G9YIL', 18, 'Order moved to production.', '2025-05-14 18:52:28'),
+(4, 'G9YIL', 18, 'Order marked as ready for pickup', '2025-05-14 18:58:18'),
+(5, '2C4QQ', 19, 'Order marked as ready for pickup', '2025-05-15 03:59:24'),
+(6, 'DYRHS', 18, 'Order marked as ready for pickup', '2025-05-18 23:31:20'),
+(7, 'G9YIL', 18, 'Order marked as completed', '2025-05-18 23:35:46'),
+(8, 'QWRAU', 18, 'Order moved to production.', '2025-05-19 14:35:03'),
+(9, 'AOQWW', 18, 'Order completed', '2025-05-19 16:20:41'),
+(12, 'SB96Q', 18, 'Order moved to production.', '2025-05-19 20:01:51'),
+(13, 'QWRAU', 18, 'Order is ready for pickup.', '2025-05-20 01:23:41'),
+(14, 'SB96Q', 18, 'Order is ready for pickup.', '2025-05-20 01:24:29');
 
 -- --------------------------------------------------------
 
@@ -127,7 +322,64 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`notification_id`, `title`, `customer_id`, `order_id`, `message`, `is_read`, `created_at`) VALUES
-(1, 'Order Declined', 8739, 'TOHUXNP', 'Your order #TOHUXNP was declined: way klaro', 1, '2025-04-22 16:12:07');
+(1, 'Order Declined', 8739, 'TOHUXNP', 'Your order #TOHUXNP was declined: way klaro', 1, '2025-04-22 16:12:07'),
+(2, 'Order Status Update', 2093, '17F3B', 'Your order #17F3B is now being processed.', 1, '2025-05-02 00:14:20'),
+(3, 'Order Declined', 2093, '3U739', 'Your order #3U739 was declined: No amount given', 1, '2025-05-02 01:21:38'),
+(4, 'Payment Notification', 2093, '2C4QQ', 'New payment submitted for Order #2C4QQ', 1, '2025-05-05 04:35:02'),
+(5, 'Order Declined', 2093, 'LSCD8', 'Your order #LSCD8 was declined: walay klaro', 1, '2025-05-05 08:42:11'),
+(6, 'Payment Notification', 2093, 'AOQWW', 'New payment submitted for Order #AOQWW', 1, '2025-05-05 08:43:53'),
+(9, 'Order Ready for Pickup', 2093, 'AOQWW', 'Your order #AOQWW is now ready for pickup.', 1, '2025-05-08 23:56:03'),
+(10, 'Payment Confirmed', 2093, 'AOQWW', 'Your payment of ₱400.00 for Order #AOQWW has been confirmed.', 1, '2025-05-09 01:08:36'),
+(11, 'Payment Confirmed', 2093, '2C4QQ', 'Your payment of ₱50.00 for Order #2C4QQ has been confirmed.', 1, '2025-05-09 01:25:49'),
+(12, 'Payment Rejected', 2093, '2C4QQ', 'Your payment for Order #2C4QQ was rejected: ayaw rani', 1, '2025-05-09 01:26:04'),
+(13, 'Payment Received', 2093, 'AOQWW', 'Your payment of ₱400.00 for order #AOQWW has been received. Thank you!', 1, '2025-05-09 11:09:33'),
+(15, 'Payment Verification Required', 2093, 'RNSWI', 'New payment submitted for Order #RNSWI requires verification', 1, '2025-05-09 11:49:13'),
+(16, 'Payment Verification Required', 2093, 'RNSWI', 'New payment submitted for Order #RNSWI requires verification', 1, '2025-05-09 12:10:46'),
+(17, 'Payment Verification Required', 2452, 'IYGVD', 'New payment submitted for Order #IYGVD requires verification', 0, '2025-05-14 08:15:48'),
+(18, 'Payment Confirmed', 2452, 'IYGVD', 'Your payment of ₱450.00 for Order #IYGVD has been confirmed.', 0, '2025-05-14 08:17:02'),
+(19, 'Payment Verification Required', 2452, 'EOPR0', 'New payment submitted for Order #EOPR0 requires verification', 0, '2025-05-14 08:55:18'),
+(20, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 09:12:43'),
+(21, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 09:16:18'),
+(22, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 09:19:21'),
+(23, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 09:25:36'),
+(24, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 09:25:59'),
+(25, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 09:28:19'),
+(26, 'Payment Verification Required', 2093, 'ZBUI0', 'New payment submitted for Order #ZBUI0 requires verification', 1, '2025-05-14 10:09:13'),
+(27, 'Payment Verification Required', 2452, 'G9YIL', 'New payment submitted for Order #G9YIL requires verification', 0, '2025-05-14 10:51:18'),
+(28, 'Order In Process', 2452, 'G9YIL', 'Your order #G9YIL is now being processed.', 0, '2025-05-14 10:52:28'),
+(29, 'Payment Verification Required', 2452, 'LI5GM', 'New payment submitted for Order #LI5GM requires verification', 0, '2025-05-14 10:53:47'),
+(30, 'Order Ready for Pickup', 2452, 'G9YIL', 'Your order #G9YIL is now ready for pickup.', 0, '2025-05-14 10:58:18'),
+(31, 'Payment Verification Required', 2452, 'XTK7G', 'New payment submitted for Order #XTK7G requires verification', 0, '2025-05-14 18:47:20'),
+(32, 'Payment Verification Required', 2452, 'ZRQ32', 'New payment submitted for Order #ZRQ32 requires verification', 0, '2025-05-14 18:51:38'),
+(33, 'Order Ready for Pickup', 2093, '2C4QQ', 'Your order #2C4QQ is now ready for pickup.', 1, '2025-05-14 19:59:24'),
+(36, 'Order Completed', 2452, '05R84', 'Your order #05R84 has been completed.', 0, '2025-05-18 14:35:19'),
+(40, 'Order Ready for Pickup', 2093, 'DYRHS', 'Your order #DYRHS is now ready for pickup.', 1, '2025-05-18 15:31:20'),
+(41, 'Order Completed', 2452, 'G9YIL', 'Your order #G9YIL has been completed.', 0, '2025-05-18 15:35:46'),
+(42, 'Payment Verification Required', 2452, '88WDD', 'New payment submitted for Order #88WDD requires verification', 0, '2025-05-19 04:03:10'),
+(43, 'Order In Process', 2452, 'QWRAU', 'Your order #QWRAU is now being processed.', 0, '2025-05-19 06:35:03'),
+(44, 'Order Completed', 2093, 'AOQWW', 'Your order #AOQWW has been completed.', 1, '2025-05-19 08:20:41'),
+(45, 'Payment Verification Required', 2452, 'ZBP6Y', 'New payment submitted for Order #ZBP6Y requires verification', 0, '2025-05-19 10:39:48'),
+(46, 'Payment Verification Required', 2452, 'KEXW2', 'New payment submitted for Order #KEXW2 requires verification', 0, '2025-05-19 10:40:13'),
+(47, 'Payment Verification Required', 2452, '2HFO9', 'New payment submitted for Order #2HFO9 requires verification', 0, '2025-05-19 10:40:38'),
+(50, 'Payment Confirmed', 2093, '17F3B', 'Your payment of ₱200.00 for Order #17F3B has been confirmed.', 1, '2025-05-19 11:44:13'),
+(51, 'Payment Confirmed', 2093, 'B1PVL', 'Your payment of ₱225.00 for Order #B1PVL has been confirmed.', 1, '2025-05-19 11:44:17'),
+(52, 'Payment Confirmed', 2093, 'PJP9N', 'Your payment of ₱0.00 for Order #PJP9N has been confirmed.', 1, '2025-05-19 11:44:21'),
+(53, 'Payment Verification Required', 2452, 'VGA1D', 'New payment submitted for Order #VGA1D requires verification', 0, '2025-05-19 11:44:28'),
+(54, 'Payment Confirmed', 2452, 'VGA1D', 'Your payment of ₱400.00 for Order #VGA1D has been confirmed.', 0, '2025-05-19 11:44:50'),
+(55, 'Payment Verification Required', 2452, 'SB96Q', 'New payment submitted for Order #SB96Q requires verification', 0, '2025-05-19 11:45:44'),
+(56, 'Payment Confirmed', 2093, 'ZBUI0', 'Your payment of ₱75.00 for Order #ZBUI0 has been confirmed.', 1, '2025-05-19 11:48:56'),
+(57, 'Payment Verification Required', 2452, 'B44ZK', 'New payment submitted for Order #B44ZK requires verification', 0, '2025-05-19 11:54:25'),
+(58, 'Payment Verification Required', 2452, 'XUAKH', 'New payment submitted for Order #XUAKH requires verification', 0, '2025-05-19 11:54:38'),
+(59, 'Payment Verification Required', 2452, 'B44ZK', 'New payment submitted for Order #B44ZK requires verification', 0, '2025-05-19 11:55:17'),
+(60, 'Payment Verification Required', 2452, 'B44ZK', 'New payment submitted for Order #B44ZK requires verification', 0, '2025-05-19 11:55:52'),
+(61, 'Order In Process', 2452, 'SB96Q', 'Your order #SB96Q is now being processed.', 0, '2025-05-19 12:01:51'),
+(62, 'Payment Verification Required', 2621, '0Q0OR', 'New payment submitted for Order #0Q0OR requires verification', 1, '2025-05-19 12:42:24'),
+(63, 'Order Ready for Pickup', 2452, 'QWRAU', 'Your order #QWRAU is now ready for pickup.', 0, '2025-05-19 17:23:41'),
+(64, 'Order Ready for Pickup', 2452, 'SB96Q', 'Your order #SB96Q is now ready for pickup.', 0, '2025-05-19 17:24:29'),
+(65, 'Payment Verification Required', 2452, '9Q8UW', 'New payment submitted for Order #9Q8UW requires verification', 0, '2025-05-20 11:15:34'),
+(66, 'Payment Confirmed', 2452, '9Q8UW', 'Your payment of ₱500.00 for Order #9Q8UW has been confirmed.', 0, '2025-05-20 11:16:30'),
+(67, 'Payment Verification Required', 2093, 'XZAJB', 'New payment submitted for Order #XZAJB requires verification', 1, '2025-05-20 12:04:48'),
+(68, 'Payment Confirmed', 2093, 'XZAJB', 'Your payment of ₱0.00 for Order #XZAJB has been confirmed.', 0, '2025-05-27 05:45:39');
 
 -- --------------------------------------------------------
 
@@ -143,33 +395,128 @@ CREATE TABLE `orders` (
   `downpayment_amount` decimal(10,2) NOT NULL,
   `payment_method` enum('cash','gcash') NOT NULL,
   `payment_status` enum('pending','downpayment_paid','fully_paid') DEFAULT 'pending',
-  `order_status` enum('pending_approval','declined','approved','in_process','ready_for_pickup','completed') DEFAULT 'pending_approval',
+  `order_status` enum('pending_approval','declined','approved','forward_to_sublimator','in_process','printing_done','ready_for_pickup','completed') DEFAULT 'pending_approval',
   `staff_id` int(11) DEFAULT NULL,
   `manager_id` int(11) DEFAULT NULL,
   `notes` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `screenshot_path` varchar(255) DEFAULT NULL,
+  `status_history` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `customer_id`, `order_type`, `total_amount`, `downpayment_amount`, `payment_method`, `payment_status`, `order_status`, `staff_id`, `manager_id`, `notes`, `created_at`, `updated_at`) VALUES
-('', 2093, 'sublimation', 400.00, 0.00, 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-06 07:22:39', '2025-04-06 07:22:39'),
-('6JYAB', 2093, 'tailoring', 1500.00, 0.00, 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-11 07:17:48', '2025-04-25 16:41:02'),
-('AFRPA', 8739, 'tailoring', 200.00, 0.00, 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:43:54', '2025-04-22 15:58:38'),
-('B1PVL', 2093, 'sublimation', 450.00, 0.00, 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-06 07:27:24', '2025-04-06 07:27:24'),
-('GNOJL', 2093, 'sublimation', 500.00, 0.00, 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-17 16:46:47', '2025-04-25 17:01:10'),
-('N77QE', 8739, 'tailoring', 150.00, 0.00, 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-19 06:53:20', '2025-04-19 06:53:20'),
-('OP9SC', 8739, 'sublimation', 800.00, 0.00, 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-19 09:26:05', '2025-04-22 16:29:34'),
-('OQIL6', 2093, 'tailoring', 1000.00, 0.00, 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-17 17:35:06', '2025-04-23 15:34:20'),
-('PJP9N', 2093, 'sublimation', 400.00, 0.00, 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-28 14:50:43', '2025-04-28 14:50:43'),
-('TF3LG', 8739, 'tailoring', 100.00, 0.00, 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-19 07:23:57', '2025-04-22 16:34:22'),
-('TO04658692', 8739, 'tailoring', 0.00, 0.00, 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-19 07:10:19', '2025-04-23 16:23:24'),
-('TO59SLN', 8739, 'tailoring', 0.00, 0.00, 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:41:23', '2025-04-22 15:52:46'),
-('TOHUXNP', 8739, 'tailoring', 0.00, 0.00, 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:24:39', '2025-04-22 16:12:07'),
-('TOK8AVY', 8739, 'tailoring', 0.00, 0.00, 'cash', 'pending', 'declined', 15, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:45:01', '2025-04-22 15:36:07');
+INSERT INTO `orders` (`order_id`, `customer_id`, `order_type`, `total_amount`, `downpayment_amount`, `payment_method`, `payment_status`, `order_status`, `staff_id`, `manager_id`, `notes`, `created_at`, `updated_at`, `screenshot_path`, `status_history`) VALUES
+('', 2093, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-06 07:22:39', '2025-04-06 07:22:39', NULL, NULL),
+('05R84', 2452, 'tailoring', '1500.00', '0.00', 'cash', 'pending', 'completed', NULL, NULL, '', '2025-05-15 05:52:46', '2025-05-18 14:35:19', NULL, NULL),
+('08HYW', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 06:10:28', '2025-05-15 06:10:28', NULL, NULL),
+('0Q0OR', 2621, 'sublimation', '400.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, '', '2025-05-19 12:42:04', '2025-05-19 12:42:24', NULL, NULL),
+('0UWXJ', 2452, 'tailoring', '300.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-14 17:57:08', '2025-05-14 17:57:08', NULL, NULL),
+('15B5T', 2452, 'tailoring', '500.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Test 3', '2025-05-14 07:26:04', '2025-05-14 07:26:04', NULL, NULL),
+('17F3B', 2093, 'sublimation', '400.00', '200.00', 'cash', 'downpayment_paid', 'completed', NULL, NULL, NULL, '2025-04-29 12:09:39', '2025-05-19 11:44:13', NULL, NULL),
+('2C4QQ', 2093, 'tailoring', '100.00', '50.00', 'cash', 'downpayment_paid', 'ready_for_pickup', NULL, NULL, NULL, '2025-05-05 03:56:18', '2025-05-14 19:59:24', NULL, NULL),
+('2HFO9', 2452, 'tailoring', '500.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, 'Thanks', '2025-05-19 10:38:17', '2025-05-19 10:40:38', NULL, NULL),
+('3D5LC', 2452, 'tailoring', '300.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Buslot ang short', '2025-05-20 11:49:19', '2025-05-20 11:49:19', NULL, NULL),
+('3SQ5N', 8740, 'tailoring', '100.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-05 06:25:32', '2025-05-05 06:27:21', NULL, NULL),
+('3U739', 2093, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: No amount given', '2025-04-29 11:52:46', '2025-05-02 01:21:38', NULL, NULL),
+('3XDSJ', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 06:53:09', '2025-05-15 06:53:09', NULL, NULL),
+('4E9C8', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:43:33', '2025-05-10 16:43:33', NULL, NULL),
+('4ERSE', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-10 16:53:20', '2025-05-14 05:02:18', NULL, NULL),
+('63W3F', 8742, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-05 07:21:07', '2025-05-05 07:21:07', NULL, NULL),
+('69RJ3', 8743, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-20 16:44:36', '2025-05-20 16:44:36', NULL, NULL),
+('6JYAB', 2093, 'tailoring', '1500.00', '0.00', 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-11 07:17:48', '2025-04-25 16:41:02', NULL, NULL),
+('6XGPL', 2093, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-08 14:37:26', '2025-05-08 14:37:26', NULL, NULL),
+('7LJH5', 2621, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 17:54:46', '2025-05-19 17:54:46', NULL, NULL),
+('88WDD', 2452, 'sublimation', '400.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, '', '2025-05-15 08:24:20', '2025-05-19 04:03:10', NULL, NULL),
+('8P4D9', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 06:25:57', '2025-05-15 06:25:57', NULL, NULL),
+('9AIWF', 2452, 'tailoring', '300.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-14 17:58:00', '2025-05-14 17:58:00', NULL, NULL),
+('9LNHM', 2093, 'sublimation', '1000.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 12:43:08', '2025-05-19 12:43:08', NULL, NULL),
+('9Q8UW', 2452, 'tailoring', '500.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, 'Tedhgs', '2025-05-20 11:13:51', '2025-05-20 11:16:30', NULL, NULL),
+('9VJDR', 2452, 'tailoring', '500.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Test\n', '2025-05-19 10:42:33', '2025-05-19 10:42:33', NULL, NULL),
+('AFRPA', 8739, 'tailoring', '200.00', '0.00', 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:43:54', '2025-04-22 15:58:38', NULL, NULL),
+('AOQWW', 2093, 'sublimation', '800.00', '400.00', 'cash', 'fully_paid', 'completed', NULL, NULL, NULL, '2025-05-05 08:40:27', '2025-05-19 08:20:41', NULL, NULL),
+('B1PVL', 2093, 'sublimation', '450.00', '225.00', 'cash', 'downpayment_paid', 'in_process', NULL, NULL, NULL, '2025-04-06 07:27:24', '2025-05-19 11:44:17', NULL, NULL),
+('B2V53', 2452, 'tailoring', '300.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Trial 2\n', '2025-05-14 05:27:35', '2025-05-14 05:27:35', NULL, NULL),
+('B44ZK', 2452, 'sublimation', '1200.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-19 11:51:47', '2025-05-19 11:53:34', NULL, NULL),
+('B6HQ0', 2452, 'tailoring', '500.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-14 16:36:08', '2025-05-14 16:36:08', NULL, NULL),
+('CNT2I', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 05:48:43', '2025-05-15 05:48:43', NULL, NULL),
+('CRQB9', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, '', '2025-05-15 07:33:39', '2025-05-19 10:30:19', NULL, NULL),
+('D4EAE', 2452, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-19 11:49:51', '2025-05-19 11:49:51', NULL, NULL),
+('D68GY', 2093, 'tailoring', '100.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-14 03:45:06', '2025-05-14 03:45:06', NULL, NULL),
+('DYRHS', 2093, 'sublimation', '450.00', '0.00', 'cash', 'downpayment_paid', 'ready_for_pickup', NULL, NULL, NULL, '2025-05-02 01:18:22', '2025-05-18 15:31:20', NULL, NULL),
+('E3UTB', 2093, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-02 01:17:36', '2025-05-02 01:17:36', NULL, NULL),
+('E4J4J', 8742, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-05 07:14:06', '2025-05-05 07:14:06', NULL, NULL),
+('EOPR0', 2452, 'tailoring', '500.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, 'Test 6', '2025-05-14 08:55:08', '2025-05-14 08:55:18', NULL, NULL),
+('ETU56', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:49:15', '2025-05-10 16:49:15', NULL, NULL),
+('F7RT4', 2093, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 12:32:33', '2025-05-19 12:32:33', NULL, NULL),
+('FDYI3', 2452, 'sublimation', '10350.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Brgy Batinguel\n', '2025-05-20 11:47:30', '2025-05-20 11:47:30', NULL, NULL),
+('FOH7G', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:43:45', '2025-05-10 16:43:45', NULL, NULL),
+('G9YIL', 2452, 'tailoring', '1500.00', '0.00', 'cash', 'fully_paid', 'completed', NULL, NULL, 'W\n', '2025-05-14 10:48:11', '2025-05-18 15:35:46', NULL, NULL),
+('GE6XA', 2621, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 22:10:26', '2025-05-19 22:10:26', NULL, NULL),
+('GNOJL', 2093, 'sublimation', '500.00', '0.00', 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-17 16:46:47', '2025-04-25 17:01:10', NULL, NULL),
+('H4DT6', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-15 08:16:15', '2025-05-15 08:16:15', NULL, NULL),
+('HGBVJ', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 06:09:43', '2025-05-15 06:09:43', NULL, NULL),
+('HK99J', 2452, 'tailoring', '1500.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-19 10:44:53', '2025-05-19 10:44:53', NULL, NULL),
+('HZZ9B', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 05:31:56', '2025-05-15 05:31:56', NULL, NULL),
+('IJPNG', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-14 18:05:20', '2025-05-14 18:05:20', NULL, NULL),
+('IYGVD', 2452, 'sublimation', '450.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, '', '2025-05-14 07:01:52', '2025-05-14 08:17:02', NULL, NULL),
+('KC5S9', 2093, 'sublimation', '5000.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-29 11:50:53', '2025-04-29 11:50:53', NULL, NULL),
+('KEXW2', 2452, 'tailoring', '500.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, 'Thanks', '2025-05-19 10:38:29', '2025-05-19 10:40:13', NULL, NULL),
+('LAE68', 2452, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-19 11:49:37', '2025-05-19 11:49:37', NULL, NULL),
+('LI5GM', 2452, 'tailoring', '1500.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, '', '2025-05-14 10:46:55', '2025-05-14 10:53:47', NULL, NULL),
+('LSCD8', 2093, 'tailoring', '100.00', '0.00', 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: walay klaro', '2025-05-05 02:33:02', '2025-05-05 08:42:11', NULL, NULL),
+('MOS51', 2093, 'sublimation', '20000.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 12:34:56', '2025-05-19 12:34:56', NULL, NULL),
+('N77QE', 8739, 'tailoring', '150.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-19 06:53:20', '2025-04-19 06:53:20', NULL, NULL),
+('N88UP', 2452, 'tailoring', '300.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, '', '2025-05-19 10:44:12', '2025-05-19 11:10:27', NULL, NULL),
+('NA8MZ', 2621, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-19 12:02:08', '2025-05-19 12:02:08', NULL, NULL),
+('NDERG', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:44:15', '2025-05-10 16:44:15', NULL, NULL),
+('OP0M0', 2452, 'tailoring', '500.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Trial\n', '2025-05-14 05:27:09', '2025-05-14 05:27:09', NULL, NULL),
+('OP9SC', 8739, 'sublimation', '800.00', '0.00', 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-19 09:26:05', '2025-04-22 16:29:34', NULL, NULL),
+('OQIL6', 2093, 'tailoring', '1000.00', '0.00', 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-17 17:35:06', '2025-04-23 15:34:20', NULL, NULL),
+('OVB9E', 2452, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-20 16:37:37', '2025-05-20 16:37:37', NULL, NULL),
+('P21ZN', 2621, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 22:18:34', '2025-05-19 22:18:34', NULL, NULL),
+('P4ZHQ', 2452, 'tailoring', '300.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-14 18:01:26', '2025-05-14 18:01:26', NULL, NULL),
+('P7Z7X', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:47:21', '2025-05-10 16:47:21', NULL, NULL),
+('PJP9N', 2093, 'sublimation', '400.00', '0.00', 'cash', 'downpayment_paid', 'in_process', NULL, NULL, NULL, '2025-04-28 14:50:43', '2025-05-19 11:44:21', NULL, NULL),
+('QWRAU', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'ready_for_pickup', NULL, NULL, NULL, '2025-05-15 06:23:49', '2025-05-19 17:23:41', NULL, NULL),
+('RBO3M', 2452, 'sublimation', '450.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-15 07:06:21', '2025-05-15 07:06:21', NULL, NULL),
+('RNSWI', 2093, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-05 08:47:08', '2025-05-05 08:47:36', NULL, NULL),
+('ROBCE', 2452, 'sublimation', '450.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 05:30:44', '2025-05-15 05:30:44', NULL, NULL),
+('RSFUN', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-15 07:28:15', '2025-05-15 07:28:15', NULL, NULL),
+('RTHGD', 2093, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-19 20:22:57', '2025-05-19 20:22:57', NULL, NULL),
+('SB96Q', 2452, 'tailoring', '500.00', '0.00', 'cash', 'fully_paid', 'ready_for_pickup', NULL, NULL, '', '2025-05-19 11:41:21', '2025-05-19 17:24:29', NULL, NULL),
+('SW0LN', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 06:54:17', '2025-05-15 06:54:17', NULL, NULL),
+('TF3LG', 8739, 'tailoring', '100.00', '0.00', 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-19 07:23:57', '2025-04-22 16:34:22', NULL, NULL),
+('TO04658692', 8739, 'tailoring', '0.00', '0.00', 'cash', 'pending', '', NULL, NULL, NULL, '2025-04-19 07:10:19', '2025-04-23 16:23:24', NULL, NULL),
+('TO59SLN', 8739, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:41:23', '2025-04-22 15:52:46', NULL, NULL),
+('TOHUXNP', 8739, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'declined', 18, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:24:39', '2025-04-22 16:12:07', NULL, NULL),
+('TOK8AVY', 8739, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'declined', 15, NULL, '\nDeclined Reason: way klaro', '2025-04-19 07:45:01', '2025-04-22 15:36:07', NULL, NULL),
+('TP2BC', 8742, 'sublimation', '0.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-05 06:47:08', '2025-05-05 06:47:08', NULL, NULL),
+('TQ6W9', 8739, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-14 05:53:25', '2025-05-14 05:53:25', NULL, NULL),
+('TUSK9', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-15 07:01:40', '2025-05-15 07:01:40', NULL, NULL),
+('VF30U', 2452, 'sublimation', '450.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Secret', '2025-05-20 11:51:37', '2025-05-20 11:51:37', NULL, NULL),
+('VGA1D', 2452, 'sublimation', '400.00', '0.00', 'cash', 'fully_paid', 'approved', NULL, NULL, '', '2025-05-19 11:41:47', '2025-05-19 11:44:50', NULL, NULL),
+('VGPGX', 2093, 'sublimation', '500.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-04-29 09:44:27', '2025-04-29 09:44:27', NULL, NULL),
+('VV4VO', 2452, 'sublimation', '5000.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:43:22', '2025-05-10 16:43:22', NULL, NULL),
+('VXRUK', 2621, 'tailoring', '0.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 21:57:49', '2025-05-19 21:57:49', NULL, NULL),
+('W7DK9', 2093, 'sublimation', '5000.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-05-19 12:36:57', '2025-05-19 12:39:03', NULL, NULL),
+('WG6M3', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, '', '2025-05-15 07:02:14', '2025-05-15 07:02:14', NULL, NULL),
+('WJOLN', 2452, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-10 16:48:55', '2025-05-10 16:48:55', NULL, NULL),
+('WSHFC', 2093, 'sublimation', '800.00', '0.00', 'cash', 'pending', 'approved', NULL, NULL, NULL, '2025-04-29 11:53:09', '2025-04-30 02:23:20', NULL, NULL),
+('XRRIH', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 06:57:24', '2025-05-15 06:57:24', NULL, NULL),
+('XTK7G', 2452, 'sublimation', '400.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, NULL, '2025-05-14 18:46:33', '2025-05-14 18:47:20', NULL, NULL),
+('XUAKH', 2452, 'sublimation', '450.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, '', '2025-05-19 11:54:05', '2025-05-19 11:54:38', NULL, NULL),
+('XZAJB', 2093, 'tailoring', '0.00', '0.00', 'cash', 'downpayment_paid', 'approved', NULL, NULL, NULL, '2025-05-19 21:27:27', '2025-05-27 05:45:39', NULL, NULL),
+('Y26QN', 2452, 'sublimation', '400.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-15 05:43:36', '2025-05-15 05:43:36', NULL, NULL),
+('Y6GX5', 2093, 'tailoring', '800.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-08 13:51:10', '2025-05-08 13:51:10', NULL, NULL),
+('ZBP6Y', 2452, 'sublimation', '400.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, 'Test Test', '2025-05-19 10:39:21', '2025-05-19 10:39:48', NULL, NULL),
+('ZBUI0', 2093, 'tailoring', '150.00', '75.00', 'cash', 'downpayment_paid', 'approved', NULL, NULL, NULL, '2025-05-14 04:57:25', '2025-05-19 11:48:56', NULL, NULL),
+('ZKGDR', 2093, 'sublimation', '450.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, NULL, '2025-05-19 12:34:31', '2025-05-19 12:34:31', NULL, NULL),
+('ZOR5I', 2452, 'sublimation', '450.00', '0.00', 'cash', 'pending', 'pending_approval', NULL, NULL, 'Nobe\n', '2025-05-15 07:41:36', '2025-05-15 07:41:36', NULL, NULL),
+('ZRQ32', 2452, 'sublimation', '400.00', '0.00', 'cash', 'fully_paid', 'pending_approval', NULL, NULL, NULL, '2025-05-14 18:43:43', '2025-05-14 18:51:38', NULL, NULL);
 
 --
 -- Triggers `orders`
@@ -214,6 +561,13 @@ CREATE TABLE `order_status_history` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `order_status_history`
+--
+
+INSERT INTO `order_status_history` (`history_id`, `order_id`, `status`, `updated_by`, `notes`, `created_at`) VALUES
+(4, '17F3B', 'in_process', 18, 'Order moved to production.', '2025-05-02 00:14:20');
+
 -- --------------------------------------------------------
 
 --
@@ -227,8 +581,68 @@ CREATE TABLE `payments` (
   `payment_type` enum('downpayment','full_payment','balance') NOT NULL,
   `payment_method` enum('cash','gcash') NOT NULL,
   `transaction_reference` varchar(100) DEFAULT NULL,
-  `received_by` int(11) NOT NULL,
-  `payment_date` timestamp NOT NULL DEFAULT current_timestamp()
+  `received_by` int(11) DEFAULT NULL,
+  `payment_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `payment_status` enum('pending','under verification','confirmed','rejected') DEFAULT 'pending',
+  `screenshot_path` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`payment_id`, `order_id`, `amount`, `payment_type`, `payment_method`, `transaction_reference`, `received_by`, `payment_date`, `payment_status`, `screenshot_path`) VALUES
+(4, 'PJP9N', '0.00', 'downpayment', 'cash', '', 4, '2025-04-29 08:45:26', 'confirmed', NULL),
+(5, 'B1PVL', '225.00', 'downpayment', 'cash', '', 3, '2025-04-29 09:10:21', 'confirmed', NULL),
+(6, '17F3B', '200.00', 'downpayment', 'cash', '', 3, '2025-04-29 12:12:15', 'confirmed', NULL),
+(7, 'DYRHS', '225.00', 'downpayment', 'cash', '', 9, '2025-05-02 09:57:10', 'pending', NULL),
+(8, '2C4QQ', '50.00', 'downpayment', 'gcash', '09564563456', 9, '2025-05-05 04:18:46', 'rejected', NULL),
+(9, '2C4QQ', '50.00', 'downpayment', 'gcash', '09564563456', 9, '2025-05-05 04:35:02', 'confirmed', NULL),
+(10, 'AOQWW', '400.00', 'downpayment', 'gcash', '25489582KDKD', 9, '2025-05-05 08:43:53', 'confirmed', NULL),
+(13, 'AOQWW', '400.00', '', 'cash', '', NULL, '2025-05-09 11:09:33', 'pending', NULL),
+(16, 'RNSWI', '200.00', 'downpayment', 'gcash', '25489582KDKDDFR', 9, '2025-05-09 11:49:13', 'pending', '../uploads/payment_screenshots/payment_RNSWI_1746791353.jfif'),
+(17, 'RNSWI', '200.00', 'downpayment', 'gcash', '25489582KDKDDFR', 9, '2025-05-09 12:10:46', 'pending', '../uploads/payment_screenshots/payment_RNSWI_1746792646.jfif'),
+(18, 'IYGVD', '450.00', 'full_payment', 'cash', '', NULL, '2025-05-14 08:15:48', 'confirmed', ''),
+(19, 'EOPR0', '500.00', 'full_payment', 'cash', '', NULL, '2025-05-14 08:55:18', 'pending', ''),
+(20, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 09:12:43', 'pending', ''),
+(21, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 09:16:18', 'pending', ''),
+(22, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 09:19:21', 'pending', ''),
+(23, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 09:25:36', 'pending', ''),
+(24, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 09:25:59', 'pending', ''),
+(25, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 09:28:19', 'pending', ''),
+(26, 'ZBUI0', '75.00', 'downpayment', 'cash', '', 9, '2025-05-14 10:09:13', 'confirmed', ''),
+(27, 'G9YIL', '1500.00', 'full_payment', 'gcash', '17726271h2h1u', NULL, '2025-05-14 10:51:18', 'pending', '../uploads/payment_screenshots/payment_G9YIL_1747219878.jpeg'),
+(28, 'LI5GM', '1500.00', 'full_payment', 'cash', '', NULL, '2025-05-14 10:53:47', 'pending', ''),
+(29, 'XTK7G', '400.00', 'full_payment', 'cash', '', NULL, '2025-05-14 18:47:20', 'pending', ''),
+(30, 'ZRQ32', '400.00', 'downpayment', 'cash', '', NULL, '2025-05-14 18:51:38', 'pending', ''),
+(31, '88WDD', '400.00', 'full_payment', 'gcash', 'SKAASJ238328', NULL, '2025-05-19 04:03:10', 'pending', '../uploads/payment_screenshots/payment_88WDD_1747627390.jpeg'),
+(32, 'ZBP6Y', '400.00', 'downpayment', 'gcash', '199373hvj101918', NULL, '2025-05-19 10:39:48', 'pending', '../uploads/payment_screenshots/payment_ZBP6Y_1747651188.jpeg'),
+(33, 'KEXW2', '500.00', 'downpayment', 'cash', '', NULL, '2025-05-19 10:40:13', 'pending', ''),
+(34, '2HFO9', '500.00', 'downpayment', 'gcash', '7393018273hdjsm', NULL, '2025-05-19 10:40:38', 'pending', '../uploads/payment_screenshots/payment_2HFO9_1747651238.jpeg'),
+(35, 'VGA1D', '400.00', 'full_payment', 'gcash', '1819293040392872', NULL, '2025-05-19 11:44:28', 'confirmed', '../uploads/payment_screenshots/payment_VGA1D_1747655068.jpeg'),
+(36, 'SB96Q', '500.00', 'downpayment', 'cash', '', NULL, '2025-05-19 11:45:44', 'pending', ''),
+(38, 'B44ZK', '600.00', 'downpayment', 'cash', '', 9, '2025-05-19 11:54:25', 'pending', ''),
+(39, 'XUAKH', '450.00', 'full_payment', 'gcash', '4738399292818291', NULL, '2025-05-19 11:54:38', 'pending', '../uploads/payment_screenshots/payment_XUAKH_1747655678.jpeg'),
+(40, 'B44ZK', '600.00', 'downpayment', 'cash', '', 9, '2025-05-19 11:55:17', 'pending', ''),
+(41, 'B44ZK', '600.00', 'downpayment', 'cash', '', 9, '2025-05-19 11:55:52', 'pending', ''),
+(42, '0Q0OR', '400.00', 'full_payment', 'gcash', '271829928373', NULL, '2025-05-19 12:42:24', 'pending', '../uploads/payment_screenshots/payment_0Q0OR_1747658544.jpeg'),
+(43, '9Q8UW', '500.00', 'full_payment', 'cash', '', NULL, '2025-05-20 11:15:34', 'confirmed', ''),
+(44, 'XZAJB', '0.00', 'downpayment', 'cash', '', 9, '2025-05-20 12:04:48', 'confirmed', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment_history`
+--
+
+CREATE TABLE `payment_history` (
+  `history_id` int(11) NOT NULL,
+  `payment_id` int(11) NOT NULL,
+  `previous_status` varchar(20) NOT NULL,
+  `new_status` varchar(20) NOT NULL,
+  `notes` text DEFAULT NULL,
+  `changed_at` datetime NOT NULL,
+  `changed_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -245,6 +659,75 @@ CREATE TABLE `staff_notifications` (
   `is_read` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `staff_notifications`
+--
+
+INSERT INTO `staff_notifications` (`notification_id`, `staff_id`, `order_id`, `message`, `is_read`, `created_at`) VALUES
+(1, 3, 'IYGVD', 'New payment of ₱450 received for Order #IYGVD', 0, '2025-05-14 08:15:48'),
+(2, 9, 'IYGVD', 'New payment of ₱450 received for Order #IYGVD', 0, '2025-05-14 08:15:48'),
+(3, 19, 'IYGVD', 'New payment of ₱450 received for Order #IYGVD', 0, '2025-05-14 08:15:48'),
+(4, 3, 'EOPR0', 'New payment of ₱500 received for Order #EOPR0', 0, '2025-05-14 08:55:18'),
+(5, 9, 'EOPR0', 'New payment of ₱500 received for Order #EOPR0', 0, '2025-05-14 08:55:18'),
+(6, 19, 'EOPR0', 'New payment of ₱500 received for Order #EOPR0', 0, '2025-05-14 08:55:18'),
+(7, 3, 'G9YIL', 'New payment of ₱1500 received for Order #G9YIL', 0, '2025-05-14 10:51:18'),
+(8, 9, 'G9YIL', 'New payment of ₱1500 received for Order #G9YIL', 0, '2025-05-14 10:51:18'),
+(9, 19, 'G9YIL', 'New payment of ₱1500 received for Order #G9YIL', 0, '2025-05-14 10:51:18'),
+(10, 3, 'LI5GM', 'New payment of ₱1500 received for Order #LI5GM', 0, '2025-05-14 10:53:47'),
+(11, 9, 'LI5GM', 'New payment of ₱1500 received for Order #LI5GM', 0, '2025-05-14 10:53:47'),
+(12, 19, 'LI5GM', 'New payment of ₱1500 received for Order #LI5GM', 0, '2025-05-14 10:53:47'),
+(13, 3, 'XTK7G', 'New payment of ₱400 received for Order #XTK7G', 0, '2025-05-14 18:47:20'),
+(14, 9, 'XTK7G', 'New payment of ₱400 received for Order #XTK7G', 0, '2025-05-14 18:47:20'),
+(15, 19, 'XTK7G', 'New payment of ₱400 received for Order #XTK7G', 0, '2025-05-14 18:47:20'),
+(16, 3, 'ZRQ32', 'New payment of ₱400 received for Order #ZRQ32', 0, '2025-05-14 18:51:38'),
+(17, 9, 'ZRQ32', 'New payment of ₱400 received for Order #ZRQ32', 0, '2025-05-14 18:51:38'),
+(18, 19, 'ZRQ32', 'New payment of ₱400 received for Order #ZRQ32', 0, '2025-05-14 18:51:38'),
+(19, 3, '88WDD', 'New payment of ₱400 received for Order #88WDD', 0, '2025-05-19 04:03:10'),
+(20, 9, '88WDD', 'New payment of ₱400 received for Order #88WDD', 0, '2025-05-19 04:03:10'),
+(21, 19, '88WDD', 'New payment of ₱400 received for Order #88WDD', 0, '2025-05-19 04:03:10'),
+(22, 4, 'ZBP6Y', 'New sublimation order #ZBP6Y received from kyle cadimas', 0, '2025-05-19 10:39:21'),
+(23, 18, 'ZBP6Y', 'New sublimation order #ZBP6Y received from kyle cadimas', 0, '2025-05-19 10:39:21'),
+(24, 3, 'ZBP6Y', 'New payment of ₱400 received for Order #ZBP6Y', 0, '2025-05-19 10:39:48'),
+(25, 9, 'ZBP6Y', 'New payment of ₱400 received for Order #ZBP6Y', 0, '2025-05-19 10:39:48'),
+(26, 19, 'ZBP6Y', 'New payment of ₱400 received for Order #ZBP6Y', 0, '2025-05-19 10:39:48'),
+(27, 3, 'KEXW2', 'New payment of ₱500 received for Order #KEXW2', 0, '2025-05-19 10:40:13'),
+(28, 9, 'KEXW2', 'New payment of ₱500 received for Order #KEXW2', 0, '2025-05-19 10:40:13'),
+(29, 19, 'KEXW2', 'New payment of ₱500 received for Order #KEXW2', 0, '2025-05-19 10:40:13'),
+(30, 3, '2HFO9', 'New payment of ₱500 received for Order #2HFO9', 0, '2025-05-19 10:40:38'),
+(31, 9, '2HFO9', 'New payment of ₱500 received for Order #2HFO9', 0, '2025-05-19 10:40:38'),
+(32, 19, '2HFO9', 'New payment of ₱500 received for Order #2HFO9', 0, '2025-05-19 10:40:38'),
+(33, 4, 'VGA1D', 'New sublimation order #VGA1D received from kyle cadimas', 0, '2025-05-19 11:41:47'),
+(34, 18, 'VGA1D', 'New sublimation order #VGA1D received from kyle cadimas', 0, '2025-05-19 11:41:47'),
+(35, 3, 'VGA1D', 'New payment of ₱400 received for Order #VGA1D', 0, '2025-05-19 11:44:28'),
+(36, 9, 'VGA1D', 'New payment of ₱400 received for Order #VGA1D', 0, '2025-05-19 11:44:28'),
+(37, 19, 'VGA1D', 'New payment of ₱400 received for Order #VGA1D', 0, '2025-05-19 11:44:28'),
+(38, 3, 'SB96Q', 'New payment of ₱500 received for Order #SB96Q', 0, '2025-05-19 11:45:44'),
+(39, 9, 'SB96Q', 'New payment of ₱500 received for Order #SB96Q', 0, '2025-05-19 11:45:44'),
+(40, 19, 'SB96Q', 'New payment of ₱500 received for Order #SB96Q', 0, '2025-05-19 11:45:44'),
+(41, 4, 'XUAKH', 'New sublimation order #XUAKH received from kyle cadimas', 0, '2025-05-19 11:54:05'),
+(42, 18, 'XUAKH', 'New sublimation order #XUAKH received from kyle cadimas', 0, '2025-05-19 11:54:05'),
+(43, 3, 'XUAKH', 'New payment of ₱450 received for Order #XUAKH', 0, '2025-05-19 11:54:38'),
+(44, 9, 'XUAKH', 'New payment of ₱450 received for Order #XUAKH', 0, '2025-05-19 11:54:38'),
+(45, 19, 'XUAKH', 'New payment of ₱450 received for Order #XUAKH', 0, '2025-05-19 11:54:38'),
+(46, 4, 'NA8MZ', 'New sublimation order #NA8MZ received from Janjan Micheal', 0, '2025-05-19 12:02:08'),
+(47, 18, 'NA8MZ', 'New sublimation order #NA8MZ received from Janjan Micheal', 0, '2025-05-19 12:02:08'),
+(48, 4, '0Q0OR', 'New sublimation order #0Q0OR received from Janjan Micheal', 0, '2025-05-19 12:42:04'),
+(49, 18, '0Q0OR', 'New sublimation order #0Q0OR received from Janjan Micheal', 0, '2025-05-19 12:42:04'),
+(50, 3, '0Q0OR', 'New payment of ₱400 received for Order #0Q0OR', 0, '2025-05-19 12:42:24'),
+(51, 9, '0Q0OR', 'New payment of ₱400 received for Order #0Q0OR', 0, '2025-05-19 12:42:24'),
+(52, 19, '0Q0OR', 'New payment of ₱400 received for Order #0Q0OR', 0, '2025-05-19 12:42:24'),
+(53, 4, '9Q8UW', 'New tailoring order #9Q8UW received from kyle cadimas', 0, '2025-05-20 11:13:51'),
+(54, 18, '9Q8UW', 'New tailoring order #9Q8UW received from kyle cadimas', 0, '2025-05-20 11:13:51'),
+(55, 3, '9Q8UW', 'New payment of ₱500 received for Order #9Q8UW', 0, '2025-05-20 11:15:34'),
+(56, 9, '9Q8UW', 'New payment of ₱500 received for Order #9Q8UW', 0, '2025-05-20 11:15:34'),
+(57, 19, '9Q8UW', 'New payment of ₱500 received for Order #9Q8UW', 0, '2025-05-20 11:15:34'),
+(58, 4, 'FDYI3', 'New sublimation order #FDYI3 received from kyle cadimas', 0, '2025-05-20 11:47:30'),
+(59, 18, 'FDYI3', 'New sublimation order #FDYI3 received from kyle cadimas', 0, '2025-05-20 11:47:30'),
+(60, 4, '3D5LC', 'New tailoring order #3D5LC received from kyle cadimas', 0, '2025-05-20 11:49:19'),
+(61, 18, '3D5LC', 'New tailoring order #3D5LC received from kyle cadimas', 0, '2025-05-20 11:49:19'),
+(62, 4, 'VF30U', 'New sublimation order #VF30U received from kyle cadimas', 0, '2025-05-20 11:51:37'),
+(63, 18, 'VF30U', 'New sublimation order #VF30U received from kyle cadimas', 0, '2025-05-20 11:51:37');
 
 -- --------------------------------------------------------
 
@@ -268,6 +751,32 @@ CREATE TABLE `sublimation_orders` (
   `printing_type` enum('sublimation','silkscreen') NOT NULL DEFAULT 'sublimation'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `sublimation_orders`
+--
+
+INSERT INTO `sublimation_orders` (`sublimation_id`, `order_id`, `template_id`, `custom_design`, `design_path`, `quantity`, `size`, `color`, `instructions`, `sublimator_id`, `allow_as_template`, `completion_date`, `printing_type`) VALUES
+(2, 'IYGVD', '28064', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(4, 'XTK7G', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(5, 'ROBCE', '28064', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(6, 'HZZ9B', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(7, 'Y26QN', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(8, 'CNT2I', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(9, 'HGBVJ', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(11, 'QWRAU', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(12, '8P4D9', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(13, '3XDSJ', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(14, 'SW0LN', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(15, 'XRRIH', '11017', 0, NULL, 1, NULL, NULL, NULL, NULL, 0, NULL, 'sublimation'),
+(16, 'TUSK9', '11017', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(17, 'WG6M3', '11017', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(18, 'RBO3M', '28064', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(19, 'RSFUN', '34833', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(20, 'CRQB9', '34833', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(21, 'ZOR5I', '28064', 0, NULL, 1, NULL, NULL, 'Nobe\n', NULL, 0, NULL, 'sublimation'),
+(22, 'H4DT6', '11017', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation'),
+(23, '88WDD', '11017', 0, NULL, 1, NULL, NULL, '', NULL, 0, NULL, 'sublimation');
+
 -- --------------------------------------------------------
 
 --
@@ -280,7 +789,8 @@ CREATE TABLE `sublimation_players` (
   `player_name` varchar(100) NOT NULL,
   `jersey_number` int(11) NOT NULL,
   `size` enum('XS','S','M','L','XL','XXL','XXXL') NOT NULL,
-  `include_lower` enum('Yes','No') NOT NULL
+  `include_lower` enum('Yes','No') NOT NULL,
+  `order_id` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -293,25 +803,38 @@ CREATE TABLE `tailoring_orders` (
   `tailoring_id` int(11) NOT NULL,
   `order_id` varchar(10) NOT NULL,
   `service_type` enum('alterations','repairs','resize','custom made') NOT NULL,
-  `description` text DEFAULT NULL,
-  `measurements` text NOT NULL,
-  `fabric_type` varchar(100) DEFAULT NULL,
-  `fabric_color` varchar(50) DEFAULT NULL,
-  `instructions` text DEFAULT NULL,
   `completion_date` date DEFAULT NULL,
-  `quantity` int(11) DEFAULT 1,
-  `measurements_file` varchar(255) DEFAULT NULL,
-  `needs_seamstress` tinyint(1) DEFAULT 0
+  `needs_seamstress` tinyint(1) DEFAULT 0,
+  `seamstress_appointment` datetime DEFAULT NULL,
+  `measurement_img` varchar(255) DEFAULT NULL,
+  `chest` int(5) DEFAULT NULL,
+  `waist` int(5) DEFAULT NULL,
+  `hips` int(5) DEFAULT NULL,
+  `shoulder_width` int(5) DEFAULT NULL,
+  `sleeve_length` int(5) DEFAULT NULL,
+  `garment_length` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tailoring_orders`
 --
 
-INSERT INTO `tailoring_orders` (`tailoring_id`, `order_id`, `service_type`, `description`, `measurements`, `fabric_type`, `fabric_color`, `instructions`, `completion_date`, `quantity`, `measurements_file`, `needs_seamstress`) VALUES
-(1, 'TOHUXNP', 'alterations', 'Shorten sleeves', 'no', '', '', 'no', '2025-04-30', 1, '', 0),
-(2, 'TO59SLN', 'custom made', '', 'unrye wsg ', 'Other', '#832a2a', '', '2025-04-30', 1, 'uploads/measurements/TO59SLN_measurements_1745048483.jpg', 1),
-(3, 'TOK8AVY', 'custom made', '', 'sdfsdfdsf', 'Polyester', '#5a2020', 'dsadas', '2025-04-30', 1, 'uploads/measurements/TOK8AVY_measurements_1745048701.jpg', 1);
+INSERT INTO `tailoring_orders` (`tailoring_id`, `order_id`, `service_type`, `completion_date`, `needs_seamstress`, `seamstress_appointment`, `measurement_img`, `chest`, `waist`, `hips`, `shoulder_width`, `sleeve_length`, `garment_length`) VALUES
+(1, 'TOHUXNP', 'alterations', '2025-04-30', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(2, 'TO59SLN', 'custom made', '2025-04-30', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(3, 'TOK8AVY', 'custom made', '2025-04-30', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(4, 'OP0M0', 'alterations', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(5, 'B2V53', 'repairs', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(6, '15B5T', 'alterations', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(7, 'EOPR0', 'alterations', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(8, 'LI5GM', '', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(9, 'G9YIL', '', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(10, '0UWXJ', 'resize', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(11, '9AIWF', 'resize', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(12, 'P4ZHQ', 'resize', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(13, '05R84', 'custom made', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(14, '9Q8UW', 'alterations', '2025-05-27', 0, NULL, 'uploads/measurements/measurement_9Q8UW_1747739631.jpg', 0, 0, 0, 0, 0, 0),
+(15, '3D5LC', 'repairs', '2025-05-27', 0, NULL, 'uploads/measurements/measurement_3D5LC_1747741759.jpg', 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -337,14 +860,14 @@ CREATE TABLE `templates` (
 --
 
 INSERT INTO `templates` (`template_id`, `name`, `description`, `image_path`, `price`, `added_by`, `category`, `created_at`, `updated_at`, `other_category`) VALUES
-('11017', 'Milwaukee Bucks Jersey', NULL, 'uploads/Bucks.png', 400.00, 15, 'Basketball', '2025-03-22 15:23:14', '2025-03-22 15:23:14', NULL),
-('23547', 'Marvel 616 Jersey', NULL, 'uploads/Marvel 616 Esports Jersey.png', 400.00, 15, 'Esports', '2025-03-22 15:10:42', '2025-03-22 15:10:42', NULL),
-('27428', 'Techbeast: Green Wolves', NULL, 'uploads/Teachbest Athletics Green Wolves.png', 400.00, 15, 'Basketball', '2025-03-22 17:26:52', '2025-03-22 17:26:52', NULL),
-('28016', 'ONIC Jersey', NULL, 'uploads/Onic Esports Jersey.png', 450.00, 15, 'Esports', '2025-03-22 15:27:56', '2025-03-22 15:27:56', NULL),
-('28064', 'Black Panthers', NULL, 'uploads/BPP.png', 450.00, 15, 'Basketball', '2025-04-04 08:13:28', '2025-04-04 08:13:28', NULL),
-('34833', 'NBA All Stars', NULL, 'uploads/All-Star NBA.png', 400.00, 17, 'Basketball', '2025-03-23 11:10:38', '2025-03-23 11:10:38', NULL),
-('59101', 'Burmese Ghouls Jersey', NULL, 'uploads/Burmese Ghouls Jersey.png', 450.00, 15, 'Esports', '2025-03-22 15:13:26', '2025-03-22 15:13:26', NULL),
-('86596', 'Nextplay EVOS Jersey', NULL, 'uploads/Nextplay Evos Jersey.png', 400.00, 15, 'Esports', '2025-03-22 15:11:24', '2025-03-22 15:11:24', NULL);
+('11017', 'Milwaukee Bucks Jersey', NULL, 'uploads/Bucks.png', '400.00', 15, 'Basketball', '2025-03-22 15:23:14', '2025-03-22 15:23:14', NULL),
+('23547', 'Marvel 616 Jersey', NULL, 'uploads/Marvel 616 Esports Jersey.png', '400.00', 15, 'Esports', '2025-03-22 15:10:42', '2025-03-22 15:10:42', NULL),
+('27428', 'Techbeast: Green Wolves', NULL, 'uploads/Teachbest Athletics Green Wolves.png', '400.00', 15, 'Basketball', '2025-03-22 17:26:52', '2025-03-22 17:26:52', NULL),
+('28016', 'ONIC Jersey', NULL, 'uploads/Onic Esports Jersey.png', '450.00', 15, 'Esports', '2025-03-22 15:27:56', '2025-03-22 15:27:56', NULL),
+('28064', 'Black Panthers', NULL, 'uploads/BPP.png', '450.00', 15, 'Basketball', '2025-04-04 08:13:28', '2025-04-04 08:13:28', NULL),
+('34833', 'NBA All Stars', NULL, 'uploads/All-Star NBA.png', '400.00', 17, 'Basketball', '2025-03-23 11:10:38', '2025-03-23 11:10:38', NULL),
+('59101', 'Burmese Ghouls Jersey', NULL, 'uploads/Burmese Ghouls Jersey.png', '450.00', 15, 'Esports', '2025-03-22 15:13:26', '2025-03-22 15:13:26', NULL),
+('86596', 'Nextplay EVOS Jersey', NULL, 'uploads/Nextplay Evos Jersey.png', '400.00', 15, 'Esports', '2025-03-22 15:11:24', '2025-03-22 15:11:24', NULL);
 
 -- --------------------------------------------------------
 
@@ -381,6 +904,50 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `first_name`, `
 (18, 'staff', '$2y$10$mmdLQ3H/3bCHJtqdB3kG9eYIegvFfke3CtWKLRTBVNxGB25MXzCWa', 'rod@gmail.com', 'Rodielyn', 'Boncales', '097867856434', 'Staff', '2025-03-26 04:24:19', '2025-03-26 04:24:19'),
 (19, 'manager', '$2y$10$q9bG..tbxB57Z6SqW408BOsAlYjiMbhFWcSAycYE.NOCUm20Ykogy', 'esnyr@gmail.com', 'Esnyr', 'Ranollo', '09551224455', 'Manager', '2025-04-11 04:31:11', '2025-04-11 04:31:11');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+CREATE TABLE `user_sessions` (
+  `session_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expiry` datetime NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_sessions`
+--
+
+INSERT INTO `user_sessions` (`session_id`, `customer_id`, `token`, `expiry`, `created_at`, `updated_at`) VALUES
+(1, 2093, '0329e387063003963e60a54b9205d5de36f8cdfa12ee1ca73f6d30e0c8eae29e', '2025-06-12 18:19:58', '2025-05-14 00:19:58', '2025-05-14 00:19:58'),
+(2, 2452, 'e3027dab0dd8126e099a00042d7778f8875649ee5a47a04b492db0f1188820f2', '2025-06-12 18:59:37', '2025-05-14 00:59:37', '2025-05-14 00:59:37'),
+(3, 2452, '3157406b4abbd0750d20ceb5ad35b4f2f8169cba254717ed2d3902f1e23b8aaf', '2025-06-13 10:57:23', '2025-05-14 16:57:23', '2025-05-14 16:57:23'),
+(4, 2452, '666aed074bcafb40c688d6df0c52dcbe8c5ca827262f1edca0115be7916e41fc', '2025-06-13 11:49:46', '2025-05-14 17:49:46', '2025-05-14 17:49:46'),
+(5, 2452, 'dd7b387be94d9d0e2ea0e6717b270a17a69241acf549d6541363fdc88d7205ff', '2025-06-13 11:50:17', '2025-05-14 17:50:17', '2025-05-14 17:50:17'),
+(6, 2452, 'f516a2951dc8f1a64c69d826bd6658efb9d5a5b4ce211705c2e46e1cda225259', '2025-06-13 12:27:53', '2025-05-14 18:27:53', '2025-05-14 18:27:53'),
+(7, 2452, 'e29674649dedd6fb0f6c544956c17017e17a78c9e0a4312bb6889ccb749e2111', '2025-06-13 12:33:09', '2025-05-14 18:33:09', '2025-05-14 18:33:09'),
+(8, 2452, '7fe073dae5a30e2b38197b113105d7acca16482d6fe1b24b0a9e853a7cf21b4e', '2025-06-13 12:46:02', '2025-05-14 18:46:02', '2025-05-14 18:46:02'),
+(9, 2452, '80f901a6165016fc51d9cda460cc6bef8fb7e4e4863a07b1e02137ecb53ff34c', '2025-06-14 07:29:45', '2025-05-15 13:29:45', '2025-05-15 13:29:45'),
+(10, 2452, '2f031686eac482c7b0117023c0e00a38246afd35bcf0a1c632b9c074a3cd37db', '2025-06-18 06:00:31', '2025-05-19 12:00:31', '2025-05-19 12:00:31'),
+(11, 2452, '58811114aad4fb1905c81cc1b5f4a804ccf6a4d0075526c99102dbd66a983684', '2025-06-18 13:50:15', '2025-05-19 19:50:15', '2025-05-19 19:50:15'),
+(12, 2621, '17c89455abed3bc4baf8224f4ded492204406b1c337511abbaab83f80cd918de', '2025-06-18 14:00:24', '2025-05-19 20:00:24', '2025-05-19 20:00:24'),
+(13, 2452, '6afff6918817052fc4ae32e9212e3ede9e394bbe176598c67d6bf629c0b87a5b', '2025-06-19 10:41:02', '2025-05-20 16:41:02', '2025-05-20 16:41:02'),
+(14, 2452, 'c817cce8dfbaedd6627c6523b1a6834e925479cc1f3f1c521d33ba6611948bfa', '2025-06-19 11:02:59', '2025-05-20 17:02:59', '2025-05-20 17:02:59'),
+(15, 2621, '45e1195e488b31e01983647b65da9554bb536f9e4e4f983a60bfefd8638c450b', '2025-06-19 11:08:26', '2025-05-20 17:08:26', '2025-05-20 17:08:26'),
+(16, 2621, 'b65eaa1e49949194cb0ec85d75f8880943d0157192f77fb7afb90567034952bc', '2025-06-19 12:02:52', '2025-05-20 18:02:52', '2025-05-20 18:02:52'),
+(17, 2621, '1db7b5ff1b9cf49bff2b6b0522de5070e2845e10399069063757c2abc75e40fe', '2025-06-19 12:05:47', '2025-05-20 18:05:47', '2025-05-20 18:05:47'),
+(18, 2621, 'cac9d185d2963588c0f09cca8569ad59e712b76c5412c2c10131f5e5b5c52450', '2025-06-19 12:13:16', '2025-05-20 18:13:16', '2025-05-20 18:13:16'),
+(19, 2452, '2babc752a74fbf704ad65ef9d4317a23838aaa46d225e13ef3f31410b3b39863', '2025-06-19 12:22:41', '2025-05-20 18:22:41', '2025-05-20 18:22:41'),
+(20, 2452, '9267ea3ba25a31fb5ba59567645dc42881e64335bb24900359ec533db985b720', '2025-06-19 12:24:54', '2025-05-20 18:24:54', '2025-05-20 18:24:54'),
+(21, 8743, '4088eaf4fd900a09e4c6d0ea7473eb5b36f4f4e09c149eb2bab723b4bac856b1', '2025-06-19 12:54:05', '2025-05-20 18:54:05', '2025-05-20 18:54:05'),
+(22, 8743, 'f114c2dbb11dd08318d36242ca9f6ebbb8f1084f39cfcc5ce7dc680dbbf91257', '2025-06-19 12:54:31', '2025-05-20 18:54:31', '2025-05-20 18:54:31'),
+(23, 2452, '917536164963ceb1ec64b8a3e3288b24aafc718981fd121ed975502df60727cc', '2025-06-19 13:11:23', '2025-05-20 19:11:23', '2025-05-20 19:11:23');
+
 --
 -- Indexes for dumped tables
 --
@@ -392,6 +959,13 @@ ALTER TABLE `activity_logs`
   ADD PRIMARY KEY (`log_id`);
 
 --
+-- Indexes for table `alterations`
+--
+ALTER TABLE `alterations`
+  ADD PRIMARY KEY (`alteration_id`),
+  ADD KEY `alterations_fk_order` (`order_id`);
+
+--
 -- Indexes for table `customers`
 --
 ALTER TABLE `customers`
@@ -400,12 +974,33 @@ ALTER TABLE `customers`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `custom_made`
+--
+ALTER TABLE `custom_made`
+  ADD PRIMARY KEY (`custom_id`),
+  ADD KEY `custom_made_fk_order` (`order_id`);
+
+--
 -- Indexes for table `declined_orders`
 --
 ALTER TABLE `declined_orders`
   ADD PRIMARY KEY (`decline_id`),
   ADD KEY `declined_by` (`declined_by`),
   ADD KEY `declined_orders_ibfk_1` (`order_id`);
+
+--
+-- Indexes for table `login_attempts`
+--
+ALTER TABLE `login_attempts`
+  ADD PRIMARY KEY (`attempt_id`);
+
+--
+-- Indexes for table `notes`
+--
+ALTER TABLE `notes`
+  ADD PRIMARY KEY (`note_id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `notifications`
@@ -441,6 +1036,12 @@ ALTER TABLE `payments`
   ADD KEY `payments_ibfk_1` (`order_id`);
 
 --
+-- Indexes for table `payment_history`
+--
+ALTER TABLE `payment_history`
+  ADD PRIMARY KEY (`history_id`);
+
+--
 -- Indexes for table `staff_notifications`
 --
 ALTER TABLE `staff_notifications`
@@ -462,7 +1063,8 @@ ALTER TABLE `sublimation_orders`
 --
 ALTER TABLE `sublimation_players`
   ADD PRIMARY KEY (`player_id`),
-  ADD KEY `sublimation_id` (`sublimation_id`);
+  ADD KEY `sublimation_id` (`sublimation_id`),
+  ADD KEY `fk_order_id` (`order_id`);
 
 --
 -- Indexes for table `tailoring_orders`
@@ -487,6 +1089,14 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD PRIMARY KEY (`session_id`),
+  ADD UNIQUE KEY `unique_token` (`token`),
+  ADD KEY `customer_sessions` (`customer_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -494,13 +1104,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `alterations`
+--
+ALTER TABLE `alterations`
+  MODIFY `alteration_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8740;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8744;
+
+--
+-- AUTO_INCREMENT for table `custom_made`
+--
+ALTER TABLE `custom_made`
+  MODIFY `custom_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `declined_orders`
@@ -509,34 +1131,52 @@ ALTER TABLE `declined_orders`
   MODIFY `decline_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `login_attempts`
+--
+ALTER TABLE `login_attempts`
+  MODIFY `attempt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+
+--
+-- AUTO_INCREMENT for table `notes`
+--
+ALTER TABLE `notes`
+  MODIFY `note_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `order_status_history`
 --
 ALTER TABLE `order_status_history`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT for table `payment_history`
+--
+ALTER TABLE `payment_history`
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `staff_notifications`
 --
 ALTER TABLE `staff_notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `sublimation_orders`
 --
 ALTER TABLE `sublimation_orders`
-  MODIFY `sublimation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `sublimation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `sublimation_players`
@@ -548,7 +1188,7 @@ ALTER TABLE `sublimation_players`
 -- AUTO_INCREMENT for table `tailoring_orders`
 --
 ALTER TABLE `tailoring_orders`
-  MODIFY `tailoring_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `tailoring_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -557,8 +1197,26 @@ ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
+-- AUTO_INCREMENT for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `alterations`
+--
+ALTER TABLE `alterations`
+  ADD CONSTRAINT `alterations_fk_order` FOREIGN KEY (`order_id`) REFERENCES `tailoring_orders` (`order_id`);
+
+--
+-- Constraints for table `custom_made`
+--
+ALTER TABLE `custom_made`
+  ADD CONSTRAINT `custom_made_fk_order` FOREIGN KEY (`order_id`) REFERENCES `tailoring_orders` (`order_id`);
 
 --
 -- Constraints for table `declined_orders`
@@ -566,6 +1224,13 @@ ALTER TABLE `users`
 ALTER TABLE `declined_orders`
   ADD CONSTRAINT `declined_orders_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
   ADD CONSTRAINT `declined_orders_ibfk_2` FOREIGN KEY (`declined_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `notes`
+--
+ALTER TABLE `notes`
+  ADD CONSTRAINT `fk_notes_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_notes_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `notifications`
@@ -616,6 +1281,7 @@ ALTER TABLE `sublimation_orders`
 -- Constraints for table `sublimation_players`
 --
 ALTER TABLE `sublimation_players`
+  ADD CONSTRAINT `fk_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `sublimation_players_ibfk_1` FOREIGN KEY (`sublimation_id`) REFERENCES `sublimation_orders` (`sublimation_id`) ON DELETE CASCADE;
 
 --
@@ -629,6 +1295,12 @@ ALTER TABLE `tailoring_orders`
 --
 ALTER TABLE `templates`
   ADD CONSTRAINT `templates_ibfk_1` FOREIGN KEY (`added_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD CONSTRAINT `fk_customer_sessions` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

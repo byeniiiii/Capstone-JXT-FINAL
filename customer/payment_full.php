@@ -16,6 +16,10 @@ $order_id = '';
 $order = null;
 $remaining_balance = 0;
 
+// Get all staff members
+$staff_query = "SELECT user_id, CONCAT(first_name, ' ', last_name) as staff_name FROM users WHERE role = 'staff'";
+$staff_result = mysqli_query($conn, $staff_query);
+
 // Get order details if order_id is provided
 if (isset($_GET['order_id']) && !empty($_GET['order_id'])) {
     $order_id = mysqli_real_escape_string($conn, $_GET['order_id']);
@@ -47,6 +51,28 @@ if (isset($_GET['order_id']) && !empty($_GET['order_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_payment'])) {
     $payment_method = mysqli_real_escape_string($conn, $_POST['payment_method']);
     $payment_reference = isset($_POST['payment_reference']) ? mysqli_real_escape_string($conn, $_POST['payment_reference']) : '';
+    $received_by = isset($_POST['received_by']) ? mysqli_real_escape_string($conn, $_POST['received_by']) : NULL;
+    
+    // Handle file upload for GCash
+    $screenshot_path = '';
+    if ($payment_method === 'gcash' && isset($_FILES['payment_screenshots'])) {
+        $file = $_FILES['payment_screenshots'];
+        $file_name = time() . '_' . $file['name'];
+        $target_dir = "../uploads/payments_screenshots/";
+        
+        // Create directory if it doesn't exist
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+        
+        $target_file = $target_dir . $file_name;
+        
+        if (move_uploaded_file($file['tmp_name'], $target_file)) {
+            $screenshot_path = 'uploads/payments/' . $file_name;
+        } else {
+            throw new Exception("Failed to upload payment screenshot");
+        }
+    }
     
     // Start transaction
     mysqli_begin_transaction($conn);
@@ -67,11 +93,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_payment'])) {
         
         // Record the payment
         $payment_query = "INSERT INTO payments 
-                             (order_id, amount, payment_method, transaction_reference, payment_type, payment_date, received_by) 
-                         VALUES (?, ?, ?, ?, 'full', NOW(), NULL)";
-        
+                         (order_id, amount, payment_method, transaction_reference, 
+                          payment_type, payment_date, received_by, screenshot_path) 
+                     VALUES (?, ?, ?, ?, 'full', NOW(), ?, ?)";
+    
         $stmt = mysqli_prepare($conn, $payment_query);
-        mysqli_stmt_bind_param($stmt, "sdss", $order_id, $remaining_balance, $payment_method, $payment_reference);
+        mysqli_stmt_bind_param($stmt, "sdssss", $order_id, $remaining_balance, 
+                          $payment_method, $payment_reference, $received_by, $screenshot_path);
         
         if (!mysqli_stmt_execute($stmt)) {
             throw new Exception("Failed to record payment");
@@ -379,6 +407,27 @@ if ($order) {
             margin-top: 25px;
             text-align: center;
         }
+
+        .form-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        #payment_screenshot {
+            border: 1px solid #ced4da;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        #received_by {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -570,7 +619,7 @@ if ($order) {
                             <div class="payment-options">
                                 <h5 class="mb-4">Payment Method</h5>
                                 
-                                <form method="post" id="paymentForm">
+                                <form method="post" id="paymentForm" enctype="multipart/form-data">
                                     <div class="payment-method">
                                         <input type="radio" class="method-input" name="payment_method" id="cash" value="cash" required>
                                         <label class="method-label" for="cash">
@@ -582,6 +631,24 @@ if ($order) {
                                                 <p class="method-description">Pay in cash when you pick up your order.</p>
                                             </div>
                                         </label>
+                                        
+                                        <div class="payment-details" id="cash-details">
+                                            <div class="mb-3">
+                                                <label for="received_by" class="form-label">Received By</label>
+                                                <select class="form-control" id="received_by" name="received_by">
+                                                    <option value="">Select Staff Member</option>
+                                                    <?php
+                                                    $staff_query = "SELECT user_id, CONCAT(first_name, ' ', last_name) as staff_name 
+                                                                  FROM users WHERE role = 'staff'";
+                                                    $staff_result = mysqli_query($conn, $staff_query);
+                                                    while ($staff = mysqli_fetch_assoc($staff_result)) {
+                                                        echo "<option value='" . $staff['user_id'] . "'>" . 
+                                                             htmlspecialchars($staff['staff_name']) . "</option>";
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                     
                                     <div class="payment-method">
@@ -605,11 +672,19 @@ if ($order) {
                                                     <p class="mb-2">Please scan the QR code or use the following details:</p>
                                                     <p class="mb-1"><strong>Account Name:</strong> JX Tailoring</p>
                                                     <p class="mb-1"><strong>Mobile Number:</strong> 09123456789</p>
-                                                    <p class="mb-3 small text-muted">After sending payment, please enter the reference number below.</p>
+                                                    <p class="mb-3 small text-muted">After sending payment, please provide the following:</p>
                                                     
                                                     <div class="mb-3">
                                                         <label for="gcash-reference" class="form-label">GCash Reference Number</label>
-                                                        <input type="text" class="form-control" id="gcash-reference" name="payment_reference" placeholder="e.g. 1234567890">
+                                                        <input type="text" class="form-control" id="gcash-reference" 
+                                                               name="payment_reference" placeholder="e.g. 1234567890">
+                                                    </div>
+                                                    
+                                                    <div class="mb-3">
+                                                        <label for="payment_screenshot" class="form-label">Upload Payment Screenshot</label>
+                                                        <input type="file" class="form-control" id="payment_screenshot" 
+                                                               name="payment_screenshot" accept="image/*">
+                                                        <div class="form-text">Please upload a screenshot of your GCash payment confirmation.</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1039,27 +1114,64 @@ if ($order) {
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Show/hide payment details based on selected method
             const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
             const gcashDetails = document.getElementById('gcash-details');
-            const bankDetails = document.getElementById('bank-details');
+            const cashDetails = document.getElementById('cash-details');
             const gcashReference = document.getElementById('gcash-reference');
-            const bankReference = document.getElementById('bank-reference');
+            const paymentScreenshot = document.getElementById('payment_screenshot');
+            const receivedBy = document.getElementById('received_by');
             
             paymentMethods.forEach(function(method) {
                 method.addEventListener('change', function() {
                     // Hide all details first
                     gcashDetails.style.display = 'none';
-                    bankDetails.style.display = 'none';
+                    cashDetails.style.display = 'none';
+                    
+                    // Reset required fields
                     gcashReference.required = false;
-                    bankReference.required = false;
+                    paymentScreenshot.required = false;
+                    receivedBy.required = false;
                     
                     // Show selected method details
                     if (this.id === 'gcash') {
                         gcashDetails.style.display = 'block';
                         gcashReference.required = true;
+                        paymentScreenshot.required = true;
+                    } else if (this.id === 'cash') {
+                        cashDetails.style.display = 'block';
+                        receivedBy.required = true;
                     }
                 });
+            });
+            
+            // Form validation
+            document.getElementById('paymentForm').addEventListener('submit', function(e) {
+                const selectedMethod = document.querySelector('input[name="payment_method"]:checked');
+                
+                if (!selectedMethod) {
+                    e.preventDefault();
+                    alert('Please select a payment method');
+                    return;
+                }
+                
+                if (selectedMethod.value === 'gcash') {
+                    if (!gcashReference.value.trim()) {
+                        e.preventDefault();
+                        alert('Please enter the GCash reference number');
+                        return;
+                    }
+                    if (!paymentScreenshot.files.length) {
+                        e.preventDefault();
+                        alert('Please upload a payment screenshot');
+                        return;
+                    }
+                } else if (selectedMethod.value === 'cash') {
+                    if (!receivedBy.value) {
+                        e.preventDefault();
+                        alert('Please select the staff member who received the payment');
+                        return;
+                    }
+                }
             });
         });
     </script>

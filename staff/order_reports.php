@@ -1,27 +1,8 @@
 <?php
-/**
- * Authentication check for staff pages
- * This file verifies that the user is logged in and has appropriate staff permissions
- */
+session_start();
 
-// Debug session
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Make sure session is started (although it should be started in the including file)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Debug session variables
-var_dump($_SESSION);
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
-    // Debug redirect
-    echo "Redirecting to index.php because: ";
-    if (!isset($_SESSION['user_id'])) echo "No user_id in session. ";
-    if (!isset($_SESSION['role'])) echo "No role in session.";
+// If the user is not logged in, redirect to index.php
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../index.php");
     exit();
 }
@@ -29,8 +10,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
 // Check if user has staff permissions (all roles except Customer)
 $allowed_roles = ['Admin', 'Manager', 'Tailor', 'Staff', 'Sublimator'];
 if (!in_array($_SESSION['role'], $allowed_roles)) {
-    // Debug redirect
-    echo "Redirecting to index.php because role " . $_SESSION['role'] . " is not allowed.";
     header("Location: ../index.php?error=insufficient_permissions");
     exit();
 }
@@ -82,12 +61,12 @@ $where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_c
 $query = "SELECT o.*, c.first_name, c.last_name, c.phone_number,
           u.first_name AS staff_fname, u.last_name AS staff_lname,
           m.first_name AS manager_fname, m.last_name AS manager_lname,
-          p.method AS payment_method
+          p.payment_method AS payment_method
           FROM orders o
           LEFT JOIN customers c ON o.customer_id = c.customer_id
           LEFT JOIN users u ON o.staff_id = u.user_id
           LEFT JOIN users m ON o.manager_id = m.user_id
-          LEFT JOIN payments p ON o.payment_id = p.payment_id
+          LEFT JOIN payments p ON p.order_id = o.order_id
           $where_clause
           ORDER BY o.created_at DESC";
 
@@ -115,7 +94,10 @@ $status_result = $conn->query($status_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Reports - JX Tailoring</title>
-    <?php include 'includes/header_scripts.php'; ?>
+    <!-- Replace includes/header_scripts.php with direct links to CSS and JS files -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">
@@ -238,11 +220,20 @@ $status_result = $conn->query($status_query);
                     </div>
                 </div>
             </div>
-            <?php include 'includes/footer.php'; ?>
+            <?php include 'footer.php'; ?>
         </div>
     </div>
     
-    <?php include 'includes/scripts.php'; ?>
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>

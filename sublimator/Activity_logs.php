@@ -10,10 +10,14 @@ if (!isset($_SESSION['user_id'])) {
 // Include database connection
 include '../db.php';
 
-// Fetch activity logs with user information
+// Get the current user's ID
+$user_id = $_SESSION['user_id'];
+
+// Fetch activity logs with user information - sublimators only see their own logs
 $query = "SELECT l.*, CONCAT(u.first_name, ' ', u.last_name) as user_name 
           FROM activity_logs l 
           LEFT JOIN users u ON l.user_id = u.user_id 
+          WHERE l.user_id = $user_id
           ORDER BY l.created_at DESC";
 $result = mysqli_query($conn, $query);
 
@@ -167,7 +171,6 @@ $templateResult = mysqli_query($conn, $sql);
                                             <th>Type</th>
                                             <th>Action</th>
                                             <th>Description</th>
-                                            <th>IP Address</th>
                                             <th>Timestamp</th>
                                         </tr>
                                     </thead>
@@ -194,12 +197,11 @@ $templateResult = mysqli_query($conn, $sql);
                                                         </span>
                                                     </td>
                                                     <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                                    <td><small><?php echo htmlspecialchars($row['ip_address']); ?></small></td>
                                                     <td><?php echo date('M d, Y h:i A', strtotime($row['created_at'])); ?></td>
                                                 </tr>
                                             <?php }
                                         } else { ?>
-                                            <tr><td colspan="7" class="text-center">No activity logs found</td></tr>
+                                            <tr><td colspan="6" class="text-center">No activity logs found</td></tr>
                                         <?php } ?>
                                     </tbody>
                                 </table>
@@ -221,7 +223,7 @@ $templateResult = mysqli_query($conn, $sql);
                 <script>
                     $(document).ready(function() {
                         $('#activityTable').DataTable({
-                            order: [[6, 'desc']],
+                            order: [[5, 'desc']],
                             pageLength: 7,
                             responsive: true,
                             dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',

@@ -1,11 +1,6 @@
 <?php
 // No need to start session here as it's already started in the parent file
-
-// Ensure user is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'sublimator') {
-    header("Location: ../index.php");
-    exit();
-}
+// No need to check authentication as it's already done in the parent file
 ?>
 
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">

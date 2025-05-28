@@ -1,0 +1,8 @@
+[28-May-2025 13:14:24 Europe/Berlin] PHP Warning:  include(notification.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 210
+[28-May-2025 13:14:24 Europe/Berlin] PHP Warning:  include(): Failed opening 'notification.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 210
+[28-May-2025 13:14:24 Europe/Berlin] PHP Warning:  include(footer.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 417
+[28-May-2025 13:14:24 Europe/Berlin] PHP Warning:  include(): Failed opening 'footer.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 417
+[28-May-2025 13:14:59 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string - int in C:\xampp\htdocs\capstone_jxt\admin\approve_payments.php:631
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\admin\approve_payments.php on line 631

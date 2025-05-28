@@ -937,6 +937,17 @@ function markCompleted(orderId) {
 
 // Function to mark an order as in process
 function markInProcess(orderId) {
+    // Show loading state while checking
+    Swal.fire({
+        title: 'Checking order...',
+        text: 'Verifying if order can be processed',
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        showConfirmButton: false
+    });
+
     // First check if the order meets the conditions: partial payment and approved status
     $.ajax({
         url: 'check_order_status.php',
@@ -946,12 +957,15 @@ function markInProcess(orderId) {
         },
         success: function(response) {
             try {
+                console.log('Raw response:', response);
                 const data = typeof response === 'string' ? JSON.parse(response) : response;
+                // Log all data for debugging
+                console.log('Order Check Response:', data);
                 
-                // Check if order is approved and has partial payment
-                if (data.status === 'success' && data.order_status === 'approved' && 
-                   (data.payment_status === 'partial' || data.payment_status === 'downpayment_paid' || data.payment_status === 'fully_paid')) {
-                    
+                // Close the loading dialog
+                Swal.close();
+                
+                if (data.status === 'success' && data.can_process === true) {
                     // Proceed with the confirmation dialog
                     Swal.fire({
                         title: 'Mark as In Process?',
@@ -973,21 +987,20 @@ function markInProcess(orderId) {
                                 allowOutsideClick: false,
                                 showConfirmButton: false
                             });
-                            
                             // Send AJAX request
                             $.ajax({
                                 url: 'update_order_status.php',
                                 type: 'POST',
                                 data: {
                                     order_id: orderId,
-                                    status: 'in_process',
+                                    new_status: 'in_process',
                                     notes: 'Order moved to production.'
                                 },
-                                success: function(response) {
+                                success: function(updateResponse) {
+                                    console.log('Update response:', updateResponse);
                                     try {
-                                        const data = typeof response === 'string' ? JSON.parse(response) : response;
-                                        
-                                        if (data.status === 'success') {
+                                        const updateData = typeof updateResponse === 'string' ? JSON.parse(updateResponse) : updateResponse;
+                                        if (updateData.status === 'success' || updateData.success === true) {
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: 'Status Updated!',
@@ -1001,28 +1014,17 @@ function markInProcess(orderId) {
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Error',
-                                                text: data.message || 'An error occurred while updating status.'
+                                                text: updateData.message || 'An error occurred while updating status.'
                                             });
                                         }
                                     } catch(e) {
+                                        console.error("Error parsing update response:", e, updateResponse);
                                         // Handle non-JSON responses
-                                        if (response === 'success') {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Status Updated!',
-                                                text: 'Order has been marked as in process.',
-                                                showConfirmButton: false,
-                                                timer: 1500
-                                            }).then(() => {
-                                                location.reload();
-                                            });
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error',
-                                                text: 'An error occurred while updating status: ' + response
-                                            });
-                                        }
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'An error occurred while updating status. Please try again.'
+                                        });
                                     }
                                 },
                                 error: function(xhr, status, error) {
@@ -1037,19 +1039,21 @@ function markInProcess(orderId) {
                         }
                     });
                 } else {
-                    // Show error message about conditions not being met
-                    let message = "This order cannot be marked as in process. ";
-                    if (data.order_status !== 'approved') {
-                        message += "Order must be in 'Approved' status. ";
+                    // Show error message from the server with more detail
+                    let errorMessage = "This order cannot be processed at this time.";
+                    
+                    if (data.reason) {
+                        errorMessage = data.reason;
                     }
-                    if (data.payment_status !== 'partial' && data.payment_status !== 'downpayment_paid') {
-                        message += "Order must have a partial payment or downpayment.";
-                    }
+                    
+                    errorMessage += "\n\nDebug info:";
+                    errorMessage += "\nOrder status: " + data.order_status;
+                    errorMessage += "\nPayment status: " + data.payment_status;
                     
                     Swal.fire({
                         icon: 'warning',
                         title: 'Cannot Process Order',
-                        text: message,
+                        text: errorMessage,
                         confirmButtonColor: '#3085d6'
                     });
                 }
@@ -1058,7 +1062,7 @@ function markInProcess(orderId) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Could not verify order status. Please try again.'
+                    text: 'Could not verify order status: ' + e.message
                 });
             }
         },
@@ -1103,14 +1107,14 @@ function markReady(orderId) {
                 type: 'POST',
                 data: {
                     order_id: orderId,
-                    status: 'ready_for_pickup',
+                    new_status: 'ready_for_pickup',
                     notes: 'Order is ready for pickup.'
                 },
                 success: function(response) {
                     try {
                         const data = typeof response === 'string' ? JSON.parse(response) : response;
                         
-                        if (data.status === 'success') {
+                        if (data.status === 'success' || data.success === true) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Status Updated!',
@@ -1242,84 +1246,3 @@ function markReady(orderId) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
-    <?php
-    // Start transaction
-    $conn->begin_transaction();
-    
-    try {
-        // Update the order status to completed
-        $update_order = "UPDATE orders SET 
-                        order_status = 'completed',
-                        -- completed_at = NOW(),
-                        -- completed_by = ?,
-                        updated_at = NOW()
-                        WHERE order_id = ?";
-                        
-        $stmt = $conn->prepare($update_order);
-        if (!$stmt) {
-            throw new Exception("Failed to prepare statement: " . $conn->error);
-        }
-        
-        // Make sure $user_id and $order_id are defined and not null
-        if (isset($user_id) || isset( $order_id)) {
-            throw new Exception("User ID or Order ID is missing");
-        }
-        
-        $stmt->bind_param("is", $user_id, $order_id);
-        
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to update order status: " . $stmt->error);
-        }
-        
-        // Get customer details for notification
-        $customer_query = "SELECT c.customer_id, c.first_name, c.last_name, o.order_type 
-                          FROM orders o
-                          JOIN customers c ON o.customer_id = c.customer_id
-                          WHERE o.order_id = ?";
-                          
-        $stmt = $conn->prepare($customer_query);
-        $stmt->bind_param("s", $order_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $customer_data = $result->fetch_assoc();
-        
-        if (!$customer_data) {
-            throw new Exception("Customer information not found");
-        }
-        
-        // Create a notification for the customer
-        $title = "Order Completed";
-        $message = "Great news! Your " . ucfirst($customer_data['order_type']) . " order (#$order_id) has been marked as completed.";
-        
-        $notification_query = "INSERT INTO notifications (customer_id, order_id, title, message, created_at) 
-                              VALUES (?, ?, ?, ?, NOW())";
-                              
-        $stmt = $conn->prepare($notification_query);
-        $stmt->bind_param("isss", $customer_data['customer_id'], $order_id, $title, $message);
-        
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to create notification");
-        }
-        
-        // Optional: Add a note about the completion
-        $note = "Order marked as completed by " . $_SESSION['first_name'] . " " . ($_SESSION['last_name'] ?? '');
-        $note_query = "INSERT INTO notes (order_id, user_id, note, created_at)
-                      VALUES (?, ?, ?, NOW())";
-                      
-        $stmt = $conn->prepare($note_query);
-        $stmt->bind_param("sis", $order_id, $user_id, $note);
-        $stmt->execute(); // We don't need to throw an exception if this fails
-        
-        // Commit the transaction
-        $conn->commit();
-        
-        echo json_encode(['status' => 'success', 'message' => 'Order marked as completed successfully']);
-        
-    } catch (Exception $e) {
-        // Rollback the transaction on error
-        $conn->rollback();
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    }
-
-?>
-</script>
