@@ -10,10 +10,27 @@ if (!isset($_SESSION['user_id'])) {
 // Include database connection
 include '../db.php';
 
-// Fetch made-to-order items with user information
-$sql = "SELECT m.*, u.first_name, u.last_name FROM made_to_order m 
-        LEFT JOIN users u ON m.user_id = u.user_id 
-        ORDER BY m.created_at DESC";
+// Create the made-to-orders table if it doesn't exist
+$createTableSQL = "CREATE TABLE IF NOT EXISTS made_to_orders (
+    mto_id INT AUTO_INCREMENT PRIMARY KEY,
+    category ENUM('band_uniform', 'security_uniform', 'school_uniform', 'other') NOT NULL,
+    subcategory VARCHAR(100),
+    description TEXT,
+    staff_id INT NOT NULL,
+    labor DECIMAL(10,2),
+    full_order DECIMAL(10,2),
+    reference_image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_staff_id FOREIGN KEY (staff_id) REFERENCES users(user_id)
+)";
+
+// Execute the query to create the table
+mysqli_query($conn, $createTableSQL);
+
+// Fetch made-to-order items without user information for now
+$sql = "SELECT * FROM made_to_orders 
+        ORDER BY created_at DESC";
 $mtoResult = mysqli_query($conn, $sql);
 ?>
 
@@ -248,8 +265,6 @@ $mtoResult = mysqli_query($conn, $sql);
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <?php include 'sidebar.php'; ?>
-                
                 <!-- Message Alerts -->
                 <?php if (isset($_GET['error'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show mx-4 mt-4" role="alert">

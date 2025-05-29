@@ -49,10 +49,10 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="JX Tailoring Staff Dashboard">
+    <meta name="description" content="JXT Tailoring Staff Dashboard">
     <meta name="author" content="">
     <link rel="icon" type="image/png" href="../image/logo.png">
-    <title>JX Tailoring - Staff Dashboard</title>
+    <title>JXT Tailoring - Staff Dashboard</title>
 
     <!-- Custom fonts -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
@@ -641,7 +641,7 @@ $weekly_income = $weekly_income_result->fetch_assoc()['weekly'] ?? 0;
 
                 <!-- Footer -->
                 <footer class="footer text-center py-3">
-                    <span>Copyright &copy; JX Tailoring and Printing Services <?php echo date('Y'); ?></span>
+                    <span>Copyright &copy; JXT Tailoring and Printing Services <?php echo date('Y'); ?></span>
                 </footer>
                 <!-- End of Footer -->
             </div>

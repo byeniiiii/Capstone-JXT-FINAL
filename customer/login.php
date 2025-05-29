@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Login | JX Tailoring</title>
+    <title>Customer Login | JXT Tailoring</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
                     <i class="fas fa-tshirt text-xl"></i>
                 </div>
-                <h1 class="text-2xl font-semibold text-gray-800">JX Tailoring</h1>
+                <h1 class="text-2xl font-semibold text-gray-800">JXT Tailoring</h1>
             </div>
             
             <!-- Login Form Card -->

@@ -426,3 +426,62 @@ Stack trace:
 [29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(): Failed opening 'includes/footer.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 244
 [29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(includes/scripts.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 248
 [29-May-2025 00:28:00 Europe/Berlin] PHP Warning:  include(): Failed opening 'includes/scripts.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\staff\order_reports.php on line 248
+[29-May-2025 05:11:41 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function formatStatus() in C:\xampp\htdocs\capstone_jxt\staff\view_order.php:1579
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\view_order.php on line 1579
+[29-May-2025 07:06:02 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:22:25 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.customer_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:22:37 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.staff_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:22:38 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.staff_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:35:07 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:35:08 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:35:08 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.user_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:36:08 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.staff_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:36:09 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.staff_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:36:09 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.staff_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17
+[29-May-2025 07:36:10 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'm.staff_id' in 'on clause' in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php:17
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php(17): mysqli_query(Object(mysqli), 'SELECT m.*, u.f...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\staff\custom_orders.php on line 17

@@ -277,3 +277,23 @@
 [29-May-2025 00:24:01 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
 [29-May-2025 00:24:01 Europe/Berlin] Checking if order exists: 2EH7XGV3UA - Found: 1
 [29-May-2025 00:24:01 Europe/Berlin] Updating existing sublimation order: 2EH7XGV3UA
+[29-May-2025 05:23:11 Europe/Berlin] Session data: Array
+(
+    [user_id] => 18
+    [role] => Staff
+    [first_name] => Rodielyn
+    [last_name] => Boncales
+    [csrf_token] => 9853f1f9d64397fa6d18c6f95ae32197c7c07b7ec2b56356ececac77d4c90d74
+)
+
+[29-May-2025 05:23:11 Europe/Berlin] POST data: Array
+(
+    [order_id] => QUYG5GMKTO
+    [sublimator_id] => 15
+    [notes] => Auto-assigned to template creator: Jane Doe
+    [csrf_token] => 9853f1f9d64397fa6d18c6f95ae32197c7c07b7ec2b56356ececac77d4c90d74
+)
+
+[29-May-2025 05:23:11 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
+[29-May-2025 05:23:11 Europe/Berlin] Checking if order exists: QUYG5GMKTO - Found: 1
+[29-May-2025 05:23:11 Europe/Berlin] Updating existing sublimation order: QUYG5GMKTO

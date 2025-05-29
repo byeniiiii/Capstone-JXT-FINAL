@@ -79,7 +79,7 @@ while ($row = mysqli_fetch_assoc($order_type_result)) {
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" type="image/png" href="../image/logo.png">
-    <title>Manage Payments - JX Tailoring</title>
+    <title>Manage Payments - JXT Tailoring</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">

@@ -14,7 +14,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <div class="sidebar-brand-icon">
             <i class="fas fa-scissors"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">JX Tailoring</div>
+        <div class="sidebar-brand-text mx-3">JXT Tailoring</div>
     </a>
 
     <!-- Divider -->

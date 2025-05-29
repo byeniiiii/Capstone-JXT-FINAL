@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Account | JX Tailoring</title>
+    <title>Register Account | JXT Tailoring</title>
+    <link rel="icon" type="image/png" href="../image/logo.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +38,7 @@
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
                     <i class="fas fa-tshirt text-xl"></i>
                 </div>
-                <h1 class="text-2xl font-semibold text-gray-800">JX Tailoring</h1>
+                <h1 class="text-2xl font-semibold text-gray-800">JXT Tailoring</h1>
             </div>
             
             <!-- Registration Form Card -->
@@ -46,7 +47,7 @@
                     <!-- Form Header -->
                     <div class="mb-8">
                         <h2 class="text-2xl font-bold text-gray-800">Create an Account</h2>
-                        <p class="text-gray-600 mt-1">Join JX Tailoring for a personalized experience</p>
+                        <p class="text-gray-600 mt-1">Join JXT Tailoring for a personalized experience</p>
                     </div>
                     
                     <!-- Form -->

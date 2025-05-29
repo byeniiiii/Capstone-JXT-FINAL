@@ -13,7 +13,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
 $query = "SELECT l.*, CONCAT(u.first_name, ' ', u.last_name) AS user_name 
           FROM activity_logs l
           LEFT JOIN users u ON l.user_id = u.user_id
-          WHERE l.user_type IN ('Staff', 'Manager', 'Sublimator')
           ORDER BY l.created_at DESC";
 
 $result = mysqli_query($conn, $query);

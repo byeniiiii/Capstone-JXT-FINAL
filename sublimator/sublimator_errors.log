@@ -14,3 +14,28 @@ Stack trace:
 #1 {main}
   thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 75
 [28-May-2025 17:50:46 Europe/Berlin] PHP Warning:  Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\capstone_jxt\sublimator\sidebar.php:4) in C:\xampp\htdocs\capstone_jxt\sublimator\topbar.php on line 6
+[29-May-2025 01:58:42 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'tailor_db.custom_designs' doesn't exist in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:58
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(58): mysqli_prepare(Object(mysqli), 'SELECT o.order_...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 58
+[29-May-2025 01:58:55 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'tailor_db.custom_designs' doesn't exist in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:58
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(58): mysqli_prepare(Object(mysqli), 'SELECT o.order_...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 58
+[29-May-2025 01:59:43 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'so.customization' in 'field list' in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:56
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(56): mysqli_prepare(Object(mysqli), 'SELECT o.order_...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 56
+[29-May-2025 02:02:51 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'so.customization' in 'field list' in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:56
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(56): mysqli_prepare(Object(mysqli), 'SELECT o.order_...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 56
+[29-May-2025 02:02:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'so.customization' in 'field list' in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php:56
+Stack trace:
+#0 C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php(56): mysqli_prepare(Object(mysqli), 'SELECT o.order_...')
+#1 {main}
+  thrown in C:\xampp\htdocs\capstone_jxt\sublimator\my_assignments.php on line 56

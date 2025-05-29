@@ -118,7 +118,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
         
         <!-- Copyright -->
         <div class="copyright">
-            © 2025 JX Tailoring
+            © 2025 JXT Tailoring
         </div>
     </div>
 </div>

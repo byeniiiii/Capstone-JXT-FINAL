@@ -154,7 +154,7 @@ if ($order) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Remaining Balance - JX Tailoring</title>
+    <title>Pay Remaining Balance - JXT Tailoring</title>
     <link rel="icon" type="image/png" href="../image/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -458,8 +458,8 @@ if ($order) {
                         <!-- BIR-style Receipt -->
                         <div class="receipt" id="printableReceipt">
                             <div class="receipt-header">
-                                <img src="../image/logo.png" alt="JX Tailoring Logo" class="receipt-logo">
-                                <h1 class="receipt-title">JX Tailoring</h1>
+                                <img src="../image/logo.png" alt="JXT Tailoring Logo" class="receipt-logo">
+                                <h1 class="receipt-title">JXT Tailoring</h1>
                                 <p class="receipt-address">123 Main Street, Cebu City<br>Phone: (032) 123-4567<br>TIN: 123-456-789-000<br>VAT Registered</p>
                                 <div class="receipt-separator"></div>
                                 <h2 class="receipt-subtitle">OFFICIAL RECEIPT</h2>
@@ -670,7 +670,7 @@ if ($order) {
                                                 </div>
                                                 <div class="col-md-8">
                                                     <p class="mb-2">Please scan the QR code or use the following details:</p>
-                                                    <p class="mb-1"><strong>Account Name:</strong> JX Tailoring</p>
+                                                    <p class="mb-1"><strong>Account Name:</strong> JXT Tailoring</p>
                                                     <p class="mb-1"><strong>Mobile Number:</strong> 09123456789</p>
                                                     <p class="mb-3 small text-muted">After sending payment, please provide the following:</p>
                                                     
@@ -930,7 +930,7 @@ if ($order) {
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>JX Tailoring - Payment Receipt</title>
+                    <title>JXT Tailoring - Payment Receipt</title>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>

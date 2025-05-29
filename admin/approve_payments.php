@@ -3,6 +3,19 @@
 session_start();
 include '../db.php';
 
+// Function to log user activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $user_id = mysqli_real_escape_string($conn, $user_id);
+    $user_type = mysqli_real_escape_string($conn, $_SESSION['role'] ?? 'Unknown');
+    $action_type = mysqli_real_escape_string($conn, $action_type);
+    $description = mysqli_real_escape_string($conn, $description);
+    
+    $query = "INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+              VALUES ('$user_id', '$user_type', '$action_type', '$description', NOW())";
+    
+    mysqli_query($conn, $query);
+}
+
 // Check if user is logged in and has appropriate role
 if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'Manager' && $_SESSION['role'] != 'Admin')) {
     header('Location: login.php');
@@ -113,7 +126,7 @@ $pending_count = $pending_result->fetch_assoc()['count'];
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Manage Payments - JX Tailoring</title>
+    <title>Manage Payments - JXT Tailoring</title>
     <link rel="icon" type="image/png" href="../image/logo.png">
     
     <!-- Custom fonts and styles -->

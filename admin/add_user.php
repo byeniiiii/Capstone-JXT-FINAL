@@ -1,18 +1,38 @@
 <?php
 // Include database connection
+session_start();
 include '../db.php';
+
+// Function to log user activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $user_id = mysqli_real_escape_string($conn, $user_id);
+    $user_type = mysqli_real_escape_string($conn, $_SESSION['role'] ?? 'Unknown');
+    $action_type = mysqli_real_escape_string($conn, $action_type);
+    $description = mysqli_real_escape_string($conn, $description);
+    
+    $query = "INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+              VALUES ('$user_id', '$user_type', '$action_type', '$description', NOW())";
+    
+    mysqli_query($conn, $query);
+}
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
     $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']); // Fix: Added email
+    $email = mysqli_real_escape_string($conn, $_POST['email']); 
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $phone_number = mysqli_real_escape_string($conn, $_POST['phone_number']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
     
-    // Generate a random password (default: 8 characters)
-    $password = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8);
+    // Use the provided password if it exists
+    if (!empty($_POST['password'])) {
+        $password = $_POST['password'];
+    } else {
+        // Generate a random password if none is provided
+        $password = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8);
+    }
+    
     $hashed_password = password_hash($password, PASSWORD_DEFAULT); // Hash the password
 
     // Check if username or email already exists
@@ -30,8 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               VALUES ('$first_name', '$last_name', '$email', '$username', '$phone_number', '$role', '$hashed_password')";
 
     if (mysqli_query($conn, $query)) {
+        // Log the user creation activity
+        if (isset($_SESSION['user_id'])) {
+            logActivity($conn, $_SESSION['user_id'], 'CREATE', "Created new user: $first_name $last_name, Role: $role");
+        }
         // Redirect with success message
-        header("Location: users.php?success=User added successfully. Default password: $password");
+        header("Location: users.php?success=User added successfully. Password: $password");
         exit();
     } else {
         // Redirect with error message

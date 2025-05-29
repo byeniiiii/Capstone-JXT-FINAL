@@ -2,6 +2,16 @@
 session_start();
 include '../db.php'; // Add this line to include database connection
 
+// Function to log user activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $stmt = $conn->prepare("INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+                          VALUES (?, ?, ?, ?, NOW())");
+    $user_type = $_SESSION['role'] ?? 'Unknown';
+    $stmt->bind_param("isss", $user_id, $user_type, $action_type, $description);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // Check if user is logged in and is staff
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['Admin', 'Manager', 'Staff'])) {
     header("Location: ../index.php");
@@ -151,6 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $order_info = $order;
                 $success_message = "Payment processed successfully!";
+                
+                // Log activity
+                logActivity($conn, $_SESSION['user_id'], 'payment_processed', "Payment of ₱" . number_format($amount_paid, 2) . " received via $payment_method");
                 
             } catch (Exception $e) {
                 // Rollback in case of error
@@ -574,7 +587,7 @@ $recent_payments = $conn->query($recent_payments_query);
                                 <div class="card-body">
                                     <div class="receipt" id="printableReceipt">
                                         <div class="receipt-header">
-                                            <h2 class="receipt-title">JX Tailoring</h2>
+                                            <h2 class="receipt-title">JXT Tailoring</h2>
                                             <p class="receipt-subtitle">Official Payment Receipt</p>
                                             <p class="receipt-date"><?php echo $payment_details['formatted_date']; ?></p>
                                             <p class="receipt-id">Receipt #<?php echo str_pad($payment_details['payment_id'], 6, '0', STR_PAD_LEFT); ?></p>
@@ -619,7 +632,7 @@ $recent_payments = $conn->query($recent_payments_query);
                                         </div>
                                         <div class="receipt-footer">
                                             <p>Thank you for your business!</p>
-                                            <p>JX Tailoring • Phone: (123) 456-7890 • Email: info@jxtailoring.com</p>
+                                            <p>JXT Tailoring • Phone: (123) 456-7890 • Email: info@jxtailoring.com</p>
                                         </div>
                                     </div>
                                     <div class="receipt-actions">
@@ -1072,7 +1085,13 @@ $recent_payments = $conn->query($recent_payments_query);
             $.ajax({
                 url: 'fetch_payment_details.php',
                 method: 'POST',
-                data: { payment_id: paymentId },
+                data: { 
+                    payment_id: paymentId,
+                    log_activity: true,
+                    user_id: <?= $_SESSION['user_id'] ?>,
+                    action_type: 'view_payment_details',
+                    description: 'Viewed payment details for payment #' + paymentId
+                },
                 success: function(response) {
                     $('#paymentDetailsContent').html(response);
                 },
@@ -1161,7 +1180,13 @@ $recent_payments = $conn->query($recent_payments_query);
             $.ajax({
                 url: 'fetch_payment_receipt.php',
                 method: 'POST',
-                data: { payment_id: paymentId },
+                data: { 
+                    payment_id: paymentId,
+                    log_activity: true,
+                    user_id: <?= $_SESSION['user_id'] ?>,
+                    action_type: 'view_payment_receipt',
+                    description: 'Viewed receipt for payment #' + paymentId
+                },
                 success: function(response) {
                     $('#receiptContent').html(response);
                 },

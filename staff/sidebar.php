@@ -21,7 +21,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
                 <div class="logo-icon">
                     <i class="fas fa-cut"></i>
                 </div>
-                <h2 class="logo-text">JX<span>Tailoring</span></h2>
+                <h2 class="logo-text">JXT <span>Tailoring</span></h2>
             </div>
         </div>
         
@@ -129,7 +129,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current file name
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Log Out</span>
             </a>
-            <div class="copyright">© 2025 JX Tailoring</div>
+            <div class="copyright">© 2025 JXT Tailoring</div>
         </div>
     </div>
     

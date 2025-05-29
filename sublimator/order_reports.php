@@ -97,7 +97,7 @@ $staff_result = mysqli_query($conn, $staff_query);
     <meta name="description" content="JXT Manager - Order Reports">
     <meta name="author" content="">
     <link rel="icon" type="image/png" href="../image/logo.png">
-    <title>JX Tailoring - Order Reports</title>
+    <title>JXT Tailoring - Order Reports</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">

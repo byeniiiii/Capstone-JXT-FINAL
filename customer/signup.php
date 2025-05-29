@@ -45,7 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | JX Tailoring</title>
+    <title>Sign Up | JXT Tailoring</title>
+    <link rel="icon" type="image/png" href="../image/logo.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -92,13 +93,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-3">
                             <i class="fas fa-tshirt text-xl"></i>
                         </div>
-                        <h1 class="text-xl font-semibold text-gray-800">JX Tailoring</h1>
+                        <h1 class="text-xl font-semibold text-gray-800">JXT Tailoring</h1>
                     </div>
                     
                     <!-- Form Header -->
                     <div class="text-center mb-8">
                         <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
-                        <p class="text-gray-600 mt-1">Fill in your details to join JX Tailoring</p>
+                        <p class="text-gray-600 mt-1">Fill in your details to join JXT Tailoring</p>
                     </div>
                     
                     <!-- Alert Messages -->
@@ -273,7 +274,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <!-- Right: Image Section -->
                 <div class="w-full md:w-2/5 bg-gradient-to-br from-dark to-primary relative hidden md:block">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-white p-8 lg:p-12">
-                        <h2 class="text-2xl font-bold mb-4">Welcome to JX Tailoring</h2>
+                        <h2 class="text-2xl font-bold mb-4">Welcome to JXT Tailoring</h2>
                         <p class="text-white/90 mb-8 text-center">
                             By creating an account, you'll be able to access our custom tailoring services, 
                             track your orders, and enjoy a personalized experience.

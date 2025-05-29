@@ -10,16 +10,32 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Sublimator') {
 
 $sublimator_id = $_SESSION['user_id'];
 
+// Function to log activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $user_id = mysqli_real_escape_string($conn, $user_id);
+    $user_type = mysqli_real_escape_string($conn, $_SESSION['role'] ?? 'Unknown');
+    $action_type = mysqli_real_escape_string($conn, $action_type);
+    $description = mysqli_real_escape_string($conn, $description);
+    
+    $query = "INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+              VALUES ('$user_id', '$user_type', '$action_type', '$description', NOW())";
+    
+    mysqli_query($conn, $query);
+}
+
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', 'sublimator_errors.log');
 
+// Log page view
+logActivity($conn, $sublimator_id, 'VIEW', "Viewed my assignments page");
+
 // Get assigned orders
 $assigned_orders_query = "SELECT o.order_id, o.order_status, o.total_amount, o.created_at, 
                          o.payment_status, c.first_name, c.last_name, c.phone_number,
-                         so.template_id, so.completion_date, 
+                         so.template_id, so.completion_date,
                          t.name AS template_name, t.image_path AS template_image
                          FROM orders o
                          JOIN customers c ON o.customer_id = c.customer_id
@@ -339,6 +355,8 @@ if ($unread_notifications > 0) {
     <?php
     // Function to display orders
     function displayOrders($result, $status_filter) {
+        global $conn, $sublimator_id;
+        
         echo '<div class="row">';
         while ($order = mysqli_fetch_assoc($result)) {
             // Skip if we're filtering by status and this order doesn't match
@@ -390,13 +408,16 @@ if ($unread_notifications > 0) {
             
             // Left column with template image
             echo '<div class="col-md-4 text-center mb-3 mb-md-0">';
-            if ($order['template_image']) {
+            
+            // Check for template image, or show placeholder
+            if (!empty($order['template_image'])) {
                 echo '<img src="../' . htmlspecialchars($order['template_image']) . '" class="template-image" alt="Template">';
-                echo '<p class="mt-2 mb-0 small">' . htmlspecialchars($order['template_name'] ?: 'Custom Design') . '</p>';
+                echo '<p class="mt-2 mb-0 small">' . htmlspecialchars($order['template_name'] ?: 'Template Design') . '</p>';
             } else {
                 echo '<div class="p-3 bg-light rounded"><i class="fas fa-tshirt fa-3x text-gray-300"></i></div>';
                 echo '<p class="mt-2 mb-0 small">Custom Design</p>';
             }
+            
             echo '</div>';
             
             // Right column with order details
@@ -428,7 +449,7 @@ if ($unread_notifications > 0) {
             
             // Action buttons based on status
             echo '<div class="d-flex justify-content-end">';
-            echo '<a href="view_order.php?id=' . $order['order_id'] . '" class="btn btn-sm btn-info mr-2"><i class="fas fa-eye"></i> View Details</a>';
+            echo '<a href="view_order.php?id=' . $order['order_id'] . '" class="btn btn-sm btn-info mr-2" onclick="logViewAction(\'' . $order['order_id'] . '\')"><i class="fas fa-eye"></i> View Details</a>';
             
             if ($order['order_status'] == 'forward_to_sublimator') {
                 echo '<button class="btn btn-sm btn-primary" onclick="updateStatus(\'' . $order['order_id'] . '\', \'in_process\')"><i class="fas fa-play"></i> Start Process</button>';
@@ -477,6 +498,21 @@ if ($unread_notifications > 0) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
+        function logViewAction(orderId) {
+            // Log view action via AJAX
+            $.ajax({
+                url: 'log_activity.php',
+                type: 'POST',
+                data: {
+                    action_type: 'VIEW',
+                    description: 'Viewed order details for Order #' + orderId
+                },
+                error: function() {
+                    console.log('Failed to log activity');
+                }
+            });
+        }
+        
         function updateStatus(orderId, newStatus) {
             let statusText = '';
             switch(newStatus) {

@@ -93,7 +93,7 @@ $status_result = $conn->query($status_query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Reports - JX Tailoring</title>
+    <title>Order Reports - JXT Tailoring</title>
     <!-- Replace includes/header_scripts.php with direct links to CSS and JS files -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -301,19 +301,19 @@ $status_result = $conn->query($status_query);
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel',
                         className: 'btn btn-sm btn-success btn-export',
-                        title: 'JX Tailoring Orders Report <?= date("Y-m-d") ?>'
+                        title: 'JXT Tailoring Orders Report <?= date("Y-m-d") ?>'
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf"></i> PDF',
                         className: 'btn btn-sm btn-danger btn-export',
-                        title: 'JX Tailoring Orders Report <?= date("Y-m-d") ?>'
+                        title: 'JXT Tailoring Orders Report <?= date("Y-m-d") ?>'
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print',
                         className: 'btn btn-sm btn-primary btn-export',
-                        title: 'JX Tailoring Orders Report'
+                        title: 'JXT Tailoring Orders Report'
                     }
                 ],
                 responsive: true,

@@ -1,6 +1,20 @@
 <?php
 // Include database connection
+session_start();
 include '../db.php';
+
+// Function to log user activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $user_id = mysqli_real_escape_string($conn, $user_id);
+    $user_type = mysqli_real_escape_string($conn, $_SESSION['role'] ?? 'Unknown');
+    $action_type = mysqli_real_escape_string($conn, $action_type);
+    $description = mysqli_real_escape_string($conn, $description);
+    
+    $query = "INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+              VALUES ('$user_id', '$user_type', '$action_type', '$description', NOW())";
+    
+    mysqli_query($conn, $query);
+}
 
 // Check if user ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -50,6 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                      WHERE user_id = '$user_id'";
 
     if (mysqli_query($conn, $update_query)) {
+        // Log the activity
+        if (isset($_SESSION['user_id'])) {
+            logActivity($conn, $_SESSION['user_id'], 'UPDATE', "Updated user: $first_name $last_name, Role: $role (ID: $user_id)");
+        }
         header("Location: users.php?success=User updated successfully");
         exit();
     } else {

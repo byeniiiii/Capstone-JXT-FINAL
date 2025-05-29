@@ -1,6 +1,19 @@
 <?php
 session_start();
 
+// Function to log user activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $user_id = mysqli_real_escape_string($conn, $user_id);
+    $user_type = mysqli_real_escape_string($conn, $_SESSION['role'] ?? 'Unknown');
+    $action_type = mysqli_real_escape_string($conn, $action_type);
+    $description = mysqli_real_escape_string($conn, $description);
+    
+    $query = "INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+              VALUES ('$user_id', '$user_type', '$action_type', '$description', NOW())";
+    
+    mysqli_query($conn, $query);
+}
+
 // If the user is not logged in, redirect to index.php
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../index.php"); // Adjust path as needed
@@ -22,6 +35,11 @@ $result = mysqli_query($conn, $query);
 // Check if query execution was successful
 if (!$result) {
     die("Database query failed: " . mysqli_error($conn));
+}
+
+// Log page view if user is logged in
+if (isset($_SESSION['user_id'])) {
+    logActivity($conn, $_SESSION['user_id'], 'VIEW', "Viewed sublimator management page");
 }
 ?>
 

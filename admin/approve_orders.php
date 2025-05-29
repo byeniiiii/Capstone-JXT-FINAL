@@ -2,6 +2,19 @@
 include '../db.php';
 session_start();
 
+// Function to log user activity
+function logActivity($conn, $user_id, $action_type, $description) {
+    $user_id = mysqli_real_escape_string($conn, $user_id);
+    $user_type = mysqli_real_escape_string($conn, $_SESSION['role'] ?? 'Unknown');
+    $action_type = mysqli_real_escape_string($conn, $action_type);
+    $description = mysqli_real_escape_string($conn, $description);
+    
+    $query = "INSERT INTO activity_logs (user_id, user_type, action_type, description, created_at) 
+              VALUES ('$user_id', '$user_type', '$action_type', '$description', NOW())";
+    
+    mysqli_query($conn, $query);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id']) && isset($_POST['approve'])) {
     include '../db.php';
 
@@ -11,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id']) && isset(
     $updateQuery = "UPDATE orders SET order_status = 'approved' WHERE order_id = '$order_id'";
 
     if (mysqli_query($conn, $updateQuery)) {
+        // Log the approval activity
+        if (isset($_SESSION['user_id'])) {
+            logActivity($conn, $_SESSION['user_id'], 'UPDATE', "Approved order #$order_id");
+        }
         echo "Order approved! Waiting for customer downpayment.";
     } else {
         echo "Error: " . mysqli_error($conn);
@@ -207,7 +224,7 @@ $result = mysqli_query($conn, $query);
                     </button>
 
                     <ul class="navbar-nav ml-auto">
-                        <?php include 'notification.php'; ?>  <!-- Changed from 'notifications.php' to 'notification.php' -->
+                        <?php include 'notifications.php'; ?>  <!-- Changed from 'notification.php' to 'notifications.php' -->
 
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

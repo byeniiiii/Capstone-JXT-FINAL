@@ -2,3 +2,5 @@
 [28-May-2025 13:08:07 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\manager\activity_logs.php on line 283
 [28-May-2025 13:08:07 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\manager\activity_logs.php on line 283
 [28-May-2025 13:08:07 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\capstone_jxt\manager\activity_logs.php on line 283
+[29-May-2025 08:09:04 Europe/Berlin] PHP Warning:  Undefined variable $amount in C:\xampp\htdocs\capstone_jxt\manager\handle_order_ajax.php on line 180
+[29-May-2025 08:09:04 Europe/Berlin] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\capstone_jxt\manager\handle_order_ajax.php on line 180

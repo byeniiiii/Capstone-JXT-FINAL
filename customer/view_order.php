@@ -181,11 +181,34 @@ switch(strtolower($order['order_status'])) {
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
+            padding-top: 70px;
         }
 
         .navbar {
-            background-color: white !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #443627 !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #EFDCAB !important;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            color: #EFDCAB !important;
+            font-weight: 500;
+            padding: 8px 15px;
+            transition: all 0.3s;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover,
+        .navbar-dark .navbar-nav .nav-link.active {
+            color: #D98324 !important;
+        }
+
+        .navbar-dark .navbar-toggler {
+            border-color: #EFDCAB;
         }
 
         .sidebar {
@@ -304,10 +327,10 @@ switch(strtolower($order['order_status'])) {
         .progress-step:not(:last-child)::after {
             content: '';
             position: absolute;
-            top: 40px;
+            top: 15px;
             left: 60%;
             width: 80%;
-            height: 3px;
+            height: 2px;
             background-color: #e9ecef;
             z-index: 1;
         }
@@ -318,20 +341,20 @@ switch(strtolower($order['order_status'])) {
         }
         
         .step-icon {
-            width: 80px;
-            height: 80px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background-color: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 10px;
+            margin: 0 auto 5px;
             z-index: 2;
             position: relative;
         }
         
         .step-icon i {
-            font-size: 30px;
+            font-size: 12px;
             color: #6c757d;
         }
         
@@ -354,7 +377,7 @@ switch(strtolower($order['order_status'])) {
         }
         
         .step-label {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 600;
             color: #6c757d;
         }
@@ -410,298 +433,308 @@ switch(strtolower($order['order_status'])) {
 </head>
 
 <body>
-    <div id="wrapper">
-        <?php include 'sidebar.php'; ?>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">JXT Tailoring</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="track_order.php"><i class="fas fa-list"></i> My Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-        <div id="content-wrapper" class="d-flex flex-column">
-            <div id="content">
-                <?php include 'topbar.php'; ?>
+    <div class="container mt-5 pt-5">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">
+                Order #<?= htmlspecialchars($order_id) ?>
+                <span class="status-badge <?= $status_class ?>"><?= $formatted_status ?></span>
+            </h1>
+            <a href="track_order.php" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Orders
+            </a>
+        </div>
 
-                <div class="container-fluid">
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">
-                            Order #<?= htmlspecialchars($order_id) ?>
-                            <span class="status-badge <?= $status_class ?>"><?= $formatted_status ?></span>
-                        </h1>
-                        <a href="track_order.php" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Back to Orders
-                        </a>
-                    </div>
-
-                    <!-- Order Progress Tracker -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-tasks mr-2"></i> Order Progress</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="progress-tracker">
-                                <div class="row">
-                                    <?php
-                                    // Define all possible statuses in order
-                                    $all_statuses = [
-                                        'pending_approval' => ['icon' => 'clock', 'label' => 'Pending Approval'],
-                                        'approved' => ['icon' => 'check-circle', 'label' => 'Approved'],
-                                        'in_process' => ['icon' => 'sync', 'label' => 'In Process'],
-                                        'ready_for_pickup' => ['icon' => 'box', 'label' => 'Ready for Pickup'],
-                                        'completed' => ['icon' => 'flag-checkered', 'label' => 'Completed'],
-                                        'declined' => ['icon' => 'times-circle', 'label' => 'Declined']
-                                    ];
-                                    
-                                    // Skip declined status for normal flow
-                                    $display_statuses = array_filter($all_statuses, function($key) {
-                                        return $key !== 'declined';
-                                    }, ARRAY_FILTER_USE_KEY);
-                                    
-                                    // If order is declined, show only that status
-                                    $current_status = strtolower($order['order_status']);
-                                    if ($current_status === 'declined') {
-                                        $display_statuses = ['declined' => $all_statuses['declined']];
-                                    }
-                                    
-                                    $i = 0;
-                                    $col_class = count($display_statuses) <= 4 ? 12 / count($display_statuses) : 3;
-                                    
-                                    foreach ($display_statuses as $status_key => $status_info) {
-                                        $is_active = ($current_status === $status_key);
-                                        $is_completed = false;
-                                        
-                                        // Determine if this step is completed (any step before current)
-                                        if ($current_status !== 'declined') {
-                                            $status_order = array_keys($all_statuses);
-                                            $current_index = array_search($current_status, $status_order);
-                                            $status_index = array_search($status_key, $status_order);
-                                            $is_completed = ($status_index < $current_index);
-                                        }
-                                        
-                                        $step_class = $is_active ? 'active' : ($is_completed ? 'completed' : '');
-                                        if ($status_key === 'declined' && $current_status === 'declined') {
-                                            $step_class = 'declined';
-                                        }
-                                    ?>
-                                        <div class="col-md-<?= $col_class ?> progress-step <?= $step_class ?> mb-3">
-                                            <div class="step-icon">
-                                                <i class="fas fa-<?= $status_info['icon'] ?>"></i>
-                                            </div>
-                                            <div class="step-label"><?= $status_info['label'] ?></div>
-                                        </div>
-                                    <?php
-                                        $i++;
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+        <!-- Order Progress Tracker -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h5><i class="fas fa-tasks mr-2"></i> Order Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress-tracker">
                     <div class="row">
-                        <!-- Order Summary Column -->
-                        <div class="col-lg-4 order-lg-2">
-                            <div class="detail-card">
-                                <div class="card-header">
-                                    <h5><i class="fas fa-info-circle mr-2"></i> Order Summary</h5>
+                        <?php
+                        // Define all possible statuses in order
+                        $all_statuses = [
+                            'pending_approval' => ['icon' => 'clock', 'label' => 'Pending Approval'],
+                            'approved' => ['icon' => 'check-circle', 'label' => 'Approved'],
+                            'in_process' => ['icon' => 'sync', 'label' => 'In Process'],
+                            'ready_for_pickup' => ['icon' => 'box', 'label' => 'Ready for Pickup'],
+                            'completed' => ['icon' => 'flag-checkered', 'label' => 'Completed'],
+                            'declined' => ['icon' => 'times-circle', 'label' => 'Declined']
+                        ];
+                        
+                        // Skip declined status for normal flow
+                        $display_statuses = array_filter($all_statuses, function($key) {
+                            return $key !== 'declined';
+                        }, ARRAY_FILTER_USE_KEY);
+                        
+                        // If order is declined, show only that status
+                        $current_status = strtolower($order['order_status']);
+                        if ($current_status === 'declined') {
+                            $display_statuses = ['declined' => $all_statuses['declined']];
+                        }
+                        
+                        $i = 0;
+                        $col_class = count($display_statuses) <= 4 ? 12 / count($display_statuses) : 3;
+                        
+                        foreach ($display_statuses as $status_key => $status_info) {
+                            $is_active = ($current_status === $status_key);
+                            $is_completed = false;
+                            
+                            // Determine if this step is completed (any step before current)
+                            if ($current_status !== 'declined') {
+                                $status_order = array_keys($all_statuses);
+                                $current_index = array_search($current_status, $status_order);
+                                $status_index = array_search($status_key, $status_order);
+                                $is_completed = ($status_index < $current_index);
+                            }
+                            
+                            $step_class = $is_active ? 'active' : ($is_completed ? 'completed' : '');
+                            if ($status_key === 'declined' && $current_status === 'declined') {
+                                $step_class = 'declined';
+                            }
+                        ?>
+                            <div class="col-md-<?= $col_class ?> progress-step <?= $step_class ?> mb-3">
+                                <div class="step-icon">
+                                    <i class="fas fa-<?= $status_info['icon'] ?>"></i>
                                 </div>
-                                <div class="card-body">
-                                    <div class="info-group">
-                                        <div class="info-label">Order ID</div>
-                                        <div class="info-value">#<?= htmlspecialchars($order['order_id']) ?></div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Order Date</div>
-                                        <div class="info-value"><?= date('F j, Y', strtotime($order['created_at'])) ?></div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Service Type</div>
-                                        <div class="info-value"><?= htmlspecialchars(ucfirst($order['order_type'])) ?></div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Status</div>
-                                        <div class="info-value">
-                                            <span class="status-badge <?= $status_class ?>">
-                                                <?= htmlspecialchars($formatted_status) ?>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Total Amount</div>
-                                        <div class="info-value">₱<?= number_format($order['total_amount'], 2) ?></div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Downpayment</div>
-                                        <div class="info-value">₱<?= number_format($order['downpayment_amount'], 2) ?></div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Payment Status</div>
-                                        <div class="info-value">
-                                            <?php if ($order['payment_status'] == 'fully_paid'): ?>
-                                                <span class="badge bg-success">Fully Paid</span>
-                                            <?php elseif ($order['payment_status'] == 'partially_paid'): ?>
-                                                <span class="badge bg-warning text-dark">Partially Paid</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-danger">Unpaid</span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <div class="info-group">
-                                        <div class="info-label">Payment Method</div>
-                                        <div class="info-value"><?= htmlspecialchars($order['payment_method']) ?></div>
-                                    </div>
-                                </div>
+                                <div class="step-label"><?= $status_info['label'] ?></div>
                             </div>
-                        </div>
-
-                        <!-- Order Details Column -->
-                        <div class="col-lg-8 order-lg-1">
-                            <!-- Order Details -->
-                            <div class="detail-card">
-                                <div class="card-header">
-                                    <h5>
-                                        <?php if ($order['order_type'] == 'sublimation'): ?>
-                                            <i class="fas fa-tshirt mr-2"></i> Sublimation Details
-                                        <?php else: ?>
-                                            <i class="fas fa-cut mr-2"></i> Tailoring Details
-                                        <?php endif; ?>
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <?php if ($order['order_type'] == 'sublimation' && isset($specific_details)): ?>
-                                        <!-- Sublimation Details -->
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="info-group">
-                                                    <div class="info-label">Printing Type</div>
-                                                    <div class="info-value"><?= htmlspecialchars($specific_details['printing_type'] ?? 'N/A') ?></div>
-                                                </div>
-                                                <div class="info-group">
-                                                    <div class="info-label">Quantity</div>
-                                                    <div class="info-value"><?= htmlspecialchars($specific_details['quantity'] ?? 'N/A') ?></div>
-                                                </div>
-                                                <div class="info-group">
-                                                    <div class="info-label">Design Option</div>
-                                                    <div class="info-value">
-                                                        <?php 
-                                                        if (isset($specific_details['custom_design']) && $specific_details['custom_design']) {
-                                                            echo 'Custom Design';
-                                                        } elseif (isset($specific_details['template_id']) && $specific_details['template_id']) {
-                                                            echo 'Template #' . htmlspecialchars($specific_details['template_id']);
-                                                        } else {
-                                                            echo 'N/A';
-                                                        }
-                                                        ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <?php if (isset($specific_details['design_path']) && $specific_details['design_path']): ?>
-                                                    <div class="text-center">
-                                                        <p class="info-label mb-2">Design Preview</p>
-                                                        <img src="<?= htmlspecialchars('../' . $specific_details['design_path']) ?>" 
-                                                             class="img-fluid border rounded" style="max-height: 150px;" alt="Design Preview">
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        
-                                        <?php
-                                        // Get player details for sublimation orders
-                                        if (isset($specific_details['sublimation_id'])) {
-                                            $players_query = "SELECT * FROM sublimation_players WHERE sublimation_id = ?";
-                                            $stmt = mysqli_prepare($conn, $players_query);
-                                            mysqli_stmt_bind_param($stmt, "i", $specific_details['sublimation_id']);
-                                            mysqli_stmt_execute($stmt);
-                                            $players_result = mysqli_stmt_get_result($stmt);
-                                            
-                                            if (mysqli_num_rows($players_result) > 0):
-                                        ?>
-                                            <hr class="my-4">
-                                            <h6 class="font-weight-bold mb-3">Player Details</h6>
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Player Name</th>
-                                                            <th>Jersey Number</th>
-                                                            <th>Size</th>
-                                                            <th>Include Lower</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php while ($player = mysqli_fetch_assoc($players_result)): ?>
-                                                            <tr>
-                                                                <td><?= htmlspecialchars($player['player_name']) ?></td>
-                                                                <td><?= htmlspecialchars($player['jersey_number']) ?></td>
-                                                                <td><?= htmlspecialchars($player['size']) ?></td>
-                                                                <td><?= $player['include_lower'] ? 'Yes' : 'No' ?></td>
-                                                            </tr>
-                                                        <?php endwhile; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        <?php 
-                                            endif;
-                                        }
-                                        ?>
-                                        
-                                    <?php elseif ($order['order_type'] == 'tailoring' && isset($specific_details)): ?>
-                                        <!-- Tailoring Details -->
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="info-group">
-                                                    <div class="info-label">Garment Type</div>
-                                                    <div class="info-value"><?= htmlspecialchars($specific_details['garment_type'] ?? 'N/A') ?></div>
-                                                </div>
-                                                <div class="info-group">
-                                                    <div class="info-label">Fabric</div>
-                                                    <div class="info-value"><?= htmlspecialchars($specific_details['fabric'] ?? 'N/A') ?></div>
-                                                </div>
-                                                <div class="info-group">
-                                                    <div class="info-label">Color</div>
-                                                    <div class="info-value"><?= htmlspecialchars($specific_details['color'] ?? 'N/A') ?></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="info-group">
-                                                    <div class="info-label">Measurements</div>
-                                                    <div class="info-value">
-                                                        <?php
-                                                        $measurements = [];
-                                                        if (!empty($specific_details['chest'])) $measurements[] = "Chest: " . htmlspecialchars($specific_details['chest']) . " inches";
-                                                        if (!empty($specific_details['waist'])) $measurements[] = "Waist: " . htmlspecialchars($specific_details['waist']) . " inches";
-                                                        if (!empty($specific_details['hips'])) $measurements[] = "Hips: " . htmlspecialchars($specific_details['hips']) . " inches";
-                                                        if (!empty($specific_details['shoulder'])) $measurements[] = "Shoulder: " . htmlspecialchars($specific_details['shoulder']) . " inches";
-                                                        if (!empty($specific_details['sleeve'])) $measurements[] = "Sleeve: " . htmlspecialchars($specific_details['sleeve']) . " inches";
-                                                        if (!empty($specific_details['inseam'])) $measurements[] = "Inseam: " . htmlspecialchars($specific_details['inseam']) . " inches";
-                                                        
-                                                        echo !empty($measurements) ? implode("<br>", $measurements) : "N/A";
-                                                        ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <?php if (!empty($specific_details['special_instructions'])): ?>
-                                        <hr class="my-4">
-                                        <div class="info-group">
-                                            <div class="info-label">Special Instructions</div>
-                                            <div class="info-value">
-                                                <?= nl2br(htmlspecialchars($specific_details['special_instructions'])) ?>
-                                            </div>
-                                        </div>
-                                        <?php endif; ?>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
+                        <?php
+                            $i++;
+                        }
+                        ?>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="text-center mt-4 mb-5">
-                        <a href="track_order.php" class="btn btn-primary btn-lg">
-                            <i class="fas fa-arrow-left mr-2"></i> Back to My Orders
-                        </a>
+        <div class="row">
+            <!-- Order Summary Column -->
+            <div class="col-lg-4 order-lg-2">
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle mr-2"></i> Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-group">
+                            <div class="info-label">Order ID</div>
+                            <div class="info-value">#<?= htmlspecialchars($order['order_id']) ?></div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Order Date</div>
+                            <div class="info-value"><?= date('F j, Y', strtotime($order['created_at'])) ?></div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Service Type</div>
+                            <div class="info-value"><?= htmlspecialchars(ucfirst($order['order_type'])) ?></div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">
+                                <span class="status-badge <?= $status_class ?>">
+                                    <?= htmlspecialchars($formatted_status) ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Total Amount</div>
+                            <div class="info-value">₱<?= number_format($order['total_amount'], 2) ?></div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Downpayment</div>
+                            <div class="info-value">₱<?= number_format($order['downpayment_amount'], 2) ?></div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Payment Status</div>
+                            <div class="info-value">
+                                <?php if ($order['payment_status'] == 'fully_paid'): ?>
+                                    <span class="badge bg-success">Fully Paid</span>
+                                <?php elseif ($order['payment_status'] == 'partially_paid'): ?>
+                                    <span class="badge bg-warning text-dark">Partially Paid</span>
+                                <?php else: ?>
+                                    <span class="badge bg-danger">Unpaid</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Payment Method</div>
+                            <div class="info-value"><?= htmlspecialchars($order['payment_method']) ?></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <?php include 'footer.php'; ?>
+            <!-- Order Details Column -->
+            <div class="col-lg-8 order-lg-1">
+                <!-- Order Details -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h5>
+                            <?php if ($order['order_type'] == 'sublimation'): ?>
+                                <i class="fas fa-tshirt mr-2"></i> Sublimation Details
+                            <?php else: ?>
+                                <i class="fas fa-cut mr-2"></i> Tailoring Details
+                            <?php endif; ?>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if ($order['order_type'] == 'sublimation' && isset($specific_details)): ?>
+                            <!-- Sublimation Details -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-group">
+                                        <div class="info-label">Printing Type</div>
+                                        <div class="info-value"><?= htmlspecialchars($specific_details['printing_type'] ?? 'N/A') ?></div>
+                                    </div>
+                                    <div class="info-group">
+                                        <div class="info-label">Quantity</div>
+                                        <div class="info-value"><?= htmlspecialchars($specific_details['quantity'] ?? 'N/A') ?></div>
+                                    </div>
+                                    <div class="info-group">
+                                        <div class="info-label">Design Option</div>
+                                        <div class="info-value">
+                                            <?php 
+                                            if (isset($specific_details['custom_design']) && $specific_details['custom_design']) {
+                                                echo 'Custom Design';
+                                            } elseif (isset($specific_details['template_id']) && $specific_details['template_id']) {
+                                                echo 'Template #' . htmlspecialchars($specific_details['template_id']);
+                                            } else {
+                                                echo 'N/A';
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php if (isset($specific_details['design_path']) && $specific_details['design_path']): ?>
+                                        <div class="text-center">
+                                            <p class="info-label mb-2">Design Preview</p>
+                                            <img src="<?= htmlspecialchars('../' . $specific_details['design_path']) ?>" 
+                                                 class="img-fluid border rounded" style="max-height: 150px;" alt="Design Preview">
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            
+                            <?php
+                            // Get player details for sublimation orders
+                            if (isset($specific_details['sublimation_id'])) {
+                                $players_query = "SELECT * FROM sublimation_players WHERE sublimation_id = ?";
+                                $stmt = mysqli_prepare($conn, $players_query);
+                                mysqli_stmt_bind_param($stmt, "i", $specific_details['sublimation_id']);
+                                mysqli_stmt_execute($stmt);
+                                $players_result = mysqli_stmt_get_result($stmt);
+                                
+                                if (mysqli_num_rows($players_result) > 0):
+                            ?>
+                                <hr class="my-4">
+                                <h6 class="font-weight-bold mb-3">Player Details</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Player Name</th>
+                                                <th>Jersey Number</th>
+                                                <th>Size</th>
+                                                <th>Include Lower</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php while ($player = mysqli_fetch_assoc($players_result)): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($player['player_name']) ?></td>
+                                                    <td><?= htmlspecialchars($player['jersey_number']) ?></td>
+                                                    <td><?= htmlspecialchars($player['size']) ?></td>
+                                                    <td><?= $player['include_lower'] ? 'Yes' : 'No' ?></td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php 
+                                endif;
+                            }
+                            ?>
+                            
+                        <?php elseif ($order['order_type'] == 'tailoring' && isset($specific_details)): ?>
+                            <!-- Tailoring Details -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-group">
+                                        <div class="info-label">Garment Type</div>
+                                        <div class="info-value"><?= htmlspecialchars($specific_details['garment_type'] ?? 'N/A') ?></div>
+                                    </div>
+                                    <div class="info-group">
+                                        <div class="info-label">Fabric</div>
+                                        <div class="info-value"><?= htmlspecialchars($specific_details['fabric'] ?? 'N/A') ?></div>
+                                    </div>
+                                    <div class="info-group">
+                                        <div class="info-label">Color</div>
+                                        <div class="info-value"><?= htmlspecialchars($specific_details['color'] ?? 'N/A') ?></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-group">
+                                        <div class="info-label">Measurements</div>
+                                        <div class="info-value">
+                                            <?php
+                                            $measurements = [];
+                                            if (!empty($specific_details['chest'])) $measurements[] = "Chest: " . htmlspecialchars($specific_details['chest']) . " inches";
+                                            if (!empty($specific_details['waist'])) $measurements[] = "Waist: " . htmlspecialchars($specific_details['waist']) . " inches";
+                                            if (!empty($specific_details['hips'])) $measurements[] = "Hips: " . htmlspecialchars($specific_details['hips']) . " inches";
+                                            if (!empty($specific_details['shoulder'])) $measurements[] = "Shoulder: " . htmlspecialchars($specific_details['shoulder']) . " inches";
+                                            if (!empty($specific_details['sleeve'])) $measurements[] = "Sleeve: " . htmlspecialchars($specific_details['sleeve']) . " inches";
+                                            if (!empty($specific_details['inseam'])) $measurements[] = "Inseam: " . htmlspecialchars($specific_details['inseam']) . " inches";
+                                            
+                                            echo !empty($measurements) ? implode("<br>", $measurements) : "N/A";
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <?php if (!empty($specific_details['special_instructions'])): ?>
+                            <hr class="my-4">
+                            <div class="info-group">
+                                <div class="info-label">Special Instructions</div>
+                                <div class="info-value">
+                                    <?= nl2br(htmlspecialchars($specific_details['special_instructions'])) ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 mb-5">
+            <a href="track_order.php" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-left mr-2"></i> Back to My Orders
+            </a>
         </div>
     </div>
 

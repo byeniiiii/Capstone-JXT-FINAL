@@ -97,7 +97,7 @@ $staff_result = mysqli_query($conn, $staff_query);
     <meta name="description" content="JXT Manager - Order Reports">
     <meta name="author" content="">
     <link rel="icon" type="image/png" href="../image/logo.png">
-    <title>JX Tailoring - Order Reports</title>
+    <title>JXT Tailoring - Order Reports</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -348,7 +348,7 @@ $staff_result = mysqli_query($conn, $staff_query);
 
                 <!-- Footer -->
                 <footer class="footer text-center py-3">
-                    <span>Copyright &copy; JX Tailoring and Printing Services</span>
+                    <span>Copyright &copy; JXT Tailoring and Printing Services</span>
                 </footer>
                 <!-- End of Footer -->
             </div>

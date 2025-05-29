@@ -124,7 +124,8 @@ function generatePagination($current_page, $total_pages, $tab_id) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Orders | JX Tailoring</title>
+    <title>Track Orders | JXT Tailoring</title>
+    <link rel="icon" type="image/png" href="../image/logo.png">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -518,7 +519,7 @@ function generatePagination($current_page, $total_pages, $tab_id) {
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="#">JX Tailoring</a>
+        <a class="navbar-brand" href="#">JXT Tailoring</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>

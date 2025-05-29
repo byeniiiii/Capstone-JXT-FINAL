@@ -75,7 +75,7 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-section">
-                <h5 class="footer-title">JX Tailoring</h5>
+                <h5 class="footer-title">JXT Tailoring</h5>
                 <p>Quality custom tailoring and sublimation services for all your needs. We create personalized clothing that fits perfectly.</p>
                 <div class="social-icons mt-3">
                     <a href="#"><i class="fab fa-facebook"></i></a>
@@ -97,15 +97,15 @@
             <div class="footer-section">
                 <h5 class="footer-title">Contact Us</h5>
                 <ul class="footer-links">
-                    <li><i class="fas fa-phone me-2"></i> (123) 456-7890</li>
+                    <li><i class="fas fa-phone me-2"></i> 0955 998 2341</li>
                     <li><i class="fas fa-envelope me-2"></i> info@jxtailoring.com</li>
-                    <li><i class="fas fa-map-marker-alt me-2"></i> 123 Tailor St, Manila, PH</li>
+                    <li><i class="fas fa-map-marker-alt me-2"></i> Palinpinon Rd, Valencia, Negros Oriental</li>
                 </ul>
             </div>
         </div>
         
         <div class="copyright">
-            &copy; <?php echo date('Y'); ?> JX Tailoring. All rights reserved.
+            &copy; <?php echo date('Y'); ?> JXT Tailoring. All rights reserved.
         </div>
     </div>
 </footer>
