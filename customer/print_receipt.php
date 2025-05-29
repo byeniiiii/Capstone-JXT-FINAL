@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>JXT Tailoring - Payment Receipt</title>
     <link rel="icon" type="image/png" href="../image/logo.png">
+=======
+    <title>JX Tailoring - Payment Receipt</title>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
@@ -200,8 +204,13 @@
         ?>
 
         <div class="receipt-header">
+<<<<<<< HEAD
             <img src="../image/logo.png" alt="JXT Tailoring Logo" class="receipt-logo img-fluid">
             <h1 class="receipt-title">JXT Tailoring</h1>
+=======
+            <img src="../image/logo.png" alt="JX Tailoring Logo" class="receipt-logo img-fluid">
+            <h1 class="receipt-title">JX Tailoring</h1>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
             <p class="receipt-address">Purok Iba, Palinpinon, Valencia, Negros Oriental<br>Phone: (032) 123-4567<br>TIN: 629-067-859-00000<br>VAT Registered</p>
             <div class="receipt-separator"></div>
             <h2 class="receipt-subtitle">OFFICIAL RECEIPT</h2>

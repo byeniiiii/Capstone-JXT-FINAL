@@ -587,7 +587,11 @@ $recent_payments = $conn->query($recent_payments_query);
                                 <div class="card-body">
                                     <div class="receipt" id="printableReceipt">
                                         <div class="receipt-header">
+<<<<<<< HEAD
                                             <h2 class="receipt-title">JXT Tailoring</h2>
+=======
+                                            <h2 class="receipt-title">JX Tailoring</h2>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
                                             <p class="receipt-subtitle">Official Payment Receipt</p>
                                             <p class="receipt-date"><?php echo $payment_details['formatted_date']; ?></p>
                                             <p class="receipt-id">Receipt #<?php echo str_pad($payment_details['payment_id'], 6, '0', STR_PAD_LEFT); ?></p>
@@ -632,7 +636,11 @@ $recent_payments = $conn->query($recent_payments_query);
                                         </div>
                                         <div class="receipt-footer">
                                             <p>Thank you for your business!</p>
+<<<<<<< HEAD
                                             <p>JXT Tailoring • Phone: (123) 456-7890 • Email: info@jxtailoring.com</p>
+=======
+                                            <p>JX Tailoring • Phone: (123) 456-7890 • Email: info@jxtailoring.com</p>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
                                         </div>
                                     </div>
                                     <div class="receipt-actions">
@@ -1180,6 +1188,7 @@ $recent_payments = $conn->query($recent_payments_query);
             $.ajax({
                 url: 'fetch_payment_receipt.php',
                 method: 'POST',
+<<<<<<< HEAD
                 data: { 
                     payment_id: paymentId,
                     log_activity: true,
@@ -1187,6 +1196,9 @@ $recent_payments = $conn->query($recent_payments_query);
                     action_type: 'view_payment_receipt',
                     description: 'Viewed receipt for payment #' + paymentId
                 },
+=======
+                data: { payment_id: paymentId },
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
                 success: function(response) {
                     $('#receiptContent').html(response);
                 },

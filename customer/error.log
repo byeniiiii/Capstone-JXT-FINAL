@@ -18,8 +18,11 @@
 [28-May-2025 23:51:21 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
 [29-May-2025 00:01:30 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
 [29-May-2025 00:02:21 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+<<<<<<< HEAD
 [29-May-2025 00:44:34 Europe/Berlin] PHP Warning:  include(sidebar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\customer\view_order.php on line 414
 [29-May-2025 00:44:34 Europe/Berlin] PHP Warning:  include(): Failed opening 'sidebar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\customer\view_order.php on line 414
 [29-May-2025 00:44:34 Europe/Berlin] PHP Warning:  include(topbar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\customer\view_order.php on line 418
 [29-May-2025 00:44:34 Europe/Berlin] PHP Warning:  include(): Failed opening 'topbar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\customer\view_order.php on line 418
 [29-May-2025 05:06:34 Europe/Berlin] PHP Warning:  Undefined array key "name" in C:\xampp\htdocs\capstone_jxt\customer\login.php on line 37
+=======
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b

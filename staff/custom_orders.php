@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 // Include database connection
 include '../db.php';
 
+<<<<<<< HEAD
 // Create the made-to-orders table if it doesn't exist
 $createTableSQL = "CREATE TABLE IF NOT EXISTS made_to_orders (
     mto_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,6 +32,12 @@ mysqli_query($conn, $createTableSQL);
 // Fetch made-to-order items without user information for now
 $sql = "SELECT * FROM made_to_orders 
         ORDER BY created_at DESC";
+=======
+// Fetch made-to-order items with user information
+$sql = "SELECT m.*, u.first_name, u.last_name FROM made_to_order m 
+        LEFT JOIN users u ON m.user_id = u.user_id 
+        ORDER BY m.created_at DESC";
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
 $mtoResult = mysqli_query($conn, $sql);
 ?>
 
@@ -265,6 +272,11 @@ $mtoResult = mysqli_query($conn, $sql);
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
+<<<<<<< HEAD
+=======
+                <?php include 'sidebar.php'; ?>
+                
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
                 <!-- Message Alerts -->
                 <?php if (isset($_GET['error'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show mx-4 mt-4" role="alert">

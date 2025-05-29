@@ -198,8 +198,12 @@ if ($payment_id > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Submit Downpayment - JXT Tailoring</title>
     <link rel="icon" type="image/png" href="../image/logo.png">
+=======
+    <title>Submit Downpayment - JX Tailoring</title>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -635,7 +639,11 @@ if ($payment_id > 0) {
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top navbar-light">
     <div class="container">
+<<<<<<< HEAD
         <a class="navbar-brand" href="index.php">JXT Tailoring</a>
+=======
+        <a class="navbar-brand" href="index.php">JX Tailoring</a>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -682,8 +690,13 @@ if ($payment_id > 0) {
                 <!-- Receipt Section -->
                 <div class="receipt" id="printableReceipt">
                     <div class="receipt-header">
+<<<<<<< HEAD
                         <img src="../image/logo.png" alt="JXT Tailoring Logo" class="receipt-logo">
                         <h1 class="receipt-title">JXT Tailoring</h1>
+=======
+                        <img src="../image/logo.png" alt="JX Tailoring Logo" class="receipt-logo">
+                        <h1 class="receipt-title">JX Tailoring</h1>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
                         <p class="receipt-address">Purok Iba, Palinpinon, Valencia, Negros Oriental<br>Phone: (032) 123-4567<br>TIN: 629-067-859-00000<br>VAT Registered</p>
                         <div class="receipt-separator"></div>
                         <h2 class="receipt-subtitle">OFFICIAL RECEIPT</h2>
@@ -884,7 +897,11 @@ if ($payment_id > 0) {
                                     <p class="mb-2"><strong>GCash Payment Instructions:</strong></p>
                                     <ol class="mb-0">
                                         <li>Open your GCash app and log in</li>
+<<<<<<< HEAD
                                         <li>Send payment to: <strong>0917 123 4567</strong> (JXT Tailoring)</li>
+=======
+                                        <li>Send payment to: <strong>0917 123 4567</strong> (JX Tailoring)</li>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
                                         <li>Enter the exact amount you want to pay</li>
                                         <li>Complete the payment and take a screenshot</li>
                                         <li>Upload the screenshot and enter the reference number above</li>
@@ -1081,7 +1098,11 @@ function printReceipt() {
         <!DOCTYPE html>
         <html>
         <head>
+<<<<<<< HEAD
             <title>JXT Tailoring - Payment Receipt</title>
+=======
+            <title>JX Tailoring - Payment Receipt</title>
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>

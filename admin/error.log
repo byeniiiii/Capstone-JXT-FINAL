@@ -6,6 +6,7 @@
 Stack trace:
 #0 {main}
   thrown in C:\xampp\htdocs\capstone_jxt\admin\approve_payments.php on line 631
+<<<<<<< HEAD
 [29-May-2025 00:58:59 Europe/Berlin] PHP Warning:  include(notification.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 210
 [29-May-2025 00:58:59 Europe/Berlin] PHP Warning:  include(): Failed opening 'notification.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 210
 [29-May-2025 00:58:59 Europe/Berlin] PHP Warning:  include(footer.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\capstone_jxt\admin\approve_orders.php on line 417
@@ -16,3 +17,5 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\xampp\htdocs\capstone_jxt\admin\approve_payments.php on line 631
+=======
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b

@@ -277,6 +277,7 @@
 [29-May-2025 00:24:01 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
 [29-May-2025 00:24:01 Europe/Berlin] Checking if order exists: 2EH7XGV3UA - Found: 1
 [29-May-2025 00:24:01 Europe/Berlin] Updating existing sublimation order: 2EH7XGV3UA
+<<<<<<< HEAD
 [29-May-2025 05:23:11 Europe/Berlin] Session data: Array
 (
     [user_id] => 18
@@ -297,3 +298,5 @@
 [29-May-2025 05:23:11 Europe/Berlin] Order status: approved, Payment status: downpayment_paid
 [29-May-2025 05:23:11 Europe/Berlin] Checking if order exists: QUYG5GMKTO - Found: 1
 [29-May-2025 05:23:11 Europe/Berlin] Updating existing sublimation order: QUYG5GMKTO
+=======
+>>>>>>> b08fcef7c437beb1ee54987e98882524ea2bfc8b
